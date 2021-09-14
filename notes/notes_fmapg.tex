@@ -1,0 +1,116 @@
+%% if some package prevents compilation, remove it
+
+\documentclass[a4paper, 11pt]{article}
+\usepackage{fullpage}
+\usepackage{titling}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\usepackage{IEEEtrantools} 
+\usepackage{bbm}
+\usepackage{lineno}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage{lipsum}
+\usepackage{etoolbox} %% <- for \pretocmd and \apptocmd
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+\setlength{\droptitle}{-6em}   % This is your set screw, for shifting up the title
+\renewcommand{\baselinestretch}{1.1}
+\setlength{\parskip}{0.5em}
+
+\author{Author
+  \\ 7th April 2020}
+\date{}
+\title{Big Blank Title for the Project \vspace{-0.5cm}}
+
+\makeatletter %% <- make @ usable in macro names
+\newcommand*\linenomathpatch{\@ifstar{\linenomathpatch@AMS}{\linenomathpatch@}}
+\newcommand*\linenomathpatch@[1]{
+  \expandafter\pretocmd\csname #1\endcsname {\linenomathWithnumbers}{}{}
+  \expandafter\pretocmd\csname #1*\endcsname{\linenomathWithnumbers}{}{}
+  \expandafter\apptocmd\csname end#1\endcsname {\endlinenomath}{}{}
+  \expandafter\apptocmd\csname end#1*\endcsname{\endlinenomath}{}{}
+}
+\newcommand*\linenomathpatch@AMS[1]{
+  \expandafter\pretocmd\csname #1\endcsname {\linenomathWithnumbersAMS}{}{}
+  \expandafter\pretocmd\csname #1*\endcsname{\linenomathWithnumbersAMS}{}{}
+  \expandafter\apptocmd\csname end#1\endcsname {\endlinenomath}{}{}
+  \expandafter\apptocmd\csname end#1*\endcsname{\endlinenomath}{}{}
+}
+\let\linenomathWithnumbersAMS\linenomathWithnumbers
+\patchcmd\linenomathWithnumbersAMS{\advance\postdisplaypenalty\linenopenalty}{}{}{}
+\makeatother %% revert @
+\linenomathpatch{IEEEeqnarray}
+\linenomathpatch{equation}
+\linenomathpatch*{gather}
+\linenomathpatch*{multline}
+\linenomathpatch*{align}
+\linenomathpatch*{alignat}
+\linenomathpatch*{flalign}
+
+\begin{document}
+\maketitle
+\vspace{-2cm}
+\linenumbers
+
+\section{Softmax PPO Closed Form Update}
+We will consider direct functional representation with tabular parameterization, i.e. $\pi \equiv p^\pi$ is essentially an $\mathrm{S} \times \mathrm{A}$ table satisfying the constraints
+\begin{IEEEeqnarray*}{rCll}
+  \sum_a p^\pi(a | s) &=& 1, & \qquad \forall s \in \mathcal{S} \\
+  p^\pi(a | s) &\geq& 0, & \qquad \forall s \in \mathcal{S}, a \in \mathcal{A}.
+\end{IEEEeqnarray*}
+Our goal is to find the closed form solution to the following optimization problem
+\begin{equation}
+  \pi_{t+1} = \arg\max_{\pi \in \Pi} \left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \left(A^{\pi_t}(s, a) + \frac{1}{\eta} \right) \log \frac{p^\pi(s, a)}{p^{\pi_t}(s, a)} \right], \label{eq: orig_problem}
+\end{equation}
+subject to the above constraints on $p^\pi$.
+
+We begin by formulating this problem using Lagrange multipliers $\lambda_s$, $\lambda_{s, a}$ for all states $s$ and actions $a$:
+\begin{IEEEeqnarray}{rCl}
+  \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \left(A^{\pi_t}(s, a) + \frac{1}{\eta} \right) \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} \nonumber \\
+  && \quad - \sum_{s, a} \lambda_{s, a} p^\pi(a | s) - \sum_s \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg).
+\end{IEEEeqnarray}
+KKT conditions for this problem are:
+\begin{IEEEeqnarray}{rCll}
+  \nabla_{p^\pi(x, b)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& 0, & \qquad \forall x \in \mathcal{S}, b \in \mathcal{A} \\
+  \sum_a p^\pi(a | s) &=& 1, & \qquad \forall s \in \mathcal{S} \\
+  p^\pi(a | s) &\geq& 0, & \qquad \forall s \in \mathcal{S}, a \in \mathcal{A} \\
+  \lambda_s &\geq& 0, & \qquad \forall s \in \mathcal{S} \\
+  \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg) &=& 0 & \qquad \forall s \in \mathcal{S} \\
+  \lambda_{s, a} p^\pi(a | s) &=& 0, & \qquad \forall s \in \mathcal{S}, a \in \mathcal{A}.
+\end{IEEEeqnarray}
+
+Let us now try to solve this system. Solving the first equation for arbitrary state-action pair $(x, b)$, gives us:
+\begin{IEEEeqnarray}{lrCl}
+  & \nabla_{p^\pi(b | x)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& d^{\pi_t}(x) p^{\pi_t}(b|x) \left( A^{\pi_t}(x, b) + \frac{1}{\eta} \right) \frac{1}{p^\pi(b|x)} - \lambda_{x, b} - \lambda_x = 0 \nonumber \\
+  \Rightarrow & p^\pi(b | x) &=& \frac{d^{\pi_t}(x) p^{\pi_t}(b|x) (1 + \eta A^{\pi_t}(x, b))}{\eta (\lambda_x + \lambda_{x, b})}. \label{eq: lagrangian_derivative}
+\end{IEEEeqnarray}
+Let us set 
+\begin{equation}
+  \lambda_{s, a} = 0, \qquad \forall s \in \mathcal{S}, a \in \mathcal{A}.
+\end{equation}
+Then combining Eq. \ref{eq: lagrangian_derivative} with the second KKT condition gives us
+\begin{equation}
+  \lambda_s = \frac{1}{\eta} \sum_a d^{\pi_t}(s) p^{\pi_t}(a|s) (1 + \eta A^{\pi_t}(s, a)).
+\end{equation}
+Therefore, with the additional assumption $d^{\pi_t}(s) > 0$, $p^\pi(a | s)$ becomes
+\begin{equation}
+  p^\pi(a | s) = \frac{p^{\pi_t}(a|s) (1 + \eta A^{\pi_t}(s, a))}{\sum_b p^{\pi_t}(b|s) (1 + \eta A^{\pi_t}(s, b))}.
+\end{equation}
+Note that $d^{\pi_t}(s), p^{\pi_t}(a|s) \geq 0$ for any state-action pair, since they are proper measures. Therefore, all that remains is to ensure that
+\begin{equation*}
+  1 + \eta A^{\pi_t}(s, a) \geq 0
+\end{equation*}
+to satisfy the third and fourth KKT conditions. But how to do that? One straightforward way is to define $p^\pi(a | s) = 0$ whenever $1 + \eta A^{\pi_t}(s, a) \leq 0$, and accordingly re-define $\lambda_s$. Therefore, this gives us the final solution to our original optimization problem (Eq. \ref{eq: orig_problem}):
+\begin{equation}
+  \pi_{t+1} = p^\pi(s, a) = \frac{p^{\pi_t}(a|s) \max(1 + \eta A^{\pi_t}(s, a), 0)}{\sum_b p^{\pi_t}(b|s) \max(1 + \eta A^{\pi_t}(s, b), 0)}.
+\end{equation}
+\textbf{This leaves one last problem:} Is it always true that given any state $s$, there exists atleast one action $a$, such that $1 + \eta A^{\pi_t}(s, a) \geq 0$? Because otherwise, we would fail to satisfy the second KKT condition.
+
+\end{document}
