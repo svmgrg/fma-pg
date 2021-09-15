@@ -24,10 +24,10 @@
 \renewcommand{\baselinestretch}{1.1}
 \setlength{\parskip}{0.5em}
 
-\author{Author
-  \\ 7th April 2020}
+\author{Shivam and Sharan
+  \\ September 2021}
 \date{}
-\title{Big Blank Title for the Project \vspace{-0.5cm}}
+\title{FMA-PG Notes}
 
 \makeatletter %% <- make @ usable in macro names
 \newcommand*\linenomathpatch{\@ifstar{\linenomathpatch@AMS}{\linenomathpatch@}}
@@ -63,28 +63,28 @@
 We will consider direct functional representation with tabular parameterization, i.e. $\pi \equiv p^\pi$ is essentially an $\mathrm{S} \times \mathrm{A}$ table satisfying the constraints
 \begin{IEEEeqnarray*}{rCll}
   \sum_a p^\pi(a | s) &=& 1, & \qquad \forall s \in \mathcal{S} \\
-  p^\pi(a | s) &\geq& 0, & \qquad \forall s \in \mathcal{S}, a \in \mathcal{A}.
+  p^\pi(a | s) &\geq& 0, & \qquad \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}.
 \end{IEEEeqnarray*}
-Our goal is to find the closed form solution to the following optimization problem
+Our goal is to find the closed form solution to the following optimization problem (from Eq. 6, Sharan et al., 2021):
 \begin{equation}
   \pi_{t+1} = \arg\max_{\pi \in \Pi} \left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \left(A^{\pi_t}(s, a) + \frac{1}{\eta} \right) \log \frac{p^\pi(s, a)}{p^{\pi_t}(s, a)} \right], \label{eq: orig_problem}
 \end{equation}
-subject to the above constraints on $p^\pi$.
+subject to the above constraints on $p^\pi$. The above equation is obtained by setting the mirror map to the weighted exponential function.
 
-We begin by formulating this problem using Lagrange multipliers $\lambda_s$, $\lambda_{s, a}$ for all states $s$ and actions $a$:
+We begin by formulating this problem using Lagrange multipliers $\lambda_s$, $\lambda_{s, a}$ for all states $s$ and actions $a$ (and with a slight abuse of the notation, i.e. we write $\lambda_s$ for all the $\lambda_s$s, etc.):
 \begin{IEEEeqnarray}{rCl}
   \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \left(A^{\pi_t}(s, a) + \frac{1}{\eta} \right) \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} \nonumber \\
-  && \quad - \sum_{s, a} \lambda_{s, a} p^\pi(a | s) - \sum_s \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg).
+  && - \sum_{s, a} \lambda_{s, a} p^\pi(a | s) - \sum_s \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg).
 \end{IEEEeqnarray}
 KKT conditions for this problem are:
-\begin{IEEEeqnarray}{rCll}
-  \nabla_{p^\pi(x, b)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& 0, & \qquad \forall x \in \mathcal{S}, b \in \mathcal{A} \\
-  \sum_a p^\pi(a | s) &=& 1, & \qquad \forall s \in \mathcal{S} \\
-  p^\pi(a | s) &\geq& 0, & \qquad \forall s \in \mathcal{S}, a \in \mathcal{A} \\
-  \lambda_s &\geq& 0, & \qquad \forall s \in \mathcal{S} \\
-  \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg) &=& 0 & \qquad \forall s \in \mathcal{S} \\
-  \lambda_{s, a} p^\pi(a | s) &=& 0, & \qquad \forall s \in \mathcal{S}, a \in \mathcal{A}.
-\end{IEEEeqnarray}
+\begin{align}
+  \nabla_{p^\pi(x, b)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) = 0, \qquad \forall x \in \mathcal{S}, \; \forall b \in \mathcal{A} \tag{C1} \label{eq: KKT1} \\
+  \sum_a p^\pi(a | s) = 1, \qquad \forall s \in \mathcal{S} \tag{C2} \label{eq: KKT2} \\
+  p^\pi(a | s) \geq 0,  \qquad \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A} \tag{C3} \label{eq: KKT3} \\
+  \lambda_s \geq 0, \qquad \forall s \in \mathcal{S} \tag{C4} \label{eq: KKT4} \\
+  \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg) = 0 \qquad \forall s \in \mathcal{S} \tag{C5} \label{eq: KKT5} \\
+  \lambda_{s, a} p^\pi(a | s) = 0, \qquad \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}. \tag{C6} \label{eq: KKT6}
+\end{align}
 
 Let us now try to solve this system. Solving the first equation for arbitrary state-action pair $(x, b)$, gives us:
 \begin{IEEEeqnarray}{lrCl}
@@ -93,9 +93,9 @@ Let us now try to solve this system. Solving the first equation for arbitrary st
 \end{IEEEeqnarray}
 Let us set 
 \begin{equation}
-  \lambda_{s, a} = 0, \qquad \forall s \in \mathcal{S}, a \in \mathcal{A}.
+  \lambda_{s, a} = 0, \qquad \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}.
 \end{equation}
-Then combining Eq. \ref{eq: lagrangian_derivative} with the second KKT condition gives us
+Combining Eq. \ref{eq: lagrangian_derivative} with the second KKT condition gives us
 \begin{equation}
   \lambda_s = \frac{1}{\eta} \sum_a d^{\pi_t}(s) p^{\pi_t}(a|s) (1 + \eta A^{\pi_t}(s, a)).
 \end{equation}
@@ -103,14 +103,45 @@ Therefore, with the additional assumption $d^{\pi_t}(s) > 0$, $p^\pi(a | s)$ bec
 \begin{equation}
   p^\pi(a | s) = \frac{p^{\pi_t}(a|s) (1 + \eta A^{\pi_t}(s, a))}{\sum_b p^{\pi_t}(b|s) (1 + \eta A^{\pi_t}(s, b))}.
 \end{equation}
-Note that $d^{\pi_t}(s), p^{\pi_t}(a|s) \geq 0$ for any state-action pair, since they are proper measures. Therefore, all that remains is to ensure that
+Note that $d^{\pi_t}(s), p^{\pi_t}(a|s) \geq 0$ for any state-action pair, since they are proper measures. All that remains is to ensure that
 \begin{equation*}
   1 + \eta A^{\pi_t}(s, a) \geq 0
 \end{equation*}
-to satisfy the third and fourth KKT conditions. But how to do that? One straightforward way is to define $p^\pi(a | s) = 0$ whenever $1 + \eta A^{\pi_t}(s, a) \leq 0$, and accordingly re-define $\lambda_s$. Therefore, this gives us the final solution to our original optimization problem (Eq. \ref{eq: orig_problem}):
+to satisfy the third and fourth KKT conditions. But how to do that? One straightforward way is to define $p^\pi(a | s) = 0$ whenever $1 + \eta A^{\pi_t}(s, a) \leq 0$, and accordingly re-define $\lambda_s$. This gives us the final solution to our original optimization problem (Eq. \ref{eq: orig_problem}):
 \begin{equation}
   \pi_{t+1} = p^\pi(s, a) = \frac{p^{\pi_t}(a|s) \max(1 + \eta A^{\pi_t}(s, a), 0)}{\sum_b p^{\pi_t}(b|s) \max(1 + \eta A^{\pi_t}(s, b), 0)}.
 \end{equation}
 \textbf{This leaves one last problem:} Is it always true that given any state $s$, there exists atleast one action $a$, such that $1 + \eta A^{\pi_t}(s, a) \geq 0$? Because otherwise, we would fail to satisfy the second KKT condition.
 
+\section{MDPO Closed Form Update}
+The paper (Sharan et al., 2021) considers the direct representation along with tabular parameterization of the policy, albeit with a small change in notation as compared to the previous section: $\pi(a|s) \equiv p^\pi(a|s, \theta)$. However, since this notation is more cumbersome, we will stick to our old one: $\pi(a|s) \equiv p^\pi(a|s)$. The constraints on these parameters are the same as before: $\sum_a p^\pi(a | s) = 1, \; \forall s \in \mathcal{S}$; and $p^\pi(a | s) \geq 0, \; \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}$. Our goal, this time, is to solve the following optimization problem (see Eq. 9, Sharan et al., 2021)
+\begin{equation}
+  \pi_{t+1} = \arg\max_{\pi \in \Pi} \left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a|s) \left( Q^{\pi_t}(s, a) \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \frac{1}{\eta} D_\phi (p^\pi(\cdot | s), p^{\pi_t}(\cdot | s)) \right) \right],
+\end{equation}
+with the mirror map as the negative entropy (Eq. 5.27, Beck and Teboulle, 2002). This particular choice results in
+\begin{equation}
+  D_\phi (p^\pi(\cdot | s), p^{\pi_t}(\cdot | s)) = \text{KL}(p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s)) := \sum_a p^\pi(a | s) \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)}.
+\end{equation}
+  The optimization problem then simplifies to
+  \begin{equation}
+  \pi_{t+1} = \arg\max_{\pi \in \Pi} \left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a|s) \left( Q^{\pi_t}(s, a) \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \frac{1}{\eta} \sum_a p^\pi(a | s) \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} \right) \right].
+  \end{equation}
+
+  Proceeding analogously to the previous section, we use Lagrange multipliers $\lambda_s$, $\lambda_{s, a}$ for all states $s$ and actions $a$ to obtain the function
+  \begin{IEEEeqnarray}{rCl}
+    \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a|s) \left( Q^{\pi_t}(s, a) \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \frac{1}{\eta} \sum_a p^\pi(a | s) \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} \right) \nonumber \\
+    && - \sum_{s, a} \lambda_{s, a} p^\pi(a | s) - \sum_s \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg).
+  \end{IEEEeqnarray}
+  The KKT conditions are exactly the same as before (Eq. \ref{eq: KKT1} to Eq. \ref{eq: KKT6}).
+
+  Again, we begin by solving the first KKT condition:
+  \begin{IEEEeqnarray}{lrCl}
+    & \nabla_{p^\pi(b | x)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& d^{\pi_t}(x) p^{\pi_t}(b|x) \left( \frac{Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} - \frac{1}{\eta} \left[ \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} + 1 \right] \right) - \lambda_{x, b} - \lambda_x \nonumber \\
+    &&=& d^{\pi_t}(x) p^{\pi_t}(b|x) \left( \frac{Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} - \frac{1}{\eta} \left[ \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} + 1 \right] - \frac{\lambda_{x, b} + \lambda_x}{d^{\pi_t}(x) p^{\pi_t}(b|x)} \right) \nonumber \\
+    &&=& 0 \nonumber \\
+    \Rightarrow & \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} &=& \frac{\eta Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} - \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x) p^{\pi_t}(b|x)} - 1 \nonumber \\
+    \Rightarrow & p^\pi(b | x) &=& p^{\pi_t}(b | x) \cdot \exp \left(\frac{\eta Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} \right) \cdot \exp \left(- \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x) p^{\pi_t}(b|x)} - 1 \right).
+  \end{IEEEeqnarray}
+  
+  
 \end{document}
