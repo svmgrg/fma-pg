@@ -89,13 +89,13 @@ KKT conditions for this problem are:
 Let us now try to solve this system. Solving the first equation for arbitrary state-action pair $(x, b)$, gives us:
 \begin{IEEEeqnarray}{lrCl}
   & \nabla_{p^\pi(b | x)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& d^{\pi_t}(x) p^{\pi_t}(b|x) \left( A^{\pi_t}(x, b) + \frac{1}{\eta} \right) \frac{1}{p^\pi(b|x)} - \lambda_{x, b} - \lambda_x = 0 \nonumber \\
-  \Rightarrow & p^\pi(b | x) &=& \frac{d^{\pi_t}(x) p^{\pi_t}(b|x) (1 + \eta A^{\pi_t}(x, b))}{\eta (\lambda_x + \lambda_{x, b})}. \label{eq: lagrangian_derivative}
+  \Rightarrow & p^\pi(b | x) &=& \frac{d^{\pi_t}(x) p^{\pi_t}(b|x) (1 + \eta A^{\pi_t}(x, b))}{\eta (\lambda_x + \lambda_{x, b})}. \label{eq: lagrangian_derivative_sppo}
 \end{IEEEeqnarray}
 Let us set 
 \begin{equation}
   \lambda_{s, a} = 0, \qquad \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}.
 \end{equation}
-Combining Eq. \ref{eq: lagrangian_derivative} with the second KKT condition gives us
+Combining Eq. \ref{eq: lagrangian_derivative_sppo} with the second KKT condition gives us
 \begin{equation}
   \lambda_s = \frac{1}{\eta} \sum_a d^{\pi_t}(s) p^{\pi_t}(a|s) (1 + \eta A^{\pi_t}(s, a)).
 \end{equation}
@@ -124,24 +124,36 @@ with the mirror map as the negative entropy (Eq. 5.27, Beck and Teboulle, 2002).
 \end{equation}
   The optimization problem then simplifies to
   \begin{equation}
-  \pi_{t+1} = \arg\max_{\pi \in \Pi} \left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a|s) \left( Q^{\pi_t}(s, a) \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \frac{1}{\eta} \sum_a p^\pi(a | s) \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} \right) \right].
+  \pi_{t+1} = \arg\max_{\pi \in \Pi} \left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a|s) \left( Q^{\pi_t}(s, a) \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \frac{1}{\eta} \sum_{a'} p^\pi(a' | s) \log \frac{p^\pi(a' | s)}{p^{\pi_t}(a' | s)} \right) \right].
   \end{equation}
 
   Proceeding analogously to the previous section, we use Lagrange multipliers $\lambda_s$, $\lambda_{s, a}$ for all states $s$ and actions $a$ to obtain the function
   \begin{IEEEeqnarray}{rCl}
-    \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a|s) \left( Q^{\pi_t}(s, a) \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \frac{1}{\eta} \sum_a p^\pi(a | s) \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} \right) \nonumber \\
+    \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a|s) Q^{\pi_t}(s, a) \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \frac{1}{\eta} \sum_s d^{\pi_t}(s) \sum_{a'} p^\pi(a' | s) \log \frac{p^\pi(a' | s)}{p^{\pi_t}(a' | s)} \nonumber \\
     && - \sum_{s, a} \lambda_{s, a} p^\pi(a | s) - \sum_s \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg).
   \end{IEEEeqnarray}
   The KKT conditions are exactly the same as before (Eq. \ref{eq: KKT1} to Eq. \ref{eq: KKT6}).
 
   Again, we begin by solving the first KKT condition:
   \begin{IEEEeqnarray}{lrCl}
-    & \nabla_{p^\pi(b | x)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& d^{\pi_t}(x) p^{\pi_t}(b|x) \left( \frac{Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} - \frac{1}{\eta} \left[ \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} + 1 \right] \right) - \lambda_{x, b} - \lambda_x \nonumber \\
-    &&=& d^{\pi_t}(x) p^{\pi_t}(b|x) \left( \frac{Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} - \frac{1}{\eta} \left[ \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} + 1 \right] - \frac{\lambda_{x, b} + \lambda_x}{d^{\pi_t}(x) p^{\pi_t}(b|x)} \right) \nonumber \\
+    & \nabla_{p^\pi(b | x)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& d^{\pi_t}(x) p^{\pi_t}(b|x) \frac{Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} - \frac{d^{\pi_t}(x)}{\eta} \left[ \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} + 1 \right] - \lambda_{x, b} - \lambda_x \nonumber \\
+    &&=& \frac{d^{\pi_t}(x)}{\eta} \left[ \eta Q^{\pi_t}(x, b) - \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} - 1 - \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} \right] \nonumber \\
     &&=& 0 \nonumber \\
-    \Rightarrow & \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} &=& \frac{\eta Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} - \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x) p^{\pi_t}(b|x)} - 1 \nonumber \\
-    \Rightarrow & p^\pi(b | x) &=& p^{\pi_t}(b | x) \cdot \exp \left(\frac{\eta Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} \right) \cdot \exp \left(- \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x) p^{\pi_t}(b|x)} - 1 \right).
+    \Rightarrow & \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} &=& \eta Q^{\pi_t}(x, b) - \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} - 1 \nonumber \\
+    \Rightarrow & p^\pi(b | x) &=& p^{\pi_t}(b | x) \cdot \exp \Big( \eta Q^{\pi_t}(x, b) \Big) \cdot \exp \left(- \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} - 1 \right), \label{eq: lagrangian_derivative_mdpo}
   \end{IEEEeqnarray}
-  
-  
+  where in the fourth line, we made the assumption that $d^{\pi_t}(x) > 0$ for all states $x$. We again set
+  \begin{equation}
+    \lambda_{s, a} = 0, \qquad \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}.
+  \end{equation}
+  Yet again, we put Eq. \ref{eq: lagrangian_derivative_mdpo} in the second KKT condition to get
+  \begin{equation}
+    \exp \left(- \frac{\eta \lambda_x}{d^{\pi_t}(x)} - 1 \right) = \left( \sum_b p^{\pi_t}(b | x) \cdot \exp \Big( \eta Q^{\pi_t}(x, b) \Big) \right)^{-1}.
+  \end{equation}
+  Therefore, we obtain
+  \begin{equation}
+    p^\pi(a | s) = \frac{p^{\pi_t}(a | s) \cdot \exp \Big( \eta Q^{\pi_t}(s, a) \Big)}{\sum_b p^{\pi_t}(b | x) \cdot \exp \Big( \eta Q^{\pi_t}(x, b) \Big)}.
+  \end{equation}
+
+  \textbf{Again, this leaves one last problem:} Can we ensure that $\lambda_s \geq 0$ for all states $s$, so that the fourth KKT condition is also satisfied?  
 \end{document}
