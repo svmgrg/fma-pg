@@ -4,8 +4,6 @@ import pdb
 
 from src.envs.gridworld_mdp import cliff_gw
 
-# only runs when put inside "commented_code" file 
-
 #----------------------------------------------------------------------
 # plotting functions
 #----------------------------------------------------------------------
@@ -79,7 +77,7 @@ def update_sPPO(pi_old, eta, adv):
 # updates the MDPO policy using the exact FMA-PG update
 # (for instance, see Eq. 2, https://arxiv.org/pdf/2005.09814.pdf)
 def update_MDPO(pi_old, eta, adv):
-    pi_new = pi_old * np.exp(eta * pi_old * adv) # exact FMA-PG update
+    pi_new = pi_old * np.exp(eta * adv) # exact FMA-PG update
     pi_new = pi_new / pi_new.sum(1).reshape(-1, 1) # normalize (projection step)
     return pi_new
 
@@ -219,7 +217,7 @@ def run_experiment(num_iters, gamma, eta):
 # actual learning code
 #----------------------------------------------------------------------
 gamma_list = [0.9] # [0.1, 0.5, 0.9, 0.95, 0.99]
-num_iters = 200000
+num_iters = 2000
 eta_list = [0.03, 1]
 
 for eta in eta_list:
