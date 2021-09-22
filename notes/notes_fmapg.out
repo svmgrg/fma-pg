@@ -1,2 +1,6 @@
-\BOOKMARK [1][-]{section.1}{Softmax PPO Closed Form Update}{}% 1
-\BOOKMARK [1][-]{section.2}{MDPO Closed Form Update}{}% 2
+\BOOKMARK [1][-]{section.1}{Softmax PPO with Tabular Parameterization}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Closed Form Update with Direct Representation}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Gradient of the Loss Function with Softmax Policy Representation}{section.1}% 3
+\BOOKMARK [1][-]{section.2}{MDPO}{}% 4
+\BOOKMARK [2][-]{subsection.2.1}{Closed Form Update with Direct Parameterization}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.2}{Gradient of the Loss Function with Softmax Policy Representation}{section.2}% 6
