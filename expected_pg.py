@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pdb
+import time
 
 from environments import CliffWorld
 
@@ -61,6 +62,10 @@ def plot_policy(ax, pi, xlim=7, ylim=7):
 #----------------------------------------------------------------------
 # utility functions
 #----------------------------------------------------------------------
+def take_action(env, pi, state):
+    action = np.random.choice(env.action_space, p=pi[state])
+    action_prob = pi[state, action]
+    return action, action_prob
 
 def softmax(x):
     e_x = np.exp(x - np.max(x))
@@ -107,9 +112,95 @@ def calc_grad_fmapg(omega, pi_t, adv_t, dpi_t, eta, pg_method):
         raise NotImplementedError()
     return grad
 
+def estimate_advantage(env, pi, num_traj, alg, qpi_old=None, stepsize=None):
+    if alg == 'monte_carlo_avg':
+        qpi = np.zeros((env.state_space, env.action_space))
+        cnt = np.zeros((env.state_space, env.action_space))
+    elif alg == 'sarsa':
+        qpi = qpi_old.copy()
+    else:
+        raise NotImplementedError()
+    
+    qpi_true = env.calc_qpi(pi)
+    error_list = [np.linalg.norm(qpi - qpi_true)]
+    
+    for traj_i in range(num_traj):
+        #========================================================
+        # sample a trajectory
+        #--------------------------------------------------------
+        traj = {'state_list': [],
+                'action_list': [],
+                'action_prob_list': [],
+                'reward_list': [],
+                'next_state_list': []}
+        state = env.reset()
+        done = 'false'
+        while done == 'false':
+            action, action_prob = take_action(env, pi, state)
+            next_state, reward, done, _ = env.step(action)
+
+            traj['state_list'].append(state)
+            traj['action_list'].append(action)
+            traj['action_prob_list'].append(action_prob)
+            traj['reward_list'].append(reward)
+            traj['next_state_list'].append(next_state)
+
+            state = next_state
+        traj['done_status'] = done
+        #========================================================
+
+        if alg == 'monte_carlo_avg':
+            G = 0
+            for i in range(len(traj['state_list']) - 1, -1, -1):
+                state = traj['state_list'][i]
+                action = traj['action_list'][i]
+                reward = traj['reward_list'][i]
+
+                G = reward + env.gamma * G
+
+                cnt[state, action] += 1
+                qpi[state, action] = qpi[state, action] \
+                    + (G - qpi[state, action]) / cnt[state, action]
+        elif alg == 'sarsa':
+            for i in range(len(traj['state_list']) - 1):
+                state = traj['state_list'][i]
+                action = traj['action_list'][i]
+                reward = traj['reward_list'][i]
+                next_state = traj['next_state_list'][i]
+
+                # very last state in the trajectory
+                if i == len(traj['state_list']) - 1:
+                    if traj['done_status'] == 'terminal':
+                        q_next_state_action = 0
+                    elif traj['done_status'] == 'cutoff':
+                        next_action = take_action(env, pi, next_state)
+                        q_next_state_action = qpi[next_state][next_action]
+                else:
+                    next_action = traj['action_list'][i+1]
+                    q_next_state_action = qpi[next_state][next_action]
+                    
+                target = reward + env.gamma * q_next_state_action
+                qpi[state][action] = qpi[state][action] \
+                    + stepsize * (target - qpi[state][action])
+
+        error_list.append(np.linalg.norm(qpi - qpi_true))
+        
+    # pdb.set_trace()
+    # plt.show(); plt.figure(); plt.plot(error_list); plt.show()
+        
+    vpi = (qpi * pi).sum(1).reshape(-1, 1)
+    adv = qpi - vpi
+
+    return adv, qpi.copy()
+
+#----------------------------------------------------------------------
+# functions for running full experiments
+#----------------------------------------------------------------------
+
 def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
                           num_inner_updates, alpha,
-                          FLAG_USE_TRUE_ADVANTAGE=True, num_traj_est_adv=10):
+                          FLAG_USE_TRUE_ADVANTAGE=True, num_traj_est_adv=10,
+                          adv_est_alg='monte_carlo_avg', adv_est_stepsize=None):
     num_states = env.state_space
     num_actions = env.action_space
 
@@ -122,14 +213,14 @@ def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
     vpi_list_inner = []
 
     # learning loop
+    qpi_est = np.zeros((env.state_space, env.action_space))
     for T in range(num_iters):
-        print(T)
-
         if FLAG_USE_TRUE_ADVANTAGE:
             adv = env.calc_qpi(pi) - env.calc_vpi(pi).reshape(-1, 1)
         else:
-            adv = env.estimate_advantage(pi=pi, num_traj=num_traj_est_adv,
-                                         alg='monte_carlo_avg')
+            adv, qpi_est = estimate_advantage(
+                env, pi=pi, num_traj=num_traj_est_adv,
+                alg=adv_est_alg, qpi_old=qpi_est, stepsize=adv_est_stepsize)
         dpi = env.calc_dpi(pi)
 
         # where would have the exact update landed?
@@ -229,45 +320,24 @@ def run_experiment_exact(num_iters, gamma, eta):
 # actual learning code
 #======================================================================
 gamma_list = [0.9] # [0.1, 0.5, 0.9, 0.95, 0.99]
-num_steps = 200000
-eta_list = [0.03] #, 1]
-pg_method = 'MDPO'
-num_inner_updates_list = [100, 50, 10, 1]
+num_steps = 200
+eta_list = [0.03] # [1] # [0.03] # [1] 
+pg_method = 'sPPO'
+num_inner_updates_list = [100, 50, 10]
 alpha = 0.35
+num_traj_est_adv_list = [100, 50, 10]
+
+color_dict = {100: 'tab:red', 50: 'tab:green', 10: 'tab:blue'}
+linestyle_dict = {100: '--', 50: '-.', 10: ':'}
+
+adv_est_alg = 'sarsa'
+adv_est_stepsize = 0.5
 
 #======================================================================
 # learning curves against the number of iterations (different steps)
 #======================================================================
-# fig, axs = plt.subplots(1, 1)
-
-# for gamma in gamma_list:
-#     env = CliffWorld()
-#     v_star = np.dot(env.calc_v_star(env), env.mu) # evaluate the optimal policy
-
-#     for eta in eta_list:
-#         # analytical FMA-PG
-#         vpi_analytical_dict = run_experiment_exact(
-#             num_iters=num_steps, gamma=gamma, eta=eta)
-#         plt.plot(vpi_analytical_dict[pg_method], label='analytical')
-        
-#         for num_inner_updates in num_inner_updates_list:
-
-#             # gradient based FMA-PG
-#             vpi_list_inner, vpi_list_outer = run_experiment_approx(
-#                 env=env, pg_method=pg_method, gamma=gamma,  num_iters=num_steps,
-#                 eta=eta, num_inner_updates=num_inner_updates, alpha=alpha)
-#             plt.plot(vpi_list_inner[:, -1],
-#                      label='FMAPG_m:{}'.format(num_inner_updates))
-# axs.set_ylim([0, v_star + 0.1])
-# plt.legend()
-# # plt.show()
-# plt.savefig('learning_curves_against_iters.pdf')
-# plt.close()
-
-#======================================================================
-# learning curves against the number of update steps
-#======================================================================
 fig, axs = plt.subplots(1, 1)
+tic = time.time()
 
 for gamma in gamma_list:
     env = CliffWorld()
@@ -277,20 +347,71 @@ for gamma in gamma_list:
         # analytical FMA-PG
         vpi_analytical_dict = run_experiment_exact(
             num_iters=num_steps, gamma=gamma, eta=eta)
-        plt.plot(vpi_analytical_dict[pg_method], label='analytical')
+        plt.plot(vpi_analytical_dict[pg_method], label='analytical',
+                 color='black')
         
         for num_inner_updates in num_inner_updates_list:
-            num_iters = int(num_steps / num_inner_updates)
-            
             # gradient based FMA-PG
+            FLAG_USE_TRUE_ADVANTAGE = True
             vpi_list_inner, vpi_list_outer = run_experiment_approx(
-                env=env, pg_method=pg_method, gamma=gamma,  num_iters=num_iters,
-                eta=eta, num_inner_updates=num_inner_updates, alpha=alpha)
-            plt.plot(vpi_list_inner[:, 0:-1].flatten(), # vpi_list_inner[:, -1],
+                env=env, pg_method=pg_method, gamma=gamma, num_iters=num_steps,
+                eta=eta, num_inner_updates=num_inner_updates, alpha=alpha,
+                FLAG_USE_TRUE_ADVANTAGE=FLAG_USE_TRUE_ADVANTAGE,
+                num_traj_est_adv=None)
+            plt.plot(vpi_list_inner[:, -1], color=color_dict[num_inner_updates],
                      label='FMAPG_m:{}'.format(num_inner_updates))
-axs.set_ylim([0, v_star + 0.1])
+
+            # gradient based FMA-PG with estimated advantage function
+            FLAG_USE_TRUE_ADVANTAGE = False
+            for num_traj_est_adv in num_traj_est_adv_list:
+                vpi_list_inner, vpi_list_outer = run_experiment_approx(
+                    env=env, pg_method=pg_method, gamma=gamma,
+                    num_iters=num_steps, eta=eta,
+                    num_inner_updates=num_inner_updates, alpha=alpha,
+                    FLAG_USE_TRUE_ADVANTAGE=FLAG_USE_TRUE_ADVANTAGE,
+                    num_traj_est_adv=num_traj_est_adv, adv_est_alg=adv_est_alg,
+                    adv_est_stepsize=adv_est_stepsize)
+
+                plt.plot(vpi_list_inner[:, -1],
+                         color=color_dict[num_inner_updates],
+                         linestyle=linestyle_dict[num_traj_est_adv],
+                         label='FMAPG_m:{}_t:{}'.format(num_inner_updates,
+                                                        num_traj_est_adv))
+print('Total time taken: {}'.format(time.time() - tic))
+axs.set_ylim([0, v_star])
 plt.legend()
-plt.savefig('learning_curves_against_steps.pdf')
+# plt.show()
+plt.savefig('learning_curves_against_iters_{}_{}_{}.pdf'.format(
+    pg_method, eta, adv_est_alg))
+plt.close()
+
+#======================================================================
+# learning curves against the number of update steps
+#======================================================================
+# fig, axs = plt.subplots(1, 1)
+
+# for gamma in gamma_list:
+#     env = CliffWorld()
+#     v_star = np.dot(env.calc_v_star(), env.mu) # evaluate the optimal policy
+
+#     for eta in eta_list:
+#         # analytical FMA-PG
+#         vpi_analytical_dict = run_experiment_exact(
+#             num_iters=num_steps, gamma=gamma, eta=eta)
+#         plt.plot(vpi_analytical_dict[pg_method], label='analytical')
+        
+#         for num_inner_updates in num_inner_updates_list:
+#             num_iters = int(num_steps / num_inner_updates)
+            
+#             # gradient based FMA-PG
+#             vpi_list_inner, vpi_list_outer = run_experiment_approx(
+#                 env=env, pg_method=pg_method, gamma=gamma,  num_iters=num_iters,
+#                 eta=eta, num_inner_updates=num_inner_updates, alpha=alpha)
+#             plt.plot(vpi_list_inner[:, 0:-1].flatten(), # vpi_list_inner[:, -1],
+#                      label='FMAPG_m:{}'.format(num_inner_updates))
+# axs.set_ylim([0, v_star + 0.1])
+# plt.legend()
+# plt.savefig('learning_curves_against_steps.pdf')
     
 #----------------------------------------------------------------------
 # testing code

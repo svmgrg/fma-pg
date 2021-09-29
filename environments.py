@@ -1,4 +1,5 @@
 import numpy as np
+import pdb
 
 class CliffWorld():
     def __init__(self, gamma=0.99, episode_cutoff_length=1000, reward_noise=0):
@@ -6,7 +7,11 @@ class CliffWorld():
         self.P = arr_dict['P']
         self.r = arr_dict['r']
         self.mu = arr_dict['mu']
-        self.terminal_states = arr_dict['terminal_states']
+        
+        #==================================================================
+        # NEED TO SORT THIS OUT!!! For now, I set 48 as the terminal state
+        #==================================================================
+        self.terminal_states = [48] # arr_dict['terminal_states']
 
         self.state_space = self.r.shape[0]
         self.action_space = self.r.shape[1]
@@ -35,6 +40,9 @@ class CliffWorld():
         self.t = self.t + 1
 
         done = 'false'
+        #==================================================================
+        # NEED TO SORT THIS OUT!!! For now, I set 48 as the terminal state
+        #==================================================================
         if self.state in self.terminal_states:
             done = 'terminal'
         elif self.t > self.episode_cutoff_length:
@@ -48,12 +56,12 @@ class CliffWorld():
     # policy pi: (i, j)th element = Pr{A = a_j | S = s_i}
     def calc_vpi(self, pi, FLAG_V_S0=False):
         p_pi = np.einsum('xay,xa->xy', self.P, pi)
-        r_pi = np.einsum('xa,xa->x', env.r, pi)
+        r_pi = np.einsum('xa,xa->x', self.r, pi)
         v_pi = np.linalg.solve(np.eye(self.state_space) - self.gamma * p_pi,
                                r_pi)
 
         if FLAG_V_S0: # calculate v_s0
-            v_s0 = np.dot(env.p0, v_pi)
+            v_s0 = np.dot(self.mu, v_pi)
             return v_s0
         else:
             return v_pi
@@ -99,41 +107,6 @@ class CliffWorld():
         pi_star = np.zeros((self.state_space, self.action_space))
         pi_star[range(self.state_space), q_star.argmax(1)] = 1
         return pi_star
-
-    def estimate_advantage(self, pi, num_traj, alg='monte_carlo_avg'):
-        qpi = np.zeros((self.state_space, self.action_space))
-        cnt = np.zeros((self.state_space, self.action_space))
-
-        for traj in range(num_traj):
-
-            # sample a trajectory
-            traj = {'state_list': [], 'action_list': [], 'action_prob_list': [],
-                    'reward_list': [], 'next_state_list': []}
-            state = env.reset()
-            done = 'false'
-            while done == 'false':
-                action = np.random.choice(self.num_actions, p=pi[state])
-                action_prob = pi[state, action]
-                next_state, reward, done, _ = env.step(action)
-
-                traj['state_list'].append(state)
-                traj['action_list'].append(action)
-                traj['action_prob_list'].append(action_prob)
-                traj['reward_list'].append(reward)
-                traj['next_state_list'].append(next_state)
-
-                state = next_state
-
-            G = 0
-            for t in range(len(traj['state_list']), -1, -1):
-                G = self.gamma * G + traj['reward']
-                q[traj['state'], traj['action']] = something_something
-                cnt[traj['state'], traj['action']] += 1
-
-        vpi = (qpi * pi).sum(1)
-        adv = qpi - vpi
-
-        return adv
 
 #----------------------------------------------------------------------
 # Saving the environment data from the original environment :D
