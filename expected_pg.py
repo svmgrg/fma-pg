@@ -2,9 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pdb
 
-from src.envs.gridworld_mdp import cliff_gw
-
-pdb.set_trace()
+from environments import CliffWorld
 
 #----------------------------------------------------------------------
 # plotting functions
@@ -109,66 +107,6 @@ def calc_grad_fmapg(omega, pi_t, adv_t, dpi_t, eta, pg_method):
         raise NotImplementedError()
     return grad
 
-# for computing v^pi = (I - gamma P_pi)^{-1} r_pi
-# P_pi(s' | s) = sum_a P(s' | s, a) * pi(a | s)
-# environment P: (i, j, k)th element = Pr{S' = s_k | S = s_i, A = a_j}
-# policy pi: (i, j)th element = Pr{A = a_j | S = s_i}
-def calc_vpi(env, pi, FLAG_V_S0=False):
-    p_pi = np.einsum('xay,xa->xy', env.P, pi)
-    r_pi = np.einsum('xa,xa->x', env.R, pi)
-    v_pi = np.linalg.solve(np.eye(env.state_space) - env.gamma * p_pi, r_pi)
-
-    if FLAG_V_S0: # calculate v_s0
-        v_s0 = np.dot(env.p0, v_pi)
-        return v_s0
-    else:
-        return v_pi
-
-# for computing q^pi
-# using q^pi(s, a) = r(s, a) + gamma * sum_s' p(s' | s, a) * v^pi(s')
-def calc_qpi(env, pi):
-    v_pi = calc_vpi(env, pi)
-    q_pi = env.R + gamma * np.einsum('xay,y->xa', env.P, v_pi)
-
-    return q_pi
-
-# computing the normalized occupancy measure d^pi
-# d^pi = (1 - gamma) * mu (I - gamma P_pi)^{-1},
-# where mu is the start state distribution
-def calc_dpi(env, pi):
-    p_pi = np.einsum('xay,xa->xy', env.P, pi)
-    d_pi = (1 - env.gamma) * \
-        np.linalg.solve(np.eye(env.state_space) - env.gamma * p_pi.T, env.p0)
-
-    # for addressing numerical errors; but not really needed?
-    d_pi /= d_pi.sum() 
-    return d_pi
-
-# compute q*
-def calc_q_star(env, num_iters=1000):
-    q = np.zeros((env.state_space, env.action_space))
-    for i in range(num_iters):
-        q_star = q.max(1)
-        q_new = env.R + np.einsum("xay,y->xa", env.gamma * env.P, q_star)
-        q = q_new.copy()
-    return q
-
-# compute v*
-def calc_v_star(env, num_iters=1000):
-    v = np.zeros(env.state_space)
-    for i in range(num_iters):
-        v_new = (env.R + np.einsum("xay,y->xa", env.gamma * env.P, v)).max(1)
-        v = v_new.copy()
-    return v
-
-def calc_pi_star(env, num_iters=1000):
-    # just go greedy wrt q_star
-    q_star = calc_q_star(env=env, num_iters=num_iters)
-    pi_star = np.zeros((env.state_space, env.action_space))
-    pi_star[range(env.state_space), q_star.argmax(1)] = 1
-    
-    return pi_star
-
 def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
                           num_inner_updates, alpha,
                           FLAG_USE_TRUE_ADVANTAGE=True, num_traj_est_adv=10):
@@ -180,7 +118,7 @@ def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
     pi = softmax(theta)
     
     # evaluate the policies
-    vpi_list_outer = [calc_vpi(env, pi, FLAG_V_S0=True)]
+    vpi_list_outer = [env.calc_vpi(pi, FLAG_V_S0=True)]
     vpi_list_inner = []
 
     # learning loop
@@ -188,19 +126,18 @@ def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
         print(T)
 
         if FLAG_USE_TRUE_ADVANTAGE:
-            adv = calc_qpi(env, pi) - calc_vpi(env, pi).reshape(-1, 1)
+            adv = env.calc_qpi(pi) - env.calc_vpi(pi).reshape(-1, 1)
         else:
             adv = env.estimate_advantage(pi=pi, num_traj=num_traj_est_adv,
                                          alg='monte_carlo_avg')
-
-        dpi = calc_dpi(env, pi)
+        dpi = env.calc_dpi(pi)
 
         # where would have the exact update landed?
         exact_new_pi = analytical_update_fmapg(pi, eta, adv, pg_method)
-        vpi_list_outer.append(calc_vpi(env, exact_new_pi, FLAG_V_S0=True))
+        vpi_list_outer.append(env.calc_vpi(exact_new_pi, FLAG_V_S0=True))
 
         # gradient based update
-        tmp_list = [calc_vpi(env, pi, FLAG_V_S0=True)]
+        tmp_list = [env.calc_vpi(pi, FLAG_V_S0=True)]
         omega = theta.copy()
         dist_from_pi_new = [np.linalg.norm(pi - exact_new_pi)]
         for k in range(num_inner_updates):
@@ -211,7 +148,7 @@ def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
 
             # save the optimization objective
             pi_tmp = softmax(omega)
-            tmp_list.append(calc_vpi(env, pi_tmp, FLAG_V_S0=True))
+            tmp_list.append(env.calc_vpi(pi_tmp, FLAG_V_S0=True))
             dist_from_pi_new.append(np.linalg.norm(pi_tmp - exact_new_pi))
             
         # plt.plot(dist_from_pi_new)
@@ -227,13 +164,13 @@ def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
  
 def run_experiment_exact(num_iters, gamma, eta):
     # create the environment
-    env = cliff_gw(gamma=gamma)
+    env = CliffWorld()
     num_states = env.state_space
     num_actions = env.action_space
 
     # estimate the optimal policy
-    v_star = np.dot(calc_v_star(env), env.p0)
-    pi_star = calc_pi_star(env)
+    v_star = np.dot(env.calc_v_star(), env.mu)
+    pi_star = env.calc_pi_star()
 
     vpi_dict = {'MDPO': [], 'sPPO': []}
     for pg_method in ['MDPO', 'sPPO']:
@@ -241,15 +178,15 @@ def run_experiment_exact(num_iters, gamma, eta):
         pi = generate_uniform_policy(num_states, num_actions)
 
         # evaluate the policies
-        vpi_dict[pg_method].append(calc_vpi(env, pi, FLAG_V_S0=True))
+        vpi_dict[pg_method].append(env.calc_vpi(pi, FLAG_V_S0=True))
 
         # learning loop
         for T in range(num_iters):
-            adv = calc_qpi(env, pi) - calc_vpi(env, pi).reshape(-1, 1)
+            adv = env.calc_qpi(pi) - env.calc_vpi(pi).reshape(-1, 1)
             pi = analytical_update_fmapg(pi, eta, adv, pg_method) # update pi
 
             # evaluate the policies    
-            vpi_dict[pg_method].append(calc_vpi(env, pi, FLAG_V_S0=True))
+            vpi_dict[pg_method].append(env.calc_vpi(pi, FLAG_V_S0=True))
 
     # generate the plots
     # fig, axs = plt.subplots(1, 4, figsize=(20, 4))
@@ -304,8 +241,8 @@ alpha = 0.35
 # fig, axs = plt.subplots(1, 1)
 
 # for gamma in gamma_list:
-#     env = cliff_gw(gamma=gamma)
-#     v_star = np.dot(calc_v_star(env), env.p0) # evaluate the optimal policy
+#     env = CliffWorld()
+#     v_star = np.dot(env.calc_v_star(env), env.mu) # evaluate the optimal policy
 
 #     for eta in eta_list:
 #         # analytical FMA-PG
@@ -333,8 +270,8 @@ alpha = 0.35
 fig, axs = plt.subplots(1, 1)
 
 for gamma in gamma_list:
-    env = cliff_gw(gamma=gamma)
-    v_star = np.dot(calc_v_star(env), env.p0) # evaluate the optimal policy
+    env = CliffWorld()
+    v_star = np.dot(env.calc_v_star(), env.mu) # evaluate the optimal policy
 
     for eta in eta_list:
         # analytical FMA-PG
@@ -358,9 +295,9 @@ plt.savefig('learning_curves_against_steps.pdf')
 #----------------------------------------------------------------------
 # testing code
 #----------------------------------------------------------------------
-# v_star = np.dot(calc_v_star(env), env.p0)
-# pi_star = calc_pi_star(env)
-# v2 = calc_vpi(env, pi_star, FLAG_V_S0=True)
+# v_star = np.dot(env.calc_v_star(), env.mu)
+# pi_star = env.calc_pi_star()
+# v2 = env.calc_vpi(pi_star, FLAG_V_S0=True)
 
 # fig, ax = plt.subplots(1, 1)
 # plot_grid(ax, xlim=7, ylim=7)
