@@ -4,6 +4,8 @@ import pdb
 
 from src.envs.gridworld_mdp import cliff_gw
 
+pdb.set_trace()
+
 #----------------------------------------------------------------------
 # plotting functions
 #----------------------------------------------------------------------
@@ -57,8 +59,6 @@ def plot_policy(ax, pi, xlim=7, ylim=7):
             ax.quiver(x_center, y_center, +diff[3], 0,
                       color='tab:green', width=0.007, headwidth=2, headlength=4,
                       scale=1, scale_units='xy', linewidth=0.1)
-
-
 
 #----------------------------------------------------------------------
 # utility functions
@@ -170,7 +170,8 @@ def calc_pi_star(env, num_iters=1000):
     return pi_star
 
 def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
-                          num_inner_updates, alpha):
+                          num_inner_updates, alpha,
+                          FLAG_USE_TRUE_ADVANTAGE=True, num_traj_est_adv=10):
     num_states = env.state_space
     num_actions = env.action_space
 
@@ -185,7 +186,13 @@ def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
     # learning loop
     for T in range(num_iters):
         print(T)
-        adv = calc_qpi(env, pi) - calc_vpi(env, pi).reshape(-1, 1)
+
+        if FLAG_USE_TRUE_ADVANTAGE:
+            adv = calc_qpi(env, pi) - calc_vpi(env, pi).reshape(-1, 1)
+        else:
+            adv = env.estimate_advantage(pi=pi, num_traj=num_traj_est_adv,
+                                         alg='monte_carlo_avg')
+
         dpi = calc_dpi(env, pi)
 
         # where would have the exact update landed?
@@ -281,7 +288,6 @@ def run_experiment_exact(num_iters, gamma, eta):
 
     return vpi_dict
 
-    
 #======================================================================
 # actual learning code
 #======================================================================
@@ -348,7 +354,6 @@ for gamma in gamma_list:
 axs.set_ylim([0, v_star + 0.1])
 plt.legend()
 plt.savefig('learning_curves_against_steps.pdf')
-   
     
 #----------------------------------------------------------------------
 # testing code
