@@ -1,6 +1,14 @@
 import numpy as np
 import pdb
 
+#----------------------------------------------------------------------
+# Saving the environment data from the original environment :D
+#----------------------------------------------------------------------
+# from src.envs.gridworld_mdp import cliff_gw
+# env = cliff_gw(gamma=0.99)
+# np.savez('cliff_world_env', P=env.P, r=env.R, mu=env.p0,
+#          terminal_states=env.terminal_states)
+
 class CliffWorld():
     def __init__(self, gamma=0.99, episode_cutoff_length=1000, reward_noise=0):
         arr_dict = np.load('cliff_world_env.npz')
@@ -107,11 +115,3 @@ class CliffWorld():
         pi_star = np.zeros((self.state_space, self.action_space))
         pi_star[range(self.state_space), q_star.argmax(1)] = 1
         return pi_star
-
-#----------------------------------------------------------------------
-# Saving the environment data from the original environment :D
-#----------------------------------------------------------------------
-# from src.envs.gridworld_mdp import cliff_gw
-# env = cliff_gw(gamma=0.99)
-# np.savez('cliff_world_env', P=env.P, r=env.R, mu=env.p0,
-#          terminal_states=env.terminal_states)
