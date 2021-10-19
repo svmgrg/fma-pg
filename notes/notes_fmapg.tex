@@ -1,6 +1,6 @@
 %% if some package prevents compilation, remove it
 
-\documentclass[a4paper, 11pt]{article}
+\documentclass[a4paper, 10pt]{article}
 \usepackage{fullpage}
 \usepackage{titling}
 \usepackage{graphicx}
@@ -59,7 +59,7 @@
 \begin{document}
 \maketitle
 \vspace{-2cm}
-\linenumbers
+% \linenumbers
 
 \section{Softmax PPO with Tabular Parameterization}
 
@@ -120,11 +120,11 @@ to satisfy the third and fourth KKT conditions. But how to do that? One straight
 \subsection{Gradient of the Loss Function with Softmax Policy Representation}
 Consider the softmax policy representation
 \begin{equation}
-  p^\pi(b | x) = \frac{\exp(\theta(x, b))}{\sum_c \exp(\theta(x, c)}, \label{eq: softmax}
+  p^\pi(b | x) = \frac{e^{\theta(x, b)}}{\sum_c e^{\theta(x, c)}}, \label{eq: softmax}
 \end{equation}
 where $\theta(x, b)$s for all state-action pairs $(x, b)$ are action preferences maintained in a table (tabular parameterization). We will use gradient ascent to approximately solve Eq. \ref{eq: optim_problem_sppo}; to do that, the quantity of interest is
 \begin{align}
-  \nabla_{\theta(s, a)} \ell^{\pi_t} &= \sum_{x, b} \left[ \nabla_{\theta(s, a)} p^\pi(b | x) \right] \left[ \nabla_{p^\pi(b | x)} \ell^{\pi_t} \right] \tag*{(using total derivative)} \\
+  \nabla_{\theta(s, a)} \ell^{\pi_t} &= \sum_{x \in \mathcal{S}} \sum_{b \in \mathcal{A}} \left[ \nabla_{\theta(s, a)} p^\pi(b | x) \right] \left[ \nabla_{p^\pi(b | x)} \ell^{\pi_t} \right] \tag*{(using total derivative)} \\
   &= \sum_{x, b} \Big[ \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^\pi(a | x) \Big) p^\pi(b | x) \Big] \left[ d^{\pi_t}(x) p^{\pi_t}(b|x) \left( A^{\pi_t}(x, b) + \frac{1}{\eta} \right) \frac{1}{p^\pi(b|x)} \right] \nonumber \\
   &= \E_{X \sim d^{\pi_t}, B \sim p^{\pi_t}(\cdot | X)} \left[ \mathbb{I}(X = s) \Big( \mathbb{I}(B = a) - p^\pi(a | x) \Big) \left( A^{\pi_t}(X, B) + \frac{1}{\eta} \right) \right] \\
   &= d^{\pi_t}(s) \sum_b \Big( \mathbb{I}(b = a) - p^\pi(a | s) \Big) p^{\pi_t}(b|s) \left( A^{\pi_t}(s, b) + \frac{1}{\eta} \right) \nonumber \\
@@ -164,7 +164,7 @@ Again, we begin by solving the first KKT condition:
   &&=& \frac{d^{\pi_t}(x)}{\eta} \left[ \eta Q^{\pi_t}(x, b) - \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} - 1 - \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} \right] \nonumber \\
   &&=& 0 \nonumber \\
   \Rightarrow & \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} &=& \eta Q^{\pi_t}(x, b) - \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} - 1 \nonumber \\
-  \Rightarrow & p^\pi(b | x) &=& p^{\pi_t}(b | x) \cdot \exp ( \eta Q^{\pi_t}(x, b) ) \cdot \exp \left(- \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} - 1 \right), \label{eq: lagrangian_derivative_mdpo}
+  \Rightarrow & p^\pi(b | x) &=& p^{\pi_t}(b | x) \cdot e^{\eta Q^{\pi_t}(x, b)} \cdot e^{- \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} - 1}, \label{eq: lagrangian_derivative_mdpo}
 \end{IEEEeqnarray}
 where in the fourth line, we made the assumption that $d^{\pi_t}(x) > 0$ for all states $x$. We again set
 \begin{equation}
@@ -172,11 +172,11 @@ where in the fourth line, we made the assumption that $d^{\pi_t}(x) > 0$ for all
 \end{equation}
 And, we put Eq. \ref{eq: lagrangian_derivative_mdpo} in the second KKT condition to get
 \begin{equation}
-  \exp \left(- \frac{\eta \lambda_x}{d^{\pi_t}(x)} - 1 \right) = \left( \sum_b p^{\pi_t}(b | x) \cdot \exp ( \eta Q^{\pi_t}(x, b) ) \right)^{-1}.
+  e^{- \frac{\eta \lambda_x}{d^{\pi_t}(x)} - 1} = \left( \sum_b p^{\pi_t}(b | x) \cdot e^{\eta Q^{\pi_t}(x, b)} \right)^{-1}.
 \end{equation}
 Therefore, we obtain
 \begin{equation}
-  p^\pi(a | s) = \frac{p^{\pi_t}(a | s) \cdot \exp ( \eta Q^{\pi_t}(s, a) )}{\sum_b p^{\pi_t}(b | s) \cdot \exp ( \eta Q^{\pi_t}(s, b) )}.
+  p^\pi(a | s) = \frac{p^{\pi_t}(a | s) \cdot e^{\eta Q^{\pi_t}(s, a)}}{\sum_b p^{\pi_t}(b | s) \cdot e^{\eta Q^{\pi_t}(s, b)}}.
 \end{equation}
 
 \textbf{This leaves one last problem:} Can we ensure that $\lambda_s \geq 0$ for all states $s$? If not, then the fourth KKT condition cannot be satisfied. Maybe, we can set the stepsize $\eta$ in such a way, such that this constraint is always fulfilled.
@@ -192,7 +192,64 @@ We again take the softmax policy representation given by Eq. \ref{eq: softmax}, 
 where in the last line, we used the fact that
 \begin{equation*}
   \sum_b p^\pi(b | s) \left[ \eta A^{\pi_t}(s, b) - \log \frac{p^\pi(b | s)}{p^{\pi_t}(b | s)} - 1 \right] = \eta \sum_b p^\pi(b|s) A^{\pi_t}(s, b) - \text{KL}(p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s)) - 1.
-  \end{equation*}
+\end{equation*}
+
+\section{TRPO}
+At each step of the policy update, TRPO (Eq. 14, Schulman et al., 2015) solves the following problem:
+\begin{equation}
+  \max_\theta \; \underbrace{\sum_s d^{\pi_t}(s) \sum_a p^{\pi_\theta}(a | s) Q^{\pi_t}(s, a)}_{=: \mathcal{J}} \qquad \text{subject to } \underbrace{\sum_s d^{\pi_t}(s) \cdot \text{KL}(p^{\pi_t}(\cdot | s) \| p^{\pi_\theta}(\cdot | s))}_{=: \mathcal{C}} \leq \delta.  
+\end{equation}
+Unlike the sPPO and the MDPO updates, most likely (not absolutely sure though) an analytical solution cannot be derived for this update (since it would require solving a system of non-trivial non-linear equations; to see this, try writing the KKT conditions for this constrained optimization problem). Therefore, we will use gradient based methods to approximately solve this problem. From Appendix C of Schulman et al. (2015), the descent direction is given by $s \approx A^{-1} g$ where the vector $g$ is defined as $g_{(s, a)} := \frac{\partial}{\partial \theta(s, a)} \mathcal{J}$, and the matrix $A$ is defined as $A_{(s, a), (s', a')} := \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}$. We compute this direction assuming a softmax policy (Eq. \ref{eq: softmax}). The vector $g$ can be readily calculated as
+\begin{align}
+  \frac{\partial}{\partial \theta(s, a)} \mathcal{J} &= \frac{\partial}{\partial \theta(s, a)} \sum_x d^{\pi_t}(x) \sum_b p^{\pi_\theta}(b | x) Q^{\pi_t}(x, b) \nonumber \\
+  &= \sum_x d^{\pi_t}(x) \sum_b Q^{\pi_t}(x, b) \frac{\partial}{\partial \theta(s, a)}  p^{\pi_\theta}(b | x) \nonumber \\
+  &= \sum_x d^{\pi_t}(x) \sum_b Q^{\pi_t}(x, b) \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | x) \Big) p^{\pi_\theta}(b | x) \nonumber \\
+  &= \sum_x d^{\pi_t}(x) \mathbb{I}(x = s) \left[ \sum_b \mathbb{I}(b = a) p^{\pi_\theta}(b | x) Q^{\pi_t}(x, b) - p^{\pi_\theta}(a | x) \sum_b p^{\pi_\theta}(b | x) Q^{\pi_t}(x, b) \right] \nonumber \\
+  &= d^{\pi_t}(s) p^{\pi_\theta}(a | s) \left[ Q^{\pi_t}(s, a) - \sum_b p^{\pi_\theta}(b | s) Q^{\pi_t}(s, b) \right]. \label{eq: trpo_gradient}
+\end{align}
+For calculating the matrix $A$, note that
+\begin{equation*}
+  \frac{\partial \mathcal{C}}{\partial p^{\pi_\theta}(b | x)} = \frac{\partial}{\partial p^{\pi_\theta}(b | x)} \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \log \frac{p^{\pi_t}(a | s)}{p^{\pi_\theta}(a | s)} = - d^{\pi_t}(x) \frac{p^{\pi_t}(b | x)}{p^{\pi_\theta}(b | x)}.
+\end{equation*}
+Then, using the law of total derivative, gives us
+\begin{align}
+  \frac{\partial}{\partial \theta(s, a)} \mathcal{C} &= \sum_{x, b} \frac{\partial p^{\pi_\theta}(b | x)}{\partial \theta(s, a)} \cdot \frac{\partial \mathcal{C}}{\partial p^{\pi_\theta}(b | x)} \nonumber \\
+  &= - \sum_{x, b} \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | x) \Big) p^{\pi_\theta}(b | x) \cdot d^{\pi_t}(x) \frac{p^{\pi_t}(b | x)}{p^{\pi_\theta}(b | x)} \nonumber \\
+  &= d^{\pi_t}(s) \sum_b \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | s) \Big) p^{\pi_t}(b | s) \nonumber \\
+  &= d^{\pi_t}(s) \left[ \sum_b \mathbb{I}(b = a) p^{\pi_t}(b | s) - p^{\pi_\theta}(a | s) \sum_b p^{\pi_t}(b | s) \right] \nonumber \\
+  &= d^{\pi_t}(s) \Big[ p^{\pi_t}(a | s) - p^{\pi_\theta}(a | s) \Big].
+\end{align}
+Finally, using the above result yields
+\begin{IEEEeqnarray}{lrCl}
+  & \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C} &=& \frac{\partial}{\partial \theta(s, a)} d^{\pi_t}(s') \Big[ p^{\pi_t}(a' | s') - p^{\pi_\theta}(a' | s') \Big] \nonumber \\
+  &&=& - d^{\pi_t}(s') \cdot \frac{\partial}{\partial \theta(s, a)} p^{\pi_\theta}(a' | s') \nonumber \\
+  &&=& - \mathbb{I}(s'=s) \cdot d^{\pi_t}(s') \Big( \mathbb{I}(a'=a) - p^{\pi_\theta}(a | s') \Big) p^{\pi_\theta}(a' | s') \\
+  \Rightarrow \quad & A_{(s, :), (s, :)} &=& - d^{\pi_t}(s) \Big( \text{diag} (p^{\pi_\theta}(\cdot | s)) - p^{\pi_\theta}(\cdot | s) p^{\pi_\theta}(\cdot | s)^\top \Big),
+\end{IEEEeqnarray}
+where $p^{\pi_\theta}(\cdot | s) \in \mathbb{R}^{|\mathcal{A}|}$ is the vector defined as $[p^{\pi_\theta}(\cdot | s)]_a = p^{\pi_\theta}(a | s)$.
+
+\section{PPO}
+The PPO (Schulman et al., 2017) solves the following optimization problem at each iteration step:
+\begin{equation}
+  \max_\theta \; \underbrace{\sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \cdot \min \left( \begin{matrix} \frac{p^{\pi_\theta}(a | s)}{p^{\pi_t}(a | s)} A^{\pi_t}(s, a), \\ \text{clip} \left[\frac{p^{\pi_\theta}(a | s)}{p^{\pi_t}(a | s)}, 1 - \epsilon, 1 + \epsilon \right] A^{\pi_t}(s, a) \end{matrix} \right)}_{=: \mathcal{J}}.
+\end{equation}
+The gradient of the objective $\mathcal{J}$ can be shown to be equivalent to
+\begin{equation}
+  \nabla \mathcal{J} = \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \cdot \mathbb{I} \Big( \text{cond}(s, a) \Big) \frac{\nabla p^{\pi_\theta}(a | s)}{p^{\pi_t}(a | s)} A^{\pi_t}(s, a),
+\end{equation}
+where 
+\begin{equation}
+  \text{cond}(s, a) = \left( A^{\pi_t}(s, a) > 0 \;\bigwedge\; \frac{p^{\pi_\theta}(a | s)}{p^{\pi_t}(a | s)} < 1 + \epsilon \right) \;\bigvee\; \left( A^{\pi_t}(s, a) < 0 \;\bigwedge\; \frac{p^{\pi_\theta}(a | s)}{p^{\pi_t}(a | s)} > 1 - \epsilon \right).
+\end{equation}
+Repeating our usual drill, we assume a softmax policy to obtain:
+\begin{align}
+  & \frac{\partial}{\partial \theta(s, a)} \mathcal{J} \nonumber \\
+  &= \sum_x d^{\pi_t}(x) \sum_b \mathbb{I} \Big( \text{cond}(x, b) \Big) \frac{\partial p^{\pi_\theta}(b | x)}{\partial \theta(s, a)} A^{\pi_t}(x, b) \nonumber \\
+  &= \sum_x d^{\pi_t}(x) \sum_b \mathbb{I} \Big( \text{cond}(x, b) \Big) \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | x) \Big) p^{\pi_\theta}(b | x) A^{\pi_t}(x, b) \nonumber \\
+  &= d^{\pi_t}(s) \Bigg[ \sum_b \mathbb{I}(b = a) \mathbb{I} \Big( \text{cond}(s, b) \Big) p^{\pi_\theta}(b | s) A^{\pi_t}(s, b) - p^{\pi_\theta}(a | s) \sum_b \mathbb{I} \Big( \text{cond}(s, b) \Big) p^{\pi_\theta}(b | s) A^{\pi_t}(s, b) \Bigg] \nonumber \\
+    &= d^{\pi_t}(s) p^{\pi_\theta}(a | s) \left[ \mathbb{I} \Big( \text{cond}(s, a) \Big) A^{\pi_t}(s, a) - p^{\pi_\theta}(a | s) \sum_b p^{\pi_\theta}(b | s) \mathbb{I} \Big( \text{cond}(s, b) \Big) A^{\pi_t}(s, b) \right]. \label{eq: ppo_gradient}
+\end{align}
+The PPO gradient (Eq. \ref{eq: ppo_gradient}) is exactly the same as the TRPO gradient (Eq. \ref{eq: trpo_gradient}) except for the additional condition on choosing only specific state-action pairs while calculating the difference between advantage under the current policy and the approximate change in advantage under the updated policy.
 
 \section*{References}
 
@@ -209,6 +266,10 @@ where in the last line, we used the fact that
 \item[] Beck, A., Teboulle, M. (2003). Mirror descent and nonlinear projected subgradient methods for convex optimization. \textit{Operations Research Letters, 31}(3), 167-175.
 
 \item[] Nocedal, J., Wright, S. (2006). Numerical optimization. \textit{Springer Science \& Business Media.}
+
+\item[] Schulman, J., Wolski, F., Dhariwal, P., Radford, A., Klimov, O. (2017). Proximal policy optimization algorithms. \textit{arXiv preprint arXiv:1707.06347.}
+
+\item[] Schulman, J., Levine, S., Abbeel, P., Jordan, M., Moritz, P. (2015, June). Trust region policy optimization. In \textit{International conference on machine learning} (pp. 1889-1897). PMLR.
   
 \item[] Vaswani, S., Bachem, O., Totaro, S., Mueller, R., Geist, M., Machado, M. C., Castro P. S., Roux, N. L. (2021). A functional mirror ascent view of policy gradient methods with function approximation. \textit{arXiv preprint arXiv:2108.05828.}
   

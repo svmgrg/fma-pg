@@ -4,3 +4,5 @@
 \BOOKMARK [1][-]{section.2}{MDPO}{}% 4
 \BOOKMARK [2][-]{subsection.2.1}{Closed Form Update with Direct Parameterization}{section.2}% 5
 \BOOKMARK [2][-]{subsection.2.2}{Gradient of the Loss Function with Softmax Policy Representation}{section.2}% 6
+\BOOKMARK [1][-]{section.3}{TRPO}{}% 7
+\BOOKMARK [1][-]{section.4}{PPO}{}% 8
