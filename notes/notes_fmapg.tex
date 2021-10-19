@@ -201,8 +201,7 @@ At each step of the policy update, TRPO (Eq. 14, Schulman et al., 2015) solves t
 \end{equation}
 Unlike the sPPO and the MDPO updates, most likely (not absolutely sure though) an analytical solution cannot be derived for this update (since it would require solving a system of non-trivial non-linear equations; to see this, try writing the KKT conditions for this constrained optimization problem). Therefore, we will use gradient based methods to approximately solve this problem. From Appendix C of Schulman et al. (2015), the descent direction is given by $s \approx A^{-1} g$ where the vector $g$ is defined as $g_{(s, a)} := \frac{\partial}{\partial \theta(s, a)} \mathcal{J}$, and the matrix $A$ is defined as $A_{(s, a), (s', a')} := \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}$. We compute this direction assuming a softmax policy (Eq. \ref{eq: softmax}). The vector $g$ can be readily calculated as
 \begin{align}
-  \frac{\partial}{\partial \theta(s, a)} \mathcal{J} &= \frac{\partial}{\partial \theta(s, a)} \sum_x d^{\pi_t}(x) \sum_b p^{\pi_\theta}(b | x) Q^{\pi_t}(x, b) \nonumber \\
-  &= \sum_x d^{\pi_t}(x) \sum_b Q^{\pi_t}(x, b) \frac{\partial}{\partial \theta(s, a)}  p^{\pi_\theta}(b | x) \nonumber \\
+  \frac{\partial}{\partial \theta(s, a)} \mathcal{J} &= \sum_x d^{\pi_t}(x) \sum_b Q^{\pi_t}(x, b) \frac{\partial p^{\pi_\theta}(b | x)}{\partial \theta(s, a)} \nonumber \\
   &= \sum_x d^{\pi_t}(x) \sum_b Q^{\pi_t}(x, b) \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | x) \Big) p^{\pi_\theta}(b | x) \nonumber \\
   &= \sum_x d^{\pi_t}(x) \mathbb{I}(x = s) \left[ \sum_b \mathbb{I}(b = a) p^{\pi_\theta}(b | x) Q^{\pi_t}(x, b) - p^{\pi_\theta}(a | x) \sum_b p^{\pi_\theta}(b | x) Q^{\pi_t}(x, b) \right] \nonumber \\
   &= d^{\pi_t}(s) p^{\pi_\theta}(a | s) \left[ Q^{\pi_t}(s, a) - \sum_b p^{\pi_\theta}(b | s) Q^{\pi_t}(s, b) \right]. \label{eq: trpo_gradient}
@@ -215,16 +214,16 @@ Then, using the law of total derivative, gives us
 \begin{align}
   \frac{\partial}{\partial \theta(s, a)} \mathcal{C} &= \sum_{x, b} \frac{\partial p^{\pi_\theta}(b | x)}{\partial \theta(s, a)} \cdot \frac{\partial \mathcal{C}}{\partial p^{\pi_\theta}(b | x)} \nonumber \\
   &= - \sum_{x, b} \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | x) \Big) p^{\pi_\theta}(b | x) \cdot d^{\pi_t}(x) \frac{p^{\pi_t}(b | x)}{p^{\pi_\theta}(b | x)} \nonumber \\
-  &= d^{\pi_t}(s) \sum_b \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | s) \Big) p^{\pi_t}(b | s) \nonumber \\
-  &= d^{\pi_t}(s) \left[ \sum_b \mathbb{I}(b = a) p^{\pi_t}(b | s) - p^{\pi_\theta}(a | s) \sum_b p^{\pi_t}(b | s) \right] \nonumber \\
-  &= d^{\pi_t}(s) \Big[ p^{\pi_t}(a | s) - p^{\pi_\theta}(a | s) \Big].
+  &= - d^{\pi_t}(s) \sum_b \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | s) \Big) p^{\pi_t}(b | s) \nonumber \\
+  &= - d^{\pi_t}(s) \left[ \sum_b \mathbb{I}(b = a) p^{\pi_t}(b | s) - p^{\pi_\theta}(a | s) \sum_b p^{\pi_t}(b | s) \right] \nonumber \\
+  &= - d^{\pi_t}(s) \Big[ p^{\pi_\theta}(a | s) - p^{\pi_t}(a | s) \Big].
 \end{align}
 Finally, using the above result yields
 \begin{IEEEeqnarray}{lrCl}
-  & \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C} &=& \frac{\partial}{\partial \theta(s, a)} d^{\pi_t}(s') \Big[ p^{\pi_t}(a' | s') - p^{\pi_\theta}(a' | s') \Big] \nonumber \\
-  &&=& - d^{\pi_t}(s') \cdot \frac{\partial}{\partial \theta(s, a)} p^{\pi_\theta}(a' | s') \nonumber \\
-  &&=& - \mathbb{I}(s'=s) \cdot d^{\pi_t}(s') \Big( \mathbb{I}(a'=a) - p^{\pi_\theta}(a | s') \Big) p^{\pi_\theta}(a' | s') \\
-  \Rightarrow \quad & A_{(s, :), (s, :)} &=& - d^{\pi_t}(s) \Big( \text{diag} (p^{\pi_\theta}(\cdot | s)) - p^{\pi_\theta}(\cdot | s) p^{\pi_\theta}(\cdot | s)^\top \Big),
+  & \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C} &=& \frac{\partial}{\partial \theta(s, a)} d^{\pi_t}(s') \Big[ p^{\pi_\theta}(a | s) - p^{\pi_t}(a | s) \Big] \nonumber \\
+  &&=& d^{\pi_t}(s') \cdot \frac{\partial}{\partial \theta(s, a)} p^{\pi_\theta}(a' | s') \nonumber \\
+  &&=& \mathbb{I}(s'=s) \cdot d^{\pi_t}(s') \Big( \mathbb{I}(a'=a) - p^{\pi_\theta}(a | s') \Big) p^{\pi_\theta}(a' | s') \\
+  \Rightarrow \quad & A_{(s, :), (s, :)} &=& d^{\pi_t}(s) \Big( \text{diag} (p^{\pi_\theta}(\cdot | s)) - p^{\pi_\theta}(\cdot | s) p^{\pi_\theta}(\cdot | s)^\top \Big),
 \end{IEEEeqnarray}
 where $p^{\pi_\theta}(\cdot | s) \in \mathbb{R}^{|\mathcal{A}|}$ is the vector defined as $[p^{\pi_\theta}(\cdot | s)]_a = p^{\pi_\theta}(a | s)$.
 

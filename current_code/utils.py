@@ -5,19 +5,19 @@ import pdb
 #----------------------------------------------------------------------
 # plotting functions
 #----------------------------------------------------------------------
-def plot_grid(ax, xlim=7, ylim=7):
+def plot_grid(ax, xlim=4, ylim=5):
     x_center = np.arange(xlim) + 0.5
     y_center = np.arange(ylim) + 0.5
 
     for x in x_center:
         for y in y_center:
-            if int((x - 0.5) * ylim + (y - 0.5)) == 8:
+            if int((x - 0.5) * ylim + (y - 0.5)) == 0:
                 ax.scatter(x, y, s=200, color='tab:blue', marker='s',
                            label='start', alpha=0.5)
-            elif int((x - 0.5) * ylim + (y - 0.5)) in [9, 10, 11]:
+            elif int((x - 0.5) * ylim + (y - 0.5)) in [1, 2, 3]:
                 ax.scatter(x, y, s=200, color='tab:red', marker='x',
                            label='chasm', alpha=0.5)
-            elif int((x - 0.5) * ylim + (y - 0.5)) == 12:
+            elif int((x - 0.5) * ylim + (y - 0.5)) == 4:
                 ax.scatter(x, y, s=200, color='tab:green', marker='o',
                            label='end', alpha=0.5)
             else:
@@ -30,7 +30,7 @@ def plot_grid(ax, xlim=7, ylim=7):
         ax.plot((0, xlim), (y, y), linewidth=0.5, color='black')
 
        
-def plot_policy(ax, pi, xlim=7, ylim=7):
+def plot_policy(ax, pi, xlim=4, ylim=5):
     for s_x in range(xlim):
         for s_y in range(ylim):
             x_center = s_x + 0.5
@@ -122,7 +122,22 @@ def calc_A_matrix(num_states, num_actions, dpi_t, pi):
         beg = num_actions * state_i
         end = beg + num_actions
         A[beg:end, beg:end] \
-            = -1 * dpi_t[state_i] * (np.diag(pi_s) - np.outer(pi_s, pi_s))
+            = dpi_t[state_i] * (np.diag(pi_s) - np.outer(pi_s, pi_s))
+    return A
+
+def calc_A_matrix_slow(num_states, num_actions, dpi_t, pi):
+    # only for verifying if calc_A_matrix() works correctly
+    n = num_states * num_actions
+    A = np.zeros((n, n))
+    for state_i in range(num_states):
+        for action_i in range(num_actions):
+            for state_j in range(num_states):
+                for action_j in range(num_actions):
+                    row = state_i * num_actions + action_i
+                    col = state_j * num_actions + action_j
+                    A[row, col] = (state_i == state_j) * dpi_t[state_j] \
+                        * ((action_i == action_j) - pi[state_j, action_i]) \
+                        * pi[state_j, action_j]
     return A
 
 # this is the grad vector, but stored as an S x A matrix, again computed using
@@ -139,16 +154,17 @@ def calc_update_direction(grad, A):
     grad_flatten = grad.reshape(-1, 1)
     # s_flatten = np.linalg.solve(A, grad_flatten)
     # Having a lot of problem with A being singular. So using pseudo-inverse
-    s_flatten = np.matmul(np.linalg.pinv(A), grad_flatten)    
-    s = s_flatten.reshape(grad.shape)
-    return s
+    update_direction_flatten = np.matmul(np.linalg.pinv(A), grad_flatten)    
+    update_direction = update_direction_flatten.reshape(grad.shape)
+    return update_direction
 
 # compute the maximum stepsize beta using the equations given in Appendix C of
 # Schulman et al. (2015)
-def calc_max_stepsize_beta(s, A, delta):
-    s_flatten = s.reshape(-1, 1)
+def calc_max_stepsize_beta(update_direction, A, delta):
+    update_direction_flatten = update_direction.reshape(-1, 1)
     beta = np.sqrt(2 * delta \
-                   / np.matmul(np.matmul(s_flatten.T, A), s_flatten).item())
+                   / np.matmul(np.matmul(update_direction_flatten.T, A),
+                               update_direction_flatten).item())
     return beta
 
 def compute_trpo_loss(dpi_t, qpi_t, pi):
@@ -166,10 +182,17 @@ def trpo_update(omega, pi_t, dpi_t, qpi_t, delta, decay_factor,
     A = calc_A_matrix(
         num_states=num_states, num_actions=num_actions, dpi_t=dpi_t, pi=pi)
     grad = calc_grad_vector(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi)
-    s = grad # calc_update_direction(grad=grad, A=A)
-    beta = 1 # calc_max_stepsize_beta(s=s, A=A, delta=delta)
+    # A2 = calc_A_matrix_slow(
+    #     num_states=num_states, num_actions=num_actions, dpi_t=dpi_t, pi=pi)
+    # assert np.allclose(A, A2)
+    update_direction = calc_update_direction(grad=grad, A=A) # grad
+    if np.allclose(np.zeros(update_direction.shape), update_direction):
+        beta = 0
+    else:
+        beta = calc_max_stepsize_beta(update_direction=update_direction,
+                                      A=A, delta=delta)
     while True: # backtracking line search
-        omega_tmp = omega + beta * s
+        omega_tmp = omega + beta * update_direction
         pi_tmp = softmax(omega_tmp)
         J_tmp = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi_tmp)
         C_tmp = compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi_tmp)
@@ -356,7 +379,7 @@ def run_experiment(env, pg_method, num_iters, eta, delta, decay_factor, epsilon,
     if FLAG_SAVE_INNER_STEPS:
         vpi_list_inner = np.array(vpi_list_inner)
         
-    return vpi_list_outer, vpi_list_inner
+    return vpi_list_outer, vpi_list_inner, pi
 
 # generate the plots
 # fig, axs = plt.subplots(1, 4, figsize=(20, 4))
