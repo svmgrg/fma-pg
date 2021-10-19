@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pdb
 
 #----------------------------------------------------------------------
 # plotting functions
@@ -108,6 +109,89 @@ def calc_grad_fmapg(omega, pi_t, adv_t, dpi_t, eta, pg_method):
         raise NotImplementedError()
     return grad
 
+#----------------------------------------------------------------------
+# TRPO and PPO
+#----------------------------------------------------------------------
+# returns the A matrix. It is an SA x SA matrix computed using equations given
+# in Section 3 of the notes
+def calc_A_matrix(num_states, num_actions, dpi_t, pi):
+    n = num_states * num_actions
+    A = np.zeros((n, n))
+    for state_i in range(num_states):
+        pi_s = pi[state_i, :]
+        beg = num_actions * state_i
+        end = beg + num_actions
+        A[beg:end, beg:end] \
+            = -1 * dpi_t[state_i] * (np.diag(pi_s) - np.outer(pi_s, pi_s))
+    return A
+
+# this is the grad vector, but stored as an S x A matrix, again computed using
+# equations given in Section 3 of the notes
+def calc_grad_vector(dpi_t, qpi_t, pi):
+    grad = dpi_t.reshape(-1, 1) * pi \
+        * (qpi_t - (pi * qpi_t).sum(1).reshape(-1, 1))
+    return grad
+
+# this calculates the update direction s = A^{-1} grad. We first flatten grad,
+# calculate s using this equation, and then reshape s again into an
+# S x A matrix
+def calc_update_direction(grad, A):
+    grad_flatten = grad.reshape(-1, 1)
+    # s_flatten = np.linalg.solve(A, grad_flatten)
+    # Having a lot of problem with A being singular. So using pseudo-inverse
+    s_flatten = np.matmul(np.linalg.pinv(A), grad_flatten)    
+    s = s_flatten.reshape(grad.shape)
+    return s
+
+# compute the maximum stepsize beta using the equations given in Appendix C of
+# Schulman et al. (2015)
+def calc_max_stepsize_beta(s, A, delta):
+    s_flatten = s.reshape(-1, 1)
+    beta = np.sqrt(2 * delta \
+                   / np.matmul(np.matmul(s_flatten.T, A), s_flatten).item())
+    return beta
+
+def compute_trpo_loss(dpi_t, qpi_t, pi):
+    J = (dpi_t * (pi * qpi_t).sum(1)).sum()
+    return J
+
+def compute_trpo_constraint(dpi_t, pi_t, pi):
+    C = (dpi_t * (pi_t * np.log(pi_t / pi)).sum(1)).sum()
+    return C
+
+def trpo_update(omega, pi_t, dpi_t, qpi_t, delta, decay_factor,
+                num_states, num_actions):
+    pi = softmax(omega)
+    J_old = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi)
+    A = calc_A_matrix(
+        num_states=num_states, num_actions=num_actions, dpi_t=dpi_t, pi=pi)
+    grad = calc_grad_vector(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi)
+    s = grad # calc_update_direction(grad=grad, A=A)
+    beta = 1 # calc_max_stepsize_beta(s=s, A=A, delta=delta)
+    while True: # backtracking line search
+        omega_tmp = omega + beta * s
+        pi_tmp = softmax(omega_tmp)
+        J_tmp = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi_tmp)
+        C_tmp = compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi_tmp)
+        if C_tmp <= delta and J_tmp >= J_old:
+            break
+        beta = decay_factor * beta
+        
+    return omega_tmp
+
+def calc_grad_ppo(omega, pi_t, adv_t, dpi_t, epsilon):
+    pi = softmax(omega)
+    ratio = pi / pi_t
+    cond = np.logical_or(np.logical_and(adv_t > 0, ratio < 1 + epsilon),
+                         np.logical_and(adv_t < 0, ratio > 1 - epsilon))
+
+    grad = dpi_t.reshape(-1, 1) * pi \
+        * (cond * adv_t - (pi * cond * adv_t).sum(1).reshape(-1, 1))
+    return grad
+
+#----------------------------------------------------------------------
+# advantage estimation
+#----------------------------------------------------------------------
 def estimate_advantage(env, pi, num_traj, alg, qpi_old=None, stepsize=None):
     if alg == 'monte_carlo_avg':
         qpi = np.zeros((env.state_space, env.action_space))
@@ -181,7 +265,6 @@ def estimate_advantage(env, pi, num_traj, alg, qpi_old=None, stepsize=None):
 
         error_list.append(np.linalg.norm(qpi - qpi_true))
         
-    # pdb.set_trace()
     # plt.show(); plt.figure(); plt.plot(error_list); plt.show()
         
     vpi = (qpi * pi).sum(1).reshape(-1, 1)
@@ -190,13 +273,13 @@ def estimate_advantage(env, pi, num_traj, alg, qpi_old=None, stepsize=None):
     return adv, qpi.copy()
 
 #----------------------------------------------------------------------
-# functions for running full experiments
+# function for running full experiments
 #----------------------------------------------------------------------
-
-def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
-                          num_inner_updates, alpha,
-                          FLAG_USE_TRUE_ADVANTAGE=True, num_traj_est_adv=10,
-                          adv_est_alg='monte_carlo_avg', adv_est_stepsize=None):
+def run_experiment(env, pg_method, num_iters, eta, delta, decay_factor, epsilon,
+                   FLAG_ANALYTICAL_GRADIENT, num_inner_updates, alpha,
+                   FLAG_TRUE_ADVANTAGE, adv_estimate_alg,
+                   num_traj_estimate_adv, adv_estimate_stepsize,
+                   FLAG_SAVE_INNER_STEPS):    
     num_states = env.state_space
     num_actions = env.action_space
 
@@ -205,109 +288,110 @@ def run_experiment_approx(env, gamma, pg_method, num_iters, eta,
     pi = softmax(theta)
     
     # evaluate the policies
-    vpi_list_outer = [env.calc_vpi(pi, FLAG_V_S0=True)]
-    vpi_list_inner = []
+    vpi_list_outer = [env.calc_vpi(pi, FLAG_RETURN_V_S0=True)]
+    vpi_list_inner = [] if FLAG_SAVE_INNER_STEPS else None
+
+    if not FLAG_TRUE_ADVANTAGE:
+        qpi_estimate = np.zeros((env.state_space, env.action_space))
 
     # learning loop
-    qpi_est = np.zeros((env.state_space, env.action_space))
     for T in range(num_iters):
-        if FLAG_USE_TRUE_ADVANTAGE:
-            adv = env.calc_qpi(pi) - env.calc_vpi(pi).reshape(-1, 1)
-        else:
-            adv, qpi_est = estimate_advantage(
-                env, pi=pi, num_traj=num_traj_est_adv,
-                alg=adv_est_alg, qpi_old=qpi_est, stepsize=adv_est_stepsize)
+        print(T)
         dpi = env.calc_dpi(pi)
-
-        # where would have the exact update landed?
-        exact_new_pi = analytical_update_fmapg(pi, eta, adv, pg_method)
-        vpi_list_outer.append(env.calc_vpi(exact_new_pi, FLAG_V_S0=True))
+        
+        if FLAG_TRUE_ADVANTAGE:
+            qpi = env.calc_qpi(pi)
+            adv = qpi - env.calc_vpi(pi).reshape(-1, 1)
+        else:
+            adv, qpi_estimate = estimate_advantage(
+                env, pi=pi, num_traj=num_traj_estimate_adv,
+                alg=adv_estimate_alg, qpi_old=qpi_estimate,
+                stepsize=adv_estimate_stepsize)
+            qpi = qpi_estimate.copy()
 
         # gradient based update
-        tmp_list = [env.calc_vpi(pi, FLAG_V_S0=True)]
-        omega = theta.copy()
-        dist_from_pi_new = [np.linalg.norm(pi - exact_new_pi)]
-        for k in range(num_inner_updates):
-            # do one gradient ascent step
-            grad = calc_grad_fmapg(omega=omega, pi_t=pi, adv_t=adv,
-                                   dpi_t=dpi, eta=eta, pg_method=pg_method)
-            omega = omega + alpha * grad
+        vpi_list_outer.append(env.calc_vpi(pi, FLAG_RETURN_V_S0=True))
 
-            # save the optimization objective
-            pi_tmp = softmax(omega)
-            tmp_list.append(env.calc_vpi(pi_tmp, FLAG_V_S0=True))
-            dist_from_pi_new.append(np.linalg.norm(pi_tmp - exact_new_pi))
-            
-        # plt.plot(dist_from_pi_new)
-        # plt.show()
+        if FLAG_ANALYTICAL_GRADIENT: # only for sPPO and MDPO
+            pi = analytical_update_fmapg(pi, eta, adv, pg_method)
+        else:
+            if FLAG_SAVE_INNER_STEPS:
+                tmp_list = [env.calc_vpi(pi, FLAG_RETURN_V_S0=True)]
+                
+            omega = theta.copy()
+            for k in range(num_inner_updates):
+                # do one gradient ascent step
+                if pg_method in ['sPPO', 'MDPO']:
+                    grad = calc_grad_fmapg(
+                        omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi, eta=eta,
+                        pg_method=pg_method)
+                    omega = omega + alpha * grad                    
+                elif pg_method == 'TRPO':
+                    omega_tmp = trpo_update(
+                        omega=omega, pi_t=pi, dpi_t=dpi, qpi_t=qpi, delta=delta,
+                        decay_factor=decay_factor, num_states=num_states,
+                        num_actions=num_actions)
+                    omega = omega_tmp.copy()
+                elif pg_method == 'PPO':
+                    grad = calc_grad_ppo(
+                        omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi,
+                        epsilon=epsilon)
+                    omega = omega + alpha * grad
+                else:
+                    raise NotImplementedError()
+                    
+                # save the optimization objective
+                if FLAG_SAVE_INNER_STEPS:
+                    pi_tmp = softmax(omega)
+                    tmp_list.append(env.calc_vpi(pi_tmp, FLAG_RETURN_V_S0=True))
 
-        vpi_list_inner.append(tmp_list)
+            if FLAG_SAVE_INNER_STEPS:
+                vpi_list_inner.append(tmp_list)
 
-        # update the policy to the approximate new point
-        theta = omega.copy()
-        pi = softmax(theta)
+            # update the policy to the new approximate point
+            theta = omega.copy()
+            pi = softmax(theta)
 
-    return np.array(vpi_list_inner), np.array(vpi_list_outer)
- 
-def run_experiment_exact(num_iters, gamma, eta):
-    # create the environment
-    env = CliffWorld()
-    num_states = env.state_space
-    num_actions = env.action_space
+    vpi_list_outer = np.array(vpi_list_outer)
+    if FLAG_SAVE_INNER_STEPS:
+        vpi_list_inner = np.array(vpi_list_inner)
+        
+    return vpi_list_outer, vpi_list_inner
 
-    # estimate the optimal policy
-    v_star = np.dot(env.calc_v_star(), env.mu)
-    pi_star = env.calc_pi_star()
+# generate the plots
+# fig, axs = plt.subplots(1, 4, figsize=(20, 4))
 
-    vpi_dict = {'MDPO': [], 'sPPO': []}
-    for pg_method in ['MDPO', 'sPPO']:
-        # initialize pi (uniform policy with direct representation)
-        pi = generate_uniform_policy(num_states, num_actions)
+# axs[0].set_title(r'$\pi*$' + ' policy visualization')
+# plot_grid(axs[0], xlim=7, ylim=7)
+# plot_policy(axs[0], pi_star, xlim=7, ylim=7)
 
-        # evaluate the policies
-        vpi_dict[pg_method].append(env.calc_vpi(pi, FLAG_V_S0=True))
+# axs[1].set_title('sPPO')
+# plot_grid(axs[1], xlim=7, ylim=7)
+# plot_policy(axs[1], pi_sPPO, xlim=7, ylim=7)
 
-        # learning loop
-        for T in range(num_iters):
-            adv = env.calc_qpi(pi) - env.calc_vpi(pi).reshape(-1, 1)
-            pi = analytical_update_fmapg(pi, eta, adv, pg_method) # update pi
+# axs[2].set_title('MDPO')
+# plot_grid(axs[2], xlim=7, ylim=7)
+# plot_policy(axs[2], pi_MDPO, xlim=7, ylim=7)
 
-            # evaluate the policies    
-            vpi_dict[pg_method].append(env.calc_vpi(pi, FLAG_V_S0=True))
+# axs[3].set_title('Learning Curves')
+# axs[3].plot(vpi_dict['MDPO'], color='tab:red', label='MDPO')
+# axs[3].plot(vpi_dict['sPPO'], color='tab:blue', label='sPPO')
+# axs[3].plot(range(num_iters + 1), [v_star] * (num_iters + 1), 'k--',
+#             label='v*')  
 
-    # generate the plots
-    # fig, axs = plt.subplots(1, 4, figsize=(20, 4))
+# axs[0].legend()
+# axs[3].legend()
 
-    # axs[0].set_title(r'$\pi*$' + ' policy visualization')
-    # plot_grid(axs[0], xlim=7, ylim=7)
-    # plot_policy(axs[0], pi_star, xlim=7, ylim=7)
+# axs[3].set_xlabel(r'$v^\pi(s_0)$' + ' vs Timesteps')
+# axs[3].set_ylim([0, v_star + 0.1])
 
-    # axs[1].set_title('sPPO')
-    # plot_grid(axs[1], xlim=7, ylim=7)
-    # plot_policy(axs[1], pi_sPPO, xlim=7, ylim=7)
+# for i in range(3):
+#     axs[i].axis('off')
+# axs[3].spines['top'].set_visible(False)
+# axs[3].spines['right'].set_visible(False)
 
-    # axs[2].set_title('MDPO')
-    # plot_grid(axs[2], xlim=7, ylim=7)
-    # plot_policy(axs[2], pi_MDPO, xlim=7, ylim=7)
+# plt.savefig('numIters{}__eta{}__gamma{}.jpg'.format(num_iters, eta, gamma))
+# plt.close()
 
-    # axs[3].set_title('Learning Curves')
-    # axs[3].plot(vpi_dict['MDPO'], color='tab:red', label='MDPO')
-    # axs[3].plot(vpi_dict['sPPO'], color='tab:blue', label='sPPO')
-    # axs[3].plot(range(num_iters + 1), [v_star] * (num_iters + 1), 'k--',
-    #             label='v*')  
-
-    # axs[0].legend()
-    # axs[3].legend()
-    
-    # axs[3].set_xlabel(r'$v^\pi(s_0)$' + ' vs Timesteps')
-    # axs[3].set_ylim([0, v_star + 0.1])
-
-    # for i in range(3):
-    #     axs[i].axis('off')
-    # axs[3].spines['top'].set_visible(False)
-    # axs[3].spines['right'].set_visible(False)
-
-    # plt.savefig('numIters{}__eta{}__gamma{}.jpg'.format(num_iters, eta, gamma))
-    # plt.close()
-
-    return vpi_dict
+# color_dict = {100: 'tab:red', 50: 'tab:green', 10: 'tab:blue'}
+# linestyle_dict = {100: '--', 50: '-.', 10: ':'}
