@@ -40,7 +40,7 @@ adv_estimate_stepsize = None
 FLAG_SAVE_INNER_STEPS = False
 
 # folder details
-folder_name = 'fmaPG_exp__CliffWorld_{}'.format(pg_method)
+folder_name = 'fmaPG_exp/CliffWorld_{}'.format(pg_method)
 os.makedirs(folder_name, exist_ok='True')
 
 #----------------------------------------------------------------------

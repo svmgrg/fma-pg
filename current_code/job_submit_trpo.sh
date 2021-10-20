@@ -3,25 +3,23 @@
 #
 # taken from here: https://github.com/sinaghiassian/OffpolicyAlgorithms/blob/master/Job/SubmitJobsTemplates.SL
 #
-#SBATCH --account=def-whitem
-#SBATCH --time=00:31:00
+#SBATCH --account=def-ashique
+#SBATCH --time=03:31:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=40
 #SBATCH --job-name FMAPG
 
 num_outer_loops_list=(2000)
 num_inner_loops_list=(1 10 100 1000)
-pg_alg_list=('sPPO' 'MDPO')
+pg_alg_list=('TRPO')
 
 # [2**i for i in range(-13, 4, 1)]
-eta_list=(0.0001220703125 0.000244140625 0.00048828125 0.0009765625 0.001953125 0.00390625 0.0078125 0.015625 0.03125 0.0625 0.125 0.25 0.5 1 2 4 8)
-alpha_list=(0.0001220703125 0.000244140625 0.00048828125 0.0009765625 0.001953125 0.00390625 0.0078125 0.015625 0.03125 0.0625 0.125 0.25 0.5 1 2 4 8)
-# [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9]
+eta_list=(-1)
+alpha_list=(-1)
 epsilon_list=(-1)
 # [2**i for i in range(-13, 14, 2)]
-delta_list=(-1)
-# [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9]
-decay_factor_list=(-1)
+delta_list=(0.0001220703125 0.00048828125 0.001953125 0.0078125 0.03125 0.125 0.5 2 8 32 128 512 2048 8192)
+decay_factor_list=(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9)
 use_analytical_grad_list=(0)
 
 module load NiaEnv/2019b

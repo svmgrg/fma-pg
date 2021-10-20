@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import pdb
 
 #----------------------------------------------------------------------
@@ -319,7 +319,7 @@ def run_experiment(env, pg_method, num_iters, eta, delta, decay_factor, epsilon,
 
     # learning loop
     for T in range(num_iters):
-        print(T)
+        # print(T)
         dpi = env.calc_dpi(pi)
         
         if FLAG_TRUE_ADVANTAGE:

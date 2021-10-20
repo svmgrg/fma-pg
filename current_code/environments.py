@@ -8,28 +8,27 @@ import pdb
 # env = cliff_gw(gamma=0.99)
 # np.savez('cliff_world_env', P=env.P, r=env.R, mu=env.p0,
 #          terminal_states=env.terminal_states)
-
-arr_dict = np.load('cliff_world_env.npz')
-P_simone = arr_dict['P']
-r_simone = arr_dict['r']
-mu_simone = arr_dict['mu']
-terminal_states_simone = [48]
+# arr_dict = np.load('cliff_world_env.npz')
+# P_simone = arr_dict['P']
+# r_simone = arr_dict['r']
+# mu_simone = arr_dict['mu']
+# terminal_states_simone = [48]
 #======================================================================
 
 #======================================================================
 # Simplified CliffWorld (re-write)
-#
-# ------------------           4 is the goal state
-#  4 | 9 | 14 | 19 |           20 is terminal state reached only via the state 4
-# ------------------           3, 2, 1 are chasms  
-#  3 | 8 | 13 | 18 |           0 is the start state
-# ------------------ 
-#  2 | 7 | 12 | 17 |           all transitions are determinitic
-# ------------------           Actions: 0=down, 1=up, 2=left, 3=right
-#  1 | 6 | 11 | 16 |
-# -----------------------      rewards are all zeros except at chasms (-100)
-#  0 | 5 | 10 | 15 | 20 |      reward for going into the goal state is +1
-# -----------------------
+#----------------------------------------------------------------------
+# -------------------         4 is the goal state
+# | 4 | 9 | 14 | 19 |         20 is terminal state reached only via the state 4
+# -------------------         3, 2, 1 are chasms  
+# | 3 | 8 | 13 | 18 |         0 is the start state
+# ------------------- 
+# | 2 | 7 | 12 | 17 |         all transitions are determinitic
+# -------------------         Actions: 0=down, 1=up, 2=left, 3=right
+# | 1 | 6 | 11 | 16 |
+# ------------------------    rewards are all zeros except at chasms (-100)
+# | 0 | 5 | 10 | 15 | 20 |    reward for going into the goal state is +1
+# ------------------------
 #----------------------------------------------------------------------
 
 # environment P: (i, j, k)th element = Pr{S' = s_k | S = s_i, A = a_j}
