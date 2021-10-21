@@ -1,8 +1,9 @@
-\BOOKMARK [1][-]{section.1}{Softmax PPO with Tabular Parameterization}{}% 1
-\BOOKMARK [2][-]{subsection.1.1}{Closed Form Update with Direct Representation}{section.1}% 2
-\BOOKMARK [2][-]{subsection.1.2}{Gradient of the Loss Function with Softmax Policy Representation}{section.1}% 3
-\BOOKMARK [1][-]{section.2}{MDPO}{}% 4
-\BOOKMARK [2][-]{subsection.2.1}{Closed Form Update with Direct Parameterization}{section.2}% 5
-\BOOKMARK [2][-]{subsection.2.2}{Gradient of the Loss Function with Softmax Policy Representation}{section.2}% 6
-\BOOKMARK [1][-]{section.3}{TRPO}{}% 7
-\BOOKMARK [1][-]{section.4}{PPO}{}% 8
+\BOOKMARK [1][-]{section.1}{Experiments on the Tabular CliffWorld Environment}{}% 1
+\BOOKMARK [1][-]{section.2}{Softmax PPO with Tabular Parameterization}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Closed Form Update with Direct Representation}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Gradient of the Loss Function with Softmax Policy Representation}{section.2}% 4
+\BOOKMARK [1][-]{section.3}{Mirror Descent Policy Optimization \(MDPO\)}{}% 5
+\BOOKMARK [2][-]{subsection.3.1}{Closed Form Update with Direct Parameterization}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.2}{Gradient of the MDPO Loss Function with Tabular Softmax Representation}{section.3}% 7
+\BOOKMARK [1][-]{section.4}{Trust Region Policy Optimization \(TRPO\)}{}% 8
+\BOOKMARK [1][-]{section.5}{Proximal Policy Optimization \(PPO\)}{}% 9
