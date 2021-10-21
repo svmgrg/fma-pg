@@ -64,12 +64,24 @@
 
 \section{Experiments on the Tabular CliffWorld Environment}
 
-  \begin{figure}[!hbp]
-    \centering
-    \includegraphics[scale=0.33]{tabular_figures/cliffworld.pdf}
-    \caption{The episodic CliffWorld environment and the learning curve for MDPO on it illustrating three different locally suboptimal policies. \textbf{(Left)} We consider a variant of the CliffWorld environment (Example 6.6, Sutton and Barto, 2018) containing 21 different states and four actions per state. The agent starts in the \texttt{Start} state and has four cardinal actions which deterministically move it into the corresponding next state. The objective is to reach the \texttt{Goal} state as quickly as possible. Any subsequent action taken after the agent falls into a state marked by \texttt{Cliff} moves it back to the start state and yields a reward of $-100$. Similarly, once in the goal state, any action takes the agent into the terminal state and yields a reward of $-1$. All the other transitions have a reward of zero and the discount factor is set to $\gamma = 0.9$. It is easy to see that the optimal policy will have a value of $v^*(s_0) = 0 + \gamma \cdot 0 + \cdots + \gamma^5 \cdot 0 + \gamma^6 \cdot 1 = 0.9^6 = 0.53$. \textbf{(Right)} We show the learning curve for the analytical MDPO update using $\eta = 1$. This curve shows three different locally optimal policies. We later show in our experiments, the different PG agents often get stuck on one of these policies.}
-    \label{fig: cliffworld}
-  \end{figure}
+\begin{figure}[!hbp]
+  \centering
+  \includegraphics[scale=0.33]{tabular_figures/cliffworld.pdf}
+  \caption{The episodic CliffWorld environment and the learning curve for MDPO on it illustrating three different locally suboptimal policies. \textbf{(Left)} We consider a variant of the CliffWorld environment (Example 6.6, Sutton and Barto, 2018) containing 21 different states and four actions per state. The agent starts in the \texttt{Start} state and has four cardinal actions which deterministically move it into the corresponding next state. The objective is to reach the \texttt{Goal} state as quickly as possible. Any subsequent action taken after the agent falls into a state marked by \texttt{Cliff} moves it back to the start state and yields a reward of $-100$. Similarly, once in the goal state, any action takes the agent into the terminal state and yields a reward of $-1$. All the other transitions have a reward of zero and the discount factor is set to $\gamma = 0.9$. It is easy to see that the optimal policy will have a value of $v^*(s_0) = 0 + \gamma \cdot 0 + \cdots + \gamma^5 \cdot 0 + \gamma^6 \cdot 1 = 0.9^6 = 0.53$. \textbf{(Right)} We show the learning curve for the analytical MDPO update using $\eta = 1$. This curve shows three different locally optimal policies. We later show in our experiments, the different PG agents often get stuck on one of these policies.}
+  \label{fig: cliffworld}
+\end{figure}
+
+\subsection{Learning Curves for the Best Parameter Configurations}
+
+\subsection{Parameter Sensitivity}
+
+\subsection{Conclusions}
+TRPO was prohibitively costly. Although, our implementation was exact, at the most precise configuration, TRPO took almost 5000 seconds for 100 inner iterations and 2000 outer iterations, whereas each of the other methods (sPPO, MDPO, and PPO) took less than 10 seconds for the same 100, 2000 iters.
+
+Both sPPO and MDPO has a better sensitivity.
+
+They were able to learn the optimal policy, whereas PPO failed to do so.
+  
 
 \section{Softmax PPO with Tabular Parameterization}
 
@@ -130,16 +142,21 @@ Consider the softmax policy representation
 \begin{equation}
   p^\pi(b | x) = \frac{e^{\theta(x, b)}}{\sum_c e^{\theta(x, c)}}, \label{eq: softmax}
 \end{equation}
-where $\theta(x, b)$s for all state-action pairs $(x, b)$ are action preferences maintained in a table (tabular parameterization). We will use gradient ascent to approximately solve Eq. \ref{eq: optim_problem_sppo}; to do that, the quantity of interest is
+where $\theta(x, b)$ for all state-action pairs $(x, b)$ are action preferences maintained in a table (tabular parameterization). Also note that the derivative of the policy with respect to the action preferences is given by
+\begin{equation}
+  \frac{\partial}{\partial \theta(s, a)} p^\pi(b | x) = \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^\pi(a | x) \Big) p^\pi(b | x),
+\end{equation}
+where $\mathbb{I}(a = b)$ is the identity function when $a = b$ and zero otherwise. 
+We will use gradient ascent to approximately solve Eq. \ref{eq: optim_problem_sppo}; to do that, the quantity of interest is
 \begin{align}
-  \nabla_{\theta(s, a)} \ell^{\pi_t}_{\text{sPPO}} &= \sum_{x \in \mathcal{S}} \sum_{b \in \mathcal{A}} \left[ \nabla_{\theta(s, a)} p^\pi(b | x) \right] \left[ \nabla_{p^\pi(b | x)} \ell^{\pi_t}_{\text{sPPO}} \right] \tag*{(using total derivative)} \\
+  \frac{\partial}{\partial \theta(s, a)} \ell^{\pi_t}_{\text{sPPO}} &= \sum_{x \in \mathcal{S}} \sum_{b \in \mathcal{A}} \left[ \frac{\partial}{\partial \theta(s, a)} p^\pi(b | x) \right] \left[ \frac{\partial}{\partial p^\pi(b | x)} \ell^{\pi_t}_{\text{sPPO}} \right] \tag*{(using total derivative)} \\
   &= \sum_{x, b} \Big[ \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^\pi(a | x) \Big) p^\pi(b | x) \Big] \left[ d^{\pi_t}(x) p^{\pi_t}(b|x) \left( A^{\pi_t}(x, b) + \frac{1}{\eta} \right) \frac{1}{p^\pi(b|x)} \right] \nonumber \\
   &= \E_{X \sim d^{\pi_t}, B \sim p^{\pi_t}(\cdot | X)} \left[ \mathbb{I}(X = s) \Big( \mathbb{I}(B = a) - p^\pi(a | x) \Big) \left( A^{\pi_t}(X, B) + \frac{1}{\eta} \right) \right] \\
   &= d^{\pi_t}(s) \sum_b \Big( \mathbb{I}(b = a) - p^\pi(a | s) \Big) p^{\pi_t}(b|s) \left( A^{\pi_t}(s, b) + \frac{1}{\eta} \right) \nonumber \\
   &= d^{\pi_t}(s) \left[ p^{\pi_t}(a|s) \left( A^{\pi_t}(s, a) + \frac{1}{\eta} \right) - p^\pi(a | s) \sum_b p^{\pi_t}(b|s) \left(A^{\pi_t}(s, b) + \frac{1}{\eta} \right) \right] \nonumber \\
   &= d^{\pi_t}(s) \left[ p^{\pi_t}(a|s) \left( A^{\pi_t}(s, a) + \frac{1}{\eta} \right) - \frac{p^\pi(a | s)}{\eta} \right], \nonumber
 \end{align}
-where $\mathbb{I}(a = b)$ is the identity function when $a = b$ and zero otherwise. Now we can simply update the inner loop of FMA-PG (Algorithm 1, main paper) via gradient ascent:
+Now we can simply update the inner loop of FMA-PG (Algorithm 1, main paper) via gradient ascent:
 \begin{equation}
   \theta(s, a) \; \leftarrow \; \theta(s, a) + \alpha d^{\pi_t}(s) \left[ p^{\pi_t}(a|s) \left( A^{\pi_t}(s, a) + \frac{1}{\eta} \right) - \frac{p^\pi(a | s)}{\eta} \right].
 \end{equation}
@@ -192,7 +209,7 @@ This leaves one last problem: Can we ensure that $\lambda_s \geq 0$ for all stat
 \subsection{Gradient of the MDPO Loss Function with Tabular Softmax Representation}
 We again take the softmax policy representation given by Eq. \ref{eq: softmax}, and compute $\nabla_{\theta(s, a)} \ell^{\pi_t}_{\text{MDPO}}$ for the MDPO loss (we substitute $Q^{\pi_t}$ with $A^{\pi_t}$ in this calculation):
 \begin{align}
-  \nabla_{\theta(s, a)} \ell^{\pi_t}_{\text{MDPO}} &= \sum_{x, b} \left[ \nabla_{\theta(s, a)} p^\pi(b | x) \right] \left[ \nabla_{p^\pi(b | x)} \ell^{\pi_t} \right] \tag*{(using total derivative)} \\
+  \frac{\partial}{\partial \theta(s, a)} \ell^{\pi_t}_{\text{MDPO}} &= \sum_{x, b} \left[ \frac{\partial}{\partial \theta(s, a)} p^\pi(b | x) \right] \left[ \frac{\partial}{\partial p^\pi(b | x)} \ell^{\pi_t} \right] \tag*{(using total derivative)} \\
   &= \sum_{x, b} \Big[ \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^\pi(a | x) \Big) p^\pi(b | x) \Big] \left[ \frac{d^{\pi_t}(x)}{\eta} \left( \eta A^{\pi_t}(x, b) - \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} - 1 \right) \right] \nonumber \\
   &= \frac{d^{\pi_t}(s)}{\eta} \sum_b \Big( \mathbb{I}(b = a) - p^\pi(a | s) \Big) p^\pi(b | s) \left[ \eta A^{\pi_t}(s, b) - \log \frac{p^\pi(b | s)}{p^{\pi_t}(b | s)} - 1 \right] \nonumber \\
   &= \frac{d^{\pi_t}(s)}{\eta} p^\pi(a | s) \left[ \eta A^{\pi_t}(s, a) - \eta \sum_b p^\pi(b|s) A^{\pi_t}(s, b) - \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} + \text{KL}(p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s)) \right], \nonumber
