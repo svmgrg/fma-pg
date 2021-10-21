@@ -3,6 +3,7 @@ import time
 import argparse
 import os
 import json
+import matplotlib.pyplot as plt
 
 from environments import *
 from utils import *
@@ -76,6 +77,18 @@ if vpi_list_inner is not None:
     vpi_list_inner = vpi_list_inner.tolist()
 dat['vpi_inner_list'] = vpi_list_inner
 dat['pi'] = pi.tolist()
+
+# fig, axs = plt.subplots(1, 2, figsize=(7, 4))
+fig, axs = plt.subplots(1, 1, figsize=(7, 4))
+# plot_grid(axs[0])
+# plot_policy(axs[0], pi)
+axs.plot(vpi_list_outer, color='black')
+v_star = np.dot(env.calc_v_star(), env.mu)
+axs.plot([v_star] * len(vpi_list_outer), color='black', linewidth=0.1)
+axs.set_ylim([0, 0.6])
+plt.savefig('lc_{}_{}_{}__env.pdf'.format(pg_method, eta, num_outer_loops))
+# plt.show()  
+# plt.close()
 
 filename='{}/numOuterLoops_{}__numInnerLoops_{}__eta_{}__alpha_{}'\
     '__epsilon_{}__delta_{}__decayFactor_{}__analyticalGrad_{}'.format(

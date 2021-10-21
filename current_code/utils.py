@@ -12,13 +12,13 @@ def plot_grid(ax, xlim=4, ylim=5):
     for x in x_center:
         for y in y_center:
             if int((x - 0.5) * ylim + (y - 0.5)) == 0:
-                ax.scatter(x, y, s=200, color='tab:blue', marker='s',
+                ax.scatter(x, y, s=1500, color='tab:blue', marker='s',
                            label='start', alpha=0.5)
             elif int((x - 0.5) * ylim + (y - 0.5)) in [1, 2, 3]:
-                ax.scatter(x, y, s=200, color='tab:red', marker='x',
+                ax.scatter(x, y, s=1500, color='tab:red', marker='x',
                            label='chasm', alpha=0.5)
             elif int((x - 0.5) * ylim + (y - 0.5)) == 4:
-                ax.scatter(x, y, s=200, color='tab:green', marker='o',
+                ax.scatter(x, y, s=1500, color='tab:green', marker='s',
                            label='end', alpha=0.5)
             else:
                 ax.scatter(x, y, s=0.1, color='purple')
@@ -40,21 +40,20 @@ def plot_policy(ax, pi, xlim=4, ylim=5):
 
             # down
             ax.quiver(x_center, y_center, 0, -diff[0],
-                      color='tab:orange', width=0.007, headwidth=2,
-                      headlength=4,
-                      scale=1, scale_units='xy', linewidth=0.1)
+                      color='tab:orange', width=0.013, headwidth=2,
+                      headlength=4, scale=1, scale_units='xy', linewidth=1)
             # up
             ax.quiver(x_center, y_center, 0, +diff[1],
-                      color='tab:blue', width=0.007, headwidth=2, headlength=4,
-                      scale=1, scale_units='xy', linewidth=0.1)
+                      color='tab:blue', width=0.013, headwidth=2, 
+                      headlength=4, scale=1, scale_units='xy', linewidth=1)
             # left
             ax.quiver(x_center, y_center, -diff[2], 0,
-                      color='tab:red', width=0.007, headwidth=2, headlength=4,
-                      scale=1, scale_units='xy', linewidth=0.1)
+                      color='tab:red', width=0.013, headwidth=2,
+                      headlength=4, scale=1, scale_units='xy', linewidth=1)
             # right
             ax.quiver(x_center, y_center, +diff[3], 0,
-                      color='tab:green', width=0.007, headwidth=2, headlength=4,
-                      scale=1, scale_units='xy', linewidth=0.1)
+                      color='tab:green', width=0.013, headwidth=2, 
+                      headlength=4, scale=1, scale_units='xy', linewidth=1)
 
 #----------------------------------------------------------------------
 # utility functions
