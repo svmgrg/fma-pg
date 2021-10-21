@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.10.1)  21 OCT 2021 13:43
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.10.1)  21 OCT 2021 14:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -488,28 +488,12 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 61.
 (/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<tabular_figures/cliffworld.pdf, id=52, 1211.30019pt x 509.25706pt>
+<tabular_figures/cliffworld.pdf, id=54, 1211.30019pt x 509.25706pt>
 File: tabular_figures/cliffworld.pdf Graphic file (type pdf)
 
 <use tabular_figures/cliffworld.pdf>
-Package pdftex.def Info: tabular_figures/cliffworld.pdf used on input line 69.
-(pdftex.def)             Requested size: 399.7303pt x 168.05534pt.
-
-<tabular_figures/learning_curves.pdf, id=53, 752.26517pt x 245.59225pt>
-File: tabular_figures/learning_curves.pdf Graphic file (type pdf)
-
-<use tabular_figures/learning_curves.pdf>
-Package pdftex.def Info: tabular_figures/learning_curves.pdf used on input line
- 77.
-(pdftex.def)             Requested size: 376.13167pt x 122.79582pt.
-
-<tabular_figures/sensitivity.pdf, id=54, 972.00592pt x 700.98912pt>
-File: tabular_figures/sensitivity.pdf Graphic file (type pdf)
-
-<use tabular_figures/sensitivity.pdf>
-Package pdftex.def Info: tabular_figures/sensitivity.pdf used on input line 85.
-
-(pdftex.def)             Requested size: 437.39862pt x 315.44218pt.
+Package pdftex.def Info: tabular_figures/cliffworld.pdf used on input line 70.
+(pdftex.def)             Requested size: 436.06773pt x 183.3324pt.
  [1
 
 {/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}pdfTeX wa
@@ -518,71 +502,90 @@ ready used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.105 \end{IEEEeqnarray*}
-                          <./tabular_figures/cliffworld.pdf>] [2pdfTeX warning 
-(ext4): destination with the same identifier (name{figure.2}) has been already 
-used, duplicate ignored
+l.76 
+      <./tabular_figures/cliffworld.pdf>]
+<tabular_figures/learning_curves.pdf, id=1203, 752.26517pt x 245.59225pt>
+File: tabular_figures/learning_curves.pdf Graphic file (type pdf)
+
+<use tabular_figures/learning_curves.pdf>
+Package pdftex.def Info: tabular_figures/learning_curves.pdf used on input line
+ 89.
+(pdftex.def)             Requested size: 451.36258pt x 147.35648pt.
+
+<tabular_figures/sensitivity.pdf, id=1204, 972.00592pt x 700.98912pt>
+File: tabular_figures/sensitivity.pdf Graphic file (type pdf)
+
+<use tabular_figures/sensitivity.pdf>
+Package pdftex.def Info: tabular_figures/sensitivity.pdf used on input line 96.
+
+(pdftex.def)             Requested size: 437.39862pt x 315.44218pt.
+ [2] [3pdfTeX warning (ext4): destination with the same identifier (name{figure
+.2}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.105 \end{IEEEeqnarray*}
-                         pdfTeX warning (ext4): destination with the same ident
-ifier (name{figure.3}) has been already used, duplicate ignored
+l.104 B
+       oth sPPO and MDPO has a better sensitivity.pdfTeX warning (ext4): destin
+ation with the same identifier (name{figure.3}) has been already used, duplicat
+e ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.105 \end{IEEEeqnarray*}
-                          <./tabular_figures/learning_curves.pdf> <./tabular_fi
-gures/sensitivity.pdf
+l.104 B
+       oth sPPO and MDPO has a better sensitivity. <./tabular_figures/learning_
+curves.pdf> <./tabular_figures/sensitivity.pdf
 
 pdfTeX warning: pdflatex (file ./tabular_figures/sensitivity.pdf): PDF inclusio
 n: multiple pdfs with page group included in a single page
->] [3] [4] [5]
-Overfull \hbox (10.86612pt too wide) in paragraph at lines 228--228
+>] [4] [5] [6]
+Overfull \hbox (10.86612pt too wide) in paragraph at lines 239--239
 [] 
  []
 
-[6] [7]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 316.
- [8]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 316.
+[7] [8]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 327.
+ [9]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 327.
  (./notes_fmapg.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 316.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 316.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 327.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 327.
 Package rerunfilecheck Info: File `notes_fmapg.out' has not changed.
-(rerunfilecheck)             Checksum: 4922DA7FE59649B431F5CE7FD48D96F4;1042.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 316.
+(rerunfilecheck)             Checksum: A902C5C9BB7F02D2E744F0CAD588789F;1139.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 327.
  ) 
 Here is how much of TeX's memory you used:
- 8626 strings out of 493089
- 123782 string characters out of 6134848
- 330567 words of memory out of 5000000
+ 8629 strings out of 493089
+ 123910 string characters out of 6134848
+ 330658 words of memory out of 5000000
  11922 multiletter control sequences out of 15000+600000
  12315 words of font info for 48 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 29i,16n,35p,1426b,427s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 29i,16n,35p,1426b,337s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
 /usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
 usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></us
 r/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/
-local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/lo
-cal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/loca
-l/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/
-texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/tex
-live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texliv
-e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2
-015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/20
-15/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2015
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2015/t
-exmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2015/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/texm
-f-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on notes_fmapg.pdf (8 pages, 504922 bytes).
+local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/lo
+cal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/loca
+l/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/
+texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/te
+xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texli
+ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/
+2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/201
+5/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2015/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2015/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2015/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2015/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2015/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/texmf-dist/f
+onts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on notes_fmapg.pdf (9 pages, 549950 bytes).
 PDF statistics:
- 2168 PDF objects out of 2487 (max. 8388607)
- 1484 compressed objects within 15 object streams
- 61 named destinations out of 1000 (max. 500000)
+ 2199 PDF objects out of 2487 (max. 8388607)
+ 1508 compressed objects within 16 object streams
+ 64 named destinations out of 1000 (max. 500000)
  112 words of extra memory for PDF output out of 10000 (max. 10000000)
 

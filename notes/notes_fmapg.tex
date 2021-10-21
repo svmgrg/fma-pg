@@ -61,33 +61,44 @@
 \vspace{-2cm}
 % \linenumbers
 
-
-\section{Experiments on the Tabular CliffWorld Environment}
+\section{Appendix}
+\subsection{Experiments on the Tabular CliffWorld Environment}
+In this section, we study the performance of four different policy gradient (PG) algorithms, sPPO (Softmax PPO\footnote{Note that this is NOT the sPPO of Section 6.2; we just overloaded this notation.}, FMA-PG with a softmax policy, see Eq. 8 in main text), MDPO, PPO, and TRPO. We use a tabular gridworld environment called CliffWorld and a tabular softmax policy parameterization. The environment description and its properties are discussed in Figure \ref{fig: cliffworld}.
 
 \begin{figure}[!hbp]
   \centering
-  \includegraphics[scale=0.33]{tabular_figures/cliffworld.pdf}
+  \includegraphics[scale=0.36]{tabular_figures/cliffworld.pdf}
   \caption{The episodic CliffWorld environment and the learning curve for MDPO on it illustrating three different locally suboptimal policies. \textbf{(Left)} We consider a variant of the CliffWorld environment (Example 6.6, Sutton and Barto, 2018) containing 21 different states and four actions per state. The agent starts in the \texttt{Start} state and has four cardinal actions which deterministically move it into the corresponding next state. The objective is to reach the \texttt{Goal} state as quickly as possible. Any subsequent action taken after the agent falls into a state marked by \texttt{Cliff} moves it back to the start state and yields a reward of $-100$. Similarly, once in the goal state, any action takes the agent into the terminal state and yields a reward of $-1$. All the other transitions have a reward of zero and the discount factor is set to $\gamma = 0.9$. It is easy to see that the optimal policy will have a value of $v^*(s_0) = 0 + \gamma \cdot 0 + \cdots + \gamma^5 \cdot 0 + \gamma^6 \cdot 1 = 0.9^6 = 0.53$. \textbf{(Right)} We show the learning curve for the analytical MDPO update using $\eta = 1$. This curve shows three different locally optimal policies. We later show in our experiments, the different PG agents often get stuck on one of these policies.}
   \label{fig: cliffworld}
 \end{figure}
 
-\subsection{Learning Curves for the Best Parameter Configurations}
-\begin{figure}[!hbp]
+To make the results easier to interpret and make them more closely follow the theoretical properties of the PG methods, we assume full access to the environment dynamics and use the analytically calculated expected gradient updates for all the four algorithms, essentially making this a study of the optimization property of the above four PG algorithms. We trained each of the method for 2000 iterations. Each iteration consisted of one or multiple inner updates (we represent this number by $m$); these updates are the off-policy style updates used by all these algorithms (also see Algorithm 1, main paper). We sweeped over the relevant parameters of the PG algorithms. For sPPO and MDPO, this was $\eta \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$ and inner loop stepsize $\alpha \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$. For PPO, we sweeped over the stepsize $\alpha \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$ and the clipping parameter $\epsilon \in \{0.1, 0.2, \ldots, 0.9\}$. For TRPO, we sweeped over the trust region size $\delta \in \{2^{-13}, 2^{-11}, \ldots, 2^{13}\}$ and the line search stepsize decay parameter $\text{df} \in \{0.1, 0.2, \ldots, 0.9\}$.
+
+In the next section, we give the learning curves for these algorithms corresponding to the best hyperparameter configurations followed by the complete parameter sensitivity plots. We then describe our conclusions from these experiments. In the end, we also include the gradient calculations used in our implementations and associated details for all the methods.
+
+\subsubsection{Learning Curves and Parameter Sensitivity Plots}
+We show the performance of the four algorithms against the number of outer loop iterations in Figure \ref{fig: learning_curves}. The three different subplots correspond to a different number of inner updates\footnote{For TRPO, in the third subplot we just reused the performance from $m=100$. From our sensitivity plots (Figure \ref{fig: sensitivity}) we observed that the performance of TRPO saturated after $m = 10$; in particular the TRPO sensitivity plots are identical for $m=10$ and $m=100$. Therefore, its performance at $m=1000$ should be exactly equivalent to its performance at $m=100$ and consequently we skipped running that experiment.}. To select the hyperparameters for each setting, we ran sweeps over different configurations and chose the ones that resulted in the best final performance at the end of 2000 iterations.
+
+From this optimal policy in less than 20 iterations. Whereas, PPO got stuck in a ``safe'' sub-optimal policy. Both MDPO and sPPO were able to achieve the optimal policy with 100 and 1000 number of inner iterations, but got stuck in the suboptimal policy with 10 number of inner iterations. We further observe that increasing the number of inner loop iterations helped all the methods, except TRPO, to improve the convergence speed. We should also mention, although TRPO had the faster convergence, its update was also the costliest (more than ten times slower than the rest of the methods) in terms of wall time. 
+
+We show the complete parameter sweeps for the different methods in Figure \ref{fig: sensitivity}. The different rows correspond to different algorithms and the columns correspond to different number of inner loop updates. Each algorithm has two parameters: the $x$ axis gives the value of one of these parameters and the shaded curves correspond to the other parameter. The $y$ axis shows the final performance of the algorithm at the end of 2000 iterations corresponding to the particular parameter configuration. We also include the sensitivity plots for sPPO and MDPO under analytical updates, which is equivalent of doing an infinite number of inner loop updates ($m = \infty$) with a small enough stepsize $\alpha$.
+
+From this figure we see that for $m=1$ all the algorithms, except TRPO, had a poor performance. However, as the value of $m$ increased, these algorithms were able to perform well with a large number of stepsizes. We also note that, both sPPO and MDPO achieved the optimal policy for some parameter configurations, whereas PPO failed to achieve the optimal policy for any stepsize configuration we tried. sPPO and MDPO both had good performance for a range of parameters. Also, not the that the value of $\eta < 1 - \gamma = 0.1$, which was suggested by the theory for sPPO, worked well. TRPO had a very low sensitivity for all its parameters. We think the reasons for this is that TRPO uses the (near) optimal steepest ascent direction with the maximal stepsize, achieved via line search. This gives TRPO much better convergence properties, especially in this case where there are no sampling or estimation errors. Also, we think that the trust region parameter $\delta = 4$ was already too small for this problem and therefore TRPO performed well for all the values below it.
+\begin{figure}[!bp]
   \centering
-  \includegraphics[scale=0.5]{tabular_figures/learning_curves.pdf}
+  \includegraphics[scale=0.6]{tabular_figures/learning_curves.pdf}
   \caption{The learning curves for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. All the updates were done using exact gradient calculations, i.e. there was no sampling involved.}
   \label{fig: learning_curves}
 \end{figure}
 
-\subsection{Parameter Sensitivity}
-\begin{figure}[!hbp]
+\begin{figure}[!bp]
   \centering
   \includegraphics[scale=0.45]{tabular_figures/sensitivity.pdf}
-  \caption{The parameter sensitivity plots for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. The $x$ axis shows sweep over one parameter of the corresponding and the different color shaded curves correspond to another parameter.}
+  \caption{The parameter sensitivity plots for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. The $x$ axis shows sweep over one parameter of the corresponding and the different color shaded curves correspond to another parameter. The faint black line near the top of each subplot depicts the value of the optimal policy.}
   \label{fig: sensitivity}
 \end{figure}
 
-\subsection{Conclusions}
+\subsubsection{Conclusions}
 TRPO was prohibitively costly. Although, our implementation was exact, at the most precise configuration, TRPO took almost 5000 seconds for 100 inner iterations and 2000 outer iterations, whereas each of the other methods (sPPO, MDPO, and PPO) took less than 10 seconds for the same 100, 2000 iters.
 
 Both sPPO and MDPO has a better sensitivity.
@@ -95,9 +106,9 @@ Both sPPO and MDPO has a better sensitivity.
 They were able to learn the optimal policy, whereas PPO failed to do so.
   
 
-\section{Softmax PPO with Tabular Parameterization}
+\subsection{Softmax PPO with Tabular Parameterization}
 
-\subsection{Closed Form Update with Direct Representation}
+\subsubsection{Closed Form Update with Direct Representation}
 We will solve this problem by assuming the policy $\pi \equiv p^\pi$ as an $|\mathcal{S}| \times |\mathcal{A}|$ table satisfying the standard constraints
 \begin{IEEEeqnarray*}{rCll}
   \sum_a p^\pi(a | s) &=& 1, & \quad \forall s \in \mathcal{S} \\
@@ -149,7 +160,7 @@ to satisfy the third and fourth KKT conditions. One straightforward way to achie
 \end{equation}
 However, it leaves us one last problem to deal with: Is it always true that given any state $s$, there always exists atleast one action $a$, such that $1 + \eta A^{\pi_t}(s, a) \geq 0$? Because otherwise, we would fail to satisfy the second KKT condition. But not that this is not a problem since we can put a condition on $\eta$ in order to fulfill this constraint.
 
-\subsection{Gradient of the Loss Function with Softmax Policy Representation}
+\subsubsection{Gradient of the Loss Function with Softmax Policy Representation}
 Consider the softmax policy representation
 \begin{equation}
   p^\pi(b | x) = \frac{e^{\theta(x, b)}}{\sum_c e^{\theta(x, c)}}, \label{eq: softmax}
@@ -173,9 +184,9 @@ Now we can simply update the inner loop of FMA-PG (Algorithm 1, main paper) via 
   \theta(s, a) \; \leftarrow \; \theta(s, a) + \alpha d^{\pi_t}(s) \left[ p^{\pi_t}(a|s) \left( A^{\pi_t}(s, a) + \frac{1}{\eta} \right) - \frac{p^\pi(a | s)}{\eta} \right].
 \end{equation}
 
-\section{Mirror Descent Policy Optimization (MDPO)}
+\subsection{Mirror Descent Policy Optimization (MDPO)}
 In this section, we study the MDPO type FMA-PG update (Eq. 6). We first calculate the analytical solution to that optimization problem, and then calculate its gradient which we use in the experiments. However, in the analysis that follows, we we replace the advantage function $A^{\pi_t}$ with the action-value function $Q^{\pi_t}$ to make it same as the MDPO (Tomar et al., 2020) update.
-\subsection{Closed Form Update with Direct Parameterization}
+\subsubsection{Closed Form Update with Direct Parameterization}
 While giving the MDPO type FMA-PG equation (Eq. 6), the paper considers the direct representation along with tabular parameterization of the policy, albeit with a small change in notation as compared to the previous subsection: $\pi(a|s) \equiv p^\pi(a|s, \theta)$. However, since this notation is more cumbersome, we will stick with our the notation of the previous subsection: $\pi(a|s) \equiv p^\pi(a|s)$. The constraints on the parameters $p^\pi(s, a)$ are the same as before: $\sum_a p^\pi(a | s) = 1, \; \forall s \in \mathcal{S}$; and $p^\pi(a | s) \geq 0, \; \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}$. Our goal, this time, is to solve the following optimization problem (from Eq. 6, main paper)
 \begin{equation}
   \pi_{t+1} = \arg\max_{\pi \in \Pi} \underbrace{\left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a|s) \left( Q^{\pi_t}(s, a) \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \frac{1}{\eta} D_\phi (p^\pi(\cdot | s), p^{\pi_t}(\cdot | s)) \right) \right]}_{=: \ell^{\pi_t}_{\text{MDPO}}}, \label{eq: optim_problem_mdpo}
@@ -218,7 +229,7 @@ Therefore, we obtain
 \end{equation}
 This leaves one last problem: Can we ensure that $\lambda_s \geq 0$ for all states $s$? If not, then the fourth KKT condition cannot be satisfied. Again, we can set the stepsize $\eta$ in such a way, such that this constraint is always fulfilled.
 
-\subsection{Gradient of the MDPO Loss Function with Tabular Softmax Representation}
+\subsubsection{Gradient of the MDPO Loss Function with Tabular Softmax Representation}
 We again take the softmax policy representation given by Eq. \ref{eq: softmax}, and compute $\nabla_{\theta(s, a)} \ell^{\pi_t}_{\text{MDPO}}$ for the MDPO loss (we substitute $Q^{\pi_t}$ with $A^{\pi_t}$ in this calculation):
 \begin{align}
   \frac{\partial}{\partial \theta(s, a)} \ell^{\pi_t}_{\text{MDPO}} &= \sum_{x, b} \left[ \frac{\partial}{\partial \theta(s, a)} p^\pi(b | x) \right] \left[ \frac{\partial}{\partial p^\pi(b | x)} \ell^{\pi_t} \right] \tag*{(using total derivative)} \\
@@ -231,7 +242,7 @@ where in the last line, we used the fact that
   \sum_b p^\pi(b | s) \left[ \eta A^{\pi_t}(s, b) - \log \frac{p^\pi(b | s)}{p^{\pi_t}(b | s)} - 1 \right] = \eta \sum_b p^\pi(b|s) A^{\pi_t}(s, b) - \text{KL}(p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s)) - 1.
 \end{equation*}
 
-\section{Trust Region Policy Optimization (TRPO)}
+\subsection{Trust Region Policy Optimization (TRPO)}
 At each step of the policy update, TRPO (Eq. 14, Schulman et al., 2015) solves the following problem:
 \begin{equation}
   \max_\theta \; \underbrace{\sum_s d^{\pi_t}(s) \sum_a p^{\pi_\theta}(a | s) Q^{\pi_t}(s, a)}_{=: \mathcal{J}_{\text{TRPO}}} \qquad \text{subject to } \underbrace{\sum_s d^{\pi_t}(s) \cdot \text{KL}(p^{\pi_t}(\cdot | s) \| p^{\pi_\theta}(\cdot | s))}_{=: \mathcal{C}_{\text{TRPO}}} \leq \delta.  
@@ -264,7 +275,7 @@ Finally, using the above result yields
 \end{IEEEeqnarray}
 where $p^{\pi_\theta}(\cdot | s) \in \mathbb{R}^{|\mathcal{A}|}$ is the vector defined as $[p^{\pi_\theta}(\cdot | s)]_a = p^{\pi_\theta}(a | s)$ and $A_{(s, :), (s, :)}$ denotes the square sub-block of the matrix $A$ corresponding to the given state $s$ and all the actions. In our experiments, since our $A$ matrix is small, we directly take its inverse to compute the update direction, thereby bypassing the conjugate method. Once we have the update direction, we then compute the maximal stepsize $\beta$ and perform an exponential backtracking line search as explained in the TRPO paper.
 
-\section{Proximal Policy Optimization (PPO)}
+\subsection{Proximal Policy Optimization (PPO)}
 The Proximal Policy Optimization algorithm (Schulman et al., 2017) solves the following optimization problem at each iteration step:
 \begin{equation}
   \max_\theta \; \underbrace{\sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \cdot \min \left( \begin{matrix} \frac{p^{\pi_\theta}(a | s)}{p^{\pi_t}(a | s)} A^{\pi_t}(s, a), \\ \text{clip} \left[\frac{p^{\pi_\theta}(a | s)}{p^{\pi_t}(a | s)}, 1 - \epsilon, 1 + \epsilon \right] A^{\pi_t}(s, a) \end{matrix} \right)}_{=: \mathcal{J}_{\text{PPO}}}.

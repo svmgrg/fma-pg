@@ -16,34 +16,34 @@
 \gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
-\@writefile{toc}{\contentsline {section}{\numberline {1}Experiments on the Tabular CliffWorld Environment}{1}{section.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Appendix}{1}{section.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Experiments on the Tabular CliffWorld Environment}{1}{subsection.1.1}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The episodic CliffWorld environment and the learning curve for MDPO on it illustrating three different locally suboptimal policies. \textbf  {(Left)} We consider a variant of the CliffWorld environment (Example 6.6, Sutton and Barto, 2018) containing 21 different states and four actions per state. The agent starts in the \texttt  {Start} state and has four cardinal actions which deterministically move it into the corresponding next state. The objective is to reach the \texttt  {Goal} state as quickly as possible. Any subsequent action taken after the agent falls into a state marked by \texttt  {Cliff} moves it back to the start state and yields a reward of $-100$. Similarly, once in the goal state, any action takes the agent into the terminal state and yields a reward of $-1$. All the other transitions have a reward of zero and the discount factor is set to $\gamma = 0.9$. It is easy to see that the optimal policy will have a value of $v^*(s_0) = 0 + \gamma \cdot 0 + \cdots  + \gamma ^5 \cdot 0 + \gamma ^6 \cdot 1 = 0.9^6 = 0.53$. \textbf  {(Right)} We show the learning curve for the analytical MDPO update using $\eta = 1$. This curve shows three different locally optimal policies. We later show in our experiments, the different PG agents often get stuck on one of these policies.}}{1}{figure.1}}
 \newlabel{fig: cliffworld}{{1}{1}{The episodic CliffWorld environment and the learning curve for MDPO on it illustrating three different locally suboptimal policies. \textbf {(Left)} We consider a variant of the CliffWorld environment (Example 6.6, Sutton and Barto, 2018) containing 21 different states and four actions per state. The agent starts in the \texttt {Start} state and has four cardinal actions which deterministically move it into the corresponding next state. The objective is to reach the \texttt {Goal} state as quickly as possible. Any subsequent action taken after the agent falls into a state marked by \texttt {Cliff} moves it back to the start state and yields a reward of $-100$. Similarly, once in the goal state, any action takes the agent into the terminal state and yields a reward of $-1$. All the other transitions have a reward of zero and the discount factor is set to $\gamma = 0.9$. It is easy to see that the optimal policy will have a value of $v^*(s_0) = 0 + \gamma \cdot 0 + \cdots + \gamma ^5 \cdot 0 + \gamma ^6 \cdot 1 = 0.9^6 = 0.53$. \textbf {(Right)} We show the learning curve for the analytical MDPO update using $\eta = 1$. This curve shows three different locally optimal policies. We later show in our experiments, the different PG agents often get stuck on one of these policies}{figure.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Learning Curves for the Best Parameter Configurations}{1}{subsection.1.1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Parameter Sensitivity}{1}{subsection.1.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Conclusions}{1}{subsection.1.3}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The learning curves for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. All the updates were done using exact gradient calculations, i.e. there was no sampling involved.}}{2}{figure.2}}
-\newlabel{fig: learning_curves}{{2}{2}{The learning curves for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. All the updates were done using exact gradient calculations, i.e. there was no sampling involved}{figure.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The parameter sensitivity plots for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. The $x$ axis shows sweep over one parameter of the corresponding and the different color shaded curves correspond to another parameter.}}{2}{figure.3}}
-\newlabel{fig: sensitivity}{{3}{2}{The parameter sensitivity plots for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. The $x$ axis shows sweep over one parameter of the corresponding and the different color shaded curves correspond to another parameter}{figure.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Softmax PPO with Tabular Parameterization}{3}{section.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Closed Form Update with Direct Representation}{3}{subsection.2.1}}
-\newlabel{eq: optim_problem_sppo}{{1}{3}{Closed Form Update with Direct Representation}{equation.2.1}{}}
-\newlabel{eq: KKT1}{{{C1}}{3}{Closed Form Update with Direct Representation}{AMS.7}{}}
-\newlabel{eq: KKT2}{{{C2}}{3}{Closed Form Update with Direct Representation}{AMS.8}{}}
-\newlabel{eq: KKT3}{{{C3}}{3}{Closed Form Update with Direct Representation}{AMS.9}{}}
-\newlabel{eq: KKT4}{{{C4}}{3}{Closed Form Update with Direct Representation}{AMS.10}{}}
-\newlabel{eq: KKT5}{{{C5}}{3}{Closed Form Update with Direct Representation}{AMS.11}{}}
-\newlabel{eq: KKT6}{{{C6}}{3}{Closed Form Update with Direct Representation}{AMS.12}{}}
-\newlabel{eq: lagrangian_derivative_sppo}{{3}{3}{Closed Form Update with Direct Representation}{equation.2.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Gradient of the Loss Function with Softmax Policy Representation}{4}{subsection.2.2}}
-\newlabel{eq: softmax}{{8}{4}{Gradient of the Loss Function with Softmax Policy Representation}{equation.2.8}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Mirror Descent Policy Optimization (MDPO)}{5}{section.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Closed Form Update with Direct Parameterization}{5}{subsection.3.1}}
-\newlabel{eq: optim_problem_mdpo}{{12}{5}{Closed Form Update with Direct Parameterization}{equation.3.12}{}}
-\newlabel{eq: lagrangian_derivative_mdpo}{{16}{5}{Closed Form Update with Direct Parameterization}{equation.3.16}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Gradient of the MDPO Loss Function with Tabular Softmax Representation}{6}{subsection.3.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Trust Region Policy Optimization (TRPO)}{6}{section.4}}
-\newlabel{eq: trpo_gradient}{{21}{7}{Trust Region Policy Optimization (TRPO)}{equation.4.21}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Proximal Policy Optimization (PPO)}{7}{section.5}}
-\newlabel{eq: ppo_gradient}{{28}{8}{Proximal Policy Optimization (PPO)}{equation.5.28}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.1.1}Learning Curves and Parameter Sensitivity Plots}{2}{subsubsection.1.1.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.1.2}Conclusions}{2}{subsubsection.1.1.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The learning curves for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. All the updates were done using exact gradient calculations, i.e. there was no sampling involved.}}{3}{figure.2}}
+\newlabel{fig: learning_curves}{{2}{3}{The learning curves for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. All the updates were done using exact gradient calculations, i.e. there was no sampling involved}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The parameter sensitivity plots for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. The $x$ axis shows sweep over one parameter of the corresponding and the different color shaded curves correspond to another parameter. The faint black line near the top of each subplot depicts the value of the optimal policy.}}{3}{figure.3}}
+\newlabel{fig: sensitivity}{{3}{3}{The parameter sensitivity plots for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. The $x$ axis shows sweep over one parameter of the corresponding and the different color shaded curves correspond to another parameter. The faint black line near the top of each subplot depicts the value of the optimal policy}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Softmax PPO with Tabular Parameterization}{4}{subsection.1.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.1}Closed Form Update with Direct Representation}{4}{subsubsection.1.2.1}}
+\newlabel{eq: optim_problem_sppo}{{1}{4}{Closed Form Update with Direct Representation}{equation.1.1}{}}
+\newlabel{eq: KKT1}{{{C1}}{4}{Closed Form Update with Direct Representation}{AMS.7}{}}
+\newlabel{eq: KKT2}{{{C2}}{4}{Closed Form Update with Direct Representation}{AMS.8}{}}
+\newlabel{eq: KKT3}{{{C3}}{4}{Closed Form Update with Direct Representation}{AMS.9}{}}
+\newlabel{eq: KKT4}{{{C4}}{4}{Closed Form Update with Direct Representation}{AMS.10}{}}
+\newlabel{eq: KKT5}{{{C5}}{4}{Closed Form Update with Direct Representation}{AMS.11}{}}
+\newlabel{eq: KKT6}{{{C6}}{4}{Closed Form Update with Direct Representation}{AMS.12}{}}
+\newlabel{eq: lagrangian_derivative_sppo}{{3}{4}{Closed Form Update with Direct Representation}{equation.1.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.2}Gradient of the Loss Function with Softmax Policy Representation}{5}{subsubsection.1.2.2}}
+\newlabel{eq: softmax}{{8}{5}{Gradient of the Loss Function with Softmax Policy Representation}{equation.1.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Mirror Descent Policy Optimization (MDPO)}{6}{subsection.1.3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.1}Closed Form Update with Direct Parameterization}{6}{subsubsection.1.3.1}}
+\newlabel{eq: optim_problem_mdpo}{{12}{6}{Closed Form Update with Direct Parameterization}{equation.1.12}{}}
+\newlabel{eq: lagrangian_derivative_mdpo}{{16}{6}{Closed Form Update with Direct Parameterization}{equation.1.16}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.2}Gradient of the MDPO Loss Function with Tabular Softmax Representation}{7}{subsubsection.1.3.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.4}Trust Region Policy Optimization (TRPO)}{7}{subsection.1.4}}
+\newlabel{eq: trpo_gradient}{{21}{8}{Trust Region Policy Optimization (TRPO)}{equation.1.21}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.5}Proximal Policy Optimization (PPO)}{8}{subsection.1.5}}
+\newlabel{eq: ppo_gradient}{{28}{9}{Proximal Policy Optimization (PPO)}{equation.1.28}{}}
