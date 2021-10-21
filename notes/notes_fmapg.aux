@@ -22,24 +22,28 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Learning Curves for the Best Parameter Configurations}{1}{subsection.1.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Parameter Sensitivity}{1}{subsection.1.2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Conclusions}{1}{subsection.1.3}}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Softmax PPO with Tabular Parameterization}{2}{section.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Closed Form Update with Direct Representation}{2}{subsection.2.1}}
-\newlabel{eq: optim_problem_sppo}{{1}{2}{Closed Form Update with Direct Representation}{equation.2.1}{}}
-\newlabel{eq: KKT1}{{{C1}}{2}{Closed Form Update with Direct Representation}{AMS.7}{}}
-\newlabel{eq: KKT2}{{{C2}}{2}{Closed Form Update with Direct Representation}{AMS.8}{}}
-\newlabel{eq: KKT3}{{{C3}}{2}{Closed Form Update with Direct Representation}{AMS.9}{}}
-\newlabel{eq: KKT4}{{{C4}}{2}{Closed Form Update with Direct Representation}{AMS.10}{}}
-\newlabel{eq: KKT5}{{{C5}}{2}{Closed Form Update with Direct Representation}{AMS.11}{}}
-\newlabel{eq: KKT6}{{{C6}}{2}{Closed Form Update with Direct Representation}{AMS.12}{}}
-\newlabel{eq: lagrangian_derivative_sppo}{{3}{2}{Closed Form Update with Direct Representation}{equation.2.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Gradient of the Loss Function with Softmax Policy Representation}{3}{subsection.2.2}}
-\newlabel{eq: softmax}{{8}{3}{Gradient of the Loss Function with Softmax Policy Representation}{equation.2.8}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Mirror Descent Policy Optimization (MDPO)}{4}{section.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Closed Form Update with Direct Parameterization}{4}{subsection.3.1}}
-\newlabel{eq: optim_problem_mdpo}{{12}{4}{Closed Form Update with Direct Parameterization}{equation.3.12}{}}
-\newlabel{eq: lagrangian_derivative_mdpo}{{16}{4}{Closed Form Update with Direct Parameterization}{equation.3.16}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Gradient of the MDPO Loss Function with Tabular Softmax Representation}{5}{subsection.3.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Trust Region Policy Optimization (TRPO)}{5}{section.4}}
-\newlabel{eq: trpo_gradient}{{21}{6}{Trust Region Policy Optimization (TRPO)}{equation.4.21}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Proximal Policy Optimization (PPO)}{6}{section.5}}
-\newlabel{eq: ppo_gradient}{{28}{7}{Proximal Policy Optimization (PPO)}{equation.5.28}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The learning curves for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. All the updates were done using exact gradient calculations, i.e. there was no sampling involved.}}{2}{figure.2}}
+\newlabel{fig: learning_curves}{{2}{2}{The learning curves for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. All the updates were done using exact gradient calculations, i.e. there was no sampling involved}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The parameter sensitivity plots for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. The $x$ axis shows sweep over one parameter of the corresponding and the different color shaded curves correspond to another parameter.}}{2}{figure.3}}
+\newlabel{fig: sensitivity}{{3}{2}{The parameter sensitivity plots for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. The $x$ axis shows sweep over one parameter of the corresponding and the different color shaded curves correspond to another parameter}{figure.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Softmax PPO with Tabular Parameterization}{3}{section.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Closed Form Update with Direct Representation}{3}{subsection.2.1}}
+\newlabel{eq: optim_problem_sppo}{{1}{3}{Closed Form Update with Direct Representation}{equation.2.1}{}}
+\newlabel{eq: KKT1}{{{C1}}{3}{Closed Form Update with Direct Representation}{AMS.7}{}}
+\newlabel{eq: KKT2}{{{C2}}{3}{Closed Form Update with Direct Representation}{AMS.8}{}}
+\newlabel{eq: KKT3}{{{C3}}{3}{Closed Form Update with Direct Representation}{AMS.9}{}}
+\newlabel{eq: KKT4}{{{C4}}{3}{Closed Form Update with Direct Representation}{AMS.10}{}}
+\newlabel{eq: KKT5}{{{C5}}{3}{Closed Form Update with Direct Representation}{AMS.11}{}}
+\newlabel{eq: KKT6}{{{C6}}{3}{Closed Form Update with Direct Representation}{AMS.12}{}}
+\newlabel{eq: lagrangian_derivative_sppo}{{3}{3}{Closed Form Update with Direct Representation}{equation.2.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Gradient of the Loss Function with Softmax Policy Representation}{4}{subsection.2.2}}
+\newlabel{eq: softmax}{{8}{4}{Gradient of the Loss Function with Softmax Policy Representation}{equation.2.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Mirror Descent Policy Optimization (MDPO)}{5}{section.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Closed Form Update with Direct Parameterization}{5}{subsection.3.1}}
+\newlabel{eq: optim_problem_mdpo}{{12}{5}{Closed Form Update with Direct Parameterization}{equation.3.12}{}}
+\newlabel{eq: lagrangian_derivative_mdpo}{{16}{5}{Closed Form Update with Direct Parameterization}{equation.3.16}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Gradient of the MDPO Loss Function with Tabular Softmax Representation}{6}{subsection.3.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Trust Region Policy Optimization (TRPO)}{6}{section.4}}
+\newlabel{eq: trpo_gradient}{{21}{7}{Trust Region Policy Optimization (TRPO)}{equation.4.21}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Proximal Policy Optimization (PPO)}{7}{section.5}}
+\newlabel{eq: ppo_gradient}{{28}{8}{Proximal Policy Optimization (PPO)}{equation.5.28}{}}

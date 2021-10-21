@@ -72,8 +72,20 @@
 \end{figure}
 
 \subsection{Learning Curves for the Best Parameter Configurations}
+\begin{figure}[!hbp]
+  \centering
+  \includegraphics[scale=0.5]{tabular_figures/learning_curves.pdf}
+  \caption{The learning curves for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. All the updates were done using exact gradient calculations, i.e. there was no sampling involved.}
+  \label{fig: learning_curves}
+\end{figure}
 
 \subsection{Parameter Sensitivity}
+\begin{figure}[!hbp]
+  \centering
+  \includegraphics[scale=0.45]{tabular_figures/sensitivity.pdf}
+  \caption{The parameter sensitivity plots for the four PG algorithms on the CliffWorld environment for different number of inner loop updates. The $x$ axis shows sweep over one parameter of the corresponding and the different color shaded curves correspond to another parameter.}
+  \label{fig: sensitivity}
+\end{figure}
 
 \subsection{Conclusions}
 TRPO was prohibitively costly. Although, our implementation was exact, at the most precise configuration, TRPO took almost 5000 seconds for 100 inner iterations and 2000 outer iterations, whereas each of the other methods (sPPO, MDPO, and PPO) took less than 10 seconds for the same 100, 2000 iters.
