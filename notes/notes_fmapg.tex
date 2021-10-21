@@ -99,12 +99,9 @@ From this figure we see that for $m=1$ all the algorithms, except TRPO, had a po
 \end{figure}
 
 \subsubsection{Conclusions}
-TRPO was prohibitively costly. Although, our implementation was exact, at the most precise configuration, TRPO took almost 5000 seconds for 100 inner iterations and 2000 outer iterations, whereas each of the other methods (sPPO, MDPO, and PPO) took less than 10 seconds for the same 100, 2000 iters.
+The experiments for sPPO served as a verification of the theoretical properties of the FMA-PG framework studied in this paper. We also compared it against other popular policy gradient algorithms from a pure optimization perspective. Our results demonstrated that sPPO was a competitive (or superior) to the popular PG methods. It was also somewhat robust to the hyperparameters; in particular we found that tha algorithm, for all the value of $\eta$ suggested by theory, was able to converge to a locally optimal policy. The results also highlighted the importance of re-using data, i.e. doing multiple off-policy type of PG updates: as we increased the number of inner updates, the performance of all the methods seem to improve. They not only enjoyed faster convergence, but they also worked for a wider range of parameters. This demonstrates the strength of these methods over simpler algorithms like REINFORCE (Williams, 1992) which only have a single update per batch of sampled data. The FMA-PG framework is a systematic way of obtaining new policy gradient algorithms that enjoy desirable theoretical properties and, as our empirical results suggest, can be competitive to existing PG methods.
 
-Both sPPO and MDPO has a better sensitivity.
-
-They were able to learn the optimal policy, whereas PPO failed to do so.
-  
+In the rest of this section, as promised, we give the calculations (the closed form analytical solutions for sPPO and MDPO, and the gradient expressions for all the four algorithms) employed in our implementation for these methods. 
 
 \subsection{Softmax PPO with Tabular Parameterization}
 
