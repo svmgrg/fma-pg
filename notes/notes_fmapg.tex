@@ -274,13 +274,13 @@ Finally, using the above result yields
 where $p^{\pi_\theta}(\cdot | s) \in \mathbb{R}^{|\mathcal{A}|}$ is the vector defined as $[p^{\pi_\theta}(\cdot | s)]_a = p^{\pi_\theta}(a | s)$ and $A_{(s, :), (s, :)}$ denotes the square sub-block of the matrix $A$ corresponding to the given state $s$ and all the actions. In our experiments, since our $A$ matrix is small, we directly take its inverse to compute the update direction, thereby bypassing the conjugate method. Once we have the update direction, we then compute the maximal stepsize $\beta$ and perform an exponential backtracking line search as explained in the TRPO paper.
 
 \subsection{TRPO with KL Regularization} \label{sec: trpo_kl}
-We also study a variant of TRPO where instead of satisfying the KL constraint on the policy, we add it as a regularization term. The resulting optimization problem becomes:
+We also study a variant of TRPO where instead of satisfying the KL constraint on the policy, we subtract it as a regularization term (we subtract because this is a maximization problem). The resulting optimization problem becomes:
 \begin{equation}
-  \max_\theta \; \underbrace{\left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_\theta}(a | s) Q^{\pi_t}(s, a) + \zeta \sum_s d^{\pi_t}(s) \cdot \text{KL}(p^{\pi_t}(\cdot | s) \| p^{\pi_\theta}(\cdot | s)) \right]}_{=: \mathcal{J}_{\text{TRPO-KL}} = \mathcal{J}_{\text{TRPO}} + \zeta \mathcal{C}_{\text{TRPO}}}.  
+  \max_\theta \; \underbrace{\left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_\theta}(a | s) Q^{\pi_t}(s, a) - \zeta \sum_s d^{\pi_t}(s) \cdot \text{KL}(p^{\pi_t}(\cdot | s) \| p^{\pi_\theta}(\cdot | s)) \right]}_{=: \mathcal{J}_{\text{TRPO-KL}} = \mathcal{J}_{\text{TRPO}} - \zeta \mathcal{C}_{\text{TRPO}}}.  
 \end{equation}
-Note that this objective is almost the same as PPO with KL penalty (Eq. 8, Schulman et al., 2017) except that PPO uses the advantage function and we used the action value function. It is also similar to the objective stated in the TRPO paper (Section 4, Schulman et al., 2015) except that it has an average KL divergence instead of the max KL divergence. And we can reuse Eq. \ref{eq: trpo_gradient} and Eq. \ref{eq: trpo_kl_mid} to compute its gradient:
+Note that this objective is almost the same as PPO with KL penalty (Eq. 8, Schulman et al., 2017) except that PPO uses the advantage function and we used the action value function. It is also similar to the objective stated in the TRPO paper (Section 4, Schulman et al., 2015) except that it has an average KL divergence instead of the max KL divergence. We can reuse Eq. \ref{eq: trpo_gradient} and Eq. \ref{eq: trpo_kl_mid} to compute its gradient:
 \begin{align}
-  \frac{\partial \mathcal{J}_{\text{TRPO-KL}}}{\partial \theta(s, a)} &= d^{\pi_t}(s) p^{\pi_\theta}(a | s) \left[ Q^{\pi_t}(s, a) - \sum_b p^{\pi_\theta}(b | s) Q^{\pi_t}(s, b) \right] - \zeta d^{\pi_t}(s) \Big[ p^{\pi_\theta}(a | s) - p^{\pi_t}(a | s) \Big].
+  \frac{\partial \mathcal{J}_{\text{TRPO-KL}}}{\partial \theta(s, a)} &= d^{\pi_t}(s) p^{\pi_\theta}(a | s) \left[ Q^{\pi_t}(s, a) - \sum_b p^{\pi_\theta}(b | s) Q^{\pi_t}(s, b) \right] + \zeta d^{\pi_t}(s) \Big[ p^{\pi_\theta}(a | s) - p^{\pi_t}(a | s) \Big].
 \end{align}
 
 \subsection{Proximal Policy Optimization (PPO)}

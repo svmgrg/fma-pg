@@ -67,6 +67,7 @@ def take_action(env, pi, state):
 def softmax(x):
     e_x = np.exp(x - np.max(x, 1).reshape(-1, 1))
     out = e_x / e_x.sum(1).reshape(-1, 1)
+    # assert np.allclose(out.sum(1), np.ones(21))
     return out
 
 # generate a uniformly random tabular policy (direct representation)
@@ -140,8 +141,8 @@ def calc_A_matrix_slow(num_states, num_actions, dpi_t, pi):
                         * pi[state_j, action_j]
     return A
 
-# this is the grad vector, but stored as an S x A matrix, again computed using
-# equations given in Section 3 of the notes
+# this is the TRPO grad vector, but stored as an S x A matrix,
+# again computed using equations given in Section 3 of the notes
 def calc_grad_vector(dpi_t, qpi_t, pi):
     grad = dpi_t.reshape(-1, 1) * pi \
         * (qpi_t - (pi * qpi_t).sum(1).reshape(-1, 1))
@@ -210,38 +211,39 @@ def trpo_kl_ls_update(omega, pi_t, dpi_t, qpi_t, decay_factor, zeta,
                       warm_start_beta_init=10, warm_start_beta_factor=10):
     pi = softmax(omega)
     J_old = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi) \
-        + zeta * compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi)
+        - zeta * compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi)
     grad = calc_grad_trpo_kl(omega=omega, pi_t=pi_t, dpi_t=dpi_t, qpi_t=qpi_t,
                              zeta=zeta)
 
-    if np.linalg.norm(grad) < 1e-8 or np.allclose(np.zeros(grad.shape), grad):
+    if np.allclose(np.zeros(grad.shape), grad):# or np.linalg.norm(grad) < 1e-8:
         beta = 0
         return omega, beta
     else:
         beta = warm_start_beta_factor * warm_start_beta_init
-                
+
     # end after finite number of iterations (say 100)
     backtracking_iter = 0
     while True: # backtracking line search
         omega_tmp = omega + beta * grad
         pi_tmp = softmax(omega_tmp)
         J_tmp = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi_tmp) \
-            + zeta * compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi_tmp)
+            - zeta * compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi_tmp)
 
         # print(beta, J_tmp - J_old)
-        if np.isnan(J_tmp - J_old):
-            pdb.set_trace()
+        # if np.isnan(J_tmp - J_old):
+        #     pdb.set_trace()
         # Armijo's line search condition
         if J_tmp >= J_old + armijo_constant * beta * np.linalg.norm(grad)**2:
             break
 
-        # just make a super small increment
+        # if too many backtracking steps, just make a super small increment
         if max_backtracking_iters is not None:
             if backtracking_iter > max_backtracking_iters:
                 omega_tmp = omega + 1e-8 * grad
                 break
 
         beta = decay_factor * beta
+        backtracking_iter += 1
         
     # print values of beta at each run
     # print('beta', beta)
@@ -262,11 +264,10 @@ def calc_grad_trpo_kl(omega, pi_t, dpi_t, qpi_t, zeta):
     
     grad_t1 = dpi_t.reshape(-1, 1) * pi \
         * (qpi_t - (pi * qpi_t).sum(1).reshape(-1, 1))
-    grad_t2 = -1 * zeta * dpi_t.reshape(-1, 1) * (pi - pi_t)
+    grad_t2 = zeta * dpi_t.reshape(-1, 1) * (pi - pi_t)
     grad = grad_t1 + grad_t2
     
     return grad
-
 
 #----------------------------------------------------------------------
 # advantage estimation
@@ -378,6 +379,7 @@ def run_experiment(env, pg_method, num_iters, eta, delta, decay_factor, epsilon,
 
     # learning loop
     for T in range(num_iters):
+        # print(T)
         dpi = env.calc_dpi(pi)
         
         if FLAG_TRUE_ADVANTAGE:
@@ -402,12 +404,11 @@ def run_experiment(env, pg_method, num_iters, eta, delta, decay_factor, epsilon,
             omega = theta.copy()
             warm_start_beta_init__current_k = warm_start_beta_init
             for k in range(num_inner_updates):
-                # print(T, k)
                 # do one gradient ascent step
                 if pg_method in ['sPPO', 'MDPO']:
                     grad = calc_grad_fmapg(
                         omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi, eta=eta,
-                         pg_method=pg_method)
+                        pg_method=pg_method)
                     omega = omega + alpha * grad                    
                 elif pg_method == 'TRPO':
                     omega_tmp = trpo_update(
