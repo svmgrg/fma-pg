@@ -3,12 +3,11 @@ import time
 import argparse
 import os
 import json
-import matplotlib.pyplot as plt
 
 from environments import *
 from utils import *
 
-# $ python run_exp.py --num_outer_loops 2000 --num_inner_loops 1000 --pg_alg 'TRPO' --eta -1 --alpha -1 --epsilon -1 --delta 0.0001 --decay_factor 0.9 --use_analytical_grad 0
+# $ python run_exp.py --num_outer_loops 2000 --num_inner_loops 1 --pg_alg 'TRPO_KL_LS' --eta -1 --alpha -1 --epsilon -1 --delta -1 --decay_factor 0.9 --use_analytical_grad 0 --zeta 128 --armijo_constant 0 --max_backtracking_iters -1 --flag_warm_start 1 --warm_start_beta_init 10 --warm_start_beta_factor 10 
 
 # read command line arguments to get parameter configurations
 parser = argparse.ArgumentParser()
@@ -21,6 +20,14 @@ parser.add_argument('-eps', '--epsilon', required=True, type=float)
 parser.add_argument('-d', '--delta', required=True, type=float)
 parser.add_argument('-dec', '--decay_factor', required=True, type=float)
 parser.add_argument('-tg', '--use_analytical_grad', required=True, type=int)
+parser.add_argument('-z', '--zeta', required=True, type=float)
+parser.add_argument('-arm', '--armijo_constant', required=True, type=float)
+parser.add_argument('-mbi', '--max_backtracking_iters', required=True, type=int)
+parser.add_argument('-ws', '--flag_warm_start', required=True, type=int)
+parser.add_argument('-wsbi', '--warm_start_beta_init', required=True,
+                    type=float)
+parser.add_argument('-wsbf', '--warm_start_beta_factor', required=True,
+                    type=float)
 
 args = parser.parse_args()
 
@@ -33,6 +40,15 @@ epsilon = args.epsilon if args.epsilon >= 0 else None
 delta = args.delta if args.delta >= 0 else None
 decay_factor = args.decay_factor if args.decay_factor >= 0 else None
 FLAG_ANALYTICAL_GRADIENT = False if args.use_analytical_grad == 0 else True
+zeta = args.zeta if args.zeta >= 0 else None
+armijo_constant = args.armijo_constant if args.armijo_constant >= 0 else None
+max_backtracking_iters = args.max_backtracking_iters \
+    if args.max_backtracking_iters >= 0 else None
+FLAG_BETA_WARM_START = False if args.flag_warm_start == 0 else True
+warm_start_beta_init = args.warm_start_beta_init \
+    if args.warm_start_beta_init >= 0 else None
+warm_start_beta_factor = args.warm_start_beta_factor \
+    if args.warm_start_beta_factor >= 0 else None
 
 FLAG_TRUE_ADVANTAGE = True
 num_traj_estimate_adv = None 
@@ -68,7 +84,12 @@ vpi_list_outer, vpi_list_inner, pi = run_experiment(
     adv_estimate_alg=adv_estimate_alg,
     num_traj_estimate_adv=num_traj_estimate_adv,
     adv_estimate_stepsize=adv_estimate_stepsize,
-    FLAG_SAVE_INNER_STEPS=FLAG_SAVE_INNER_STEPS)
+    FLAG_SAVE_INNER_STEPS=FLAG_SAVE_INNER_STEPS, zeta=zeta,
+    armijo_constant=armijo_constant,
+    max_backtracking_iters=max_backtracking_iters,
+    FLAG_BETA_WARM_START=FLAG_BETA_WARM_START,
+    warm_start_beta_init=warm_start_beta_init,
+    warm_start_beta_factor=warm_start_beta_factor)
 print('Total time taken: {}'.format(time.time() - tic))
 
 dat = dict()
@@ -78,22 +99,14 @@ if vpi_list_inner is not None:
 dat['vpi_inner_list'] = vpi_list_inner
 dat['pi'] = pi.tolist()
 
-# fig, axs = plt.subplots(1, 2, figsize=(7, 4))
-fig, axs = plt.subplots(1, 1, figsize=(7, 4))
-# plot_grid(axs[0])
-# plot_policy(axs[0], pi)
-axs.plot(vpi_list_outer, color='black')
-v_star = np.dot(env.calc_v_star(), env.mu)
-axs.plot([v_star] * len(vpi_list_outer), color='black', linewidth=0.1)
-axs.set_ylim([0, 0.6])
-plt.savefig('lc_{}_{}_{}__env.pdf'.format(pg_method, eta, num_outer_loops))
-# plt.show()  
-# plt.close()
-
 filename='{}/numOuterLoops_{}__numInnerLoops_{}__eta_{}__alpha_{}'\
-    '__epsilon_{}__delta_{}__decayFactor_{}__analyticalGrad_{}'.format(
+    '__epsilon_{}__delta_{}__decayFactor_{}__analyticalGrad_{}__zeta_{}'\
+    '__armijoConstant_{}__maxBacktrackingIters_{}__FlagBetaWarmStart_{}'\
+    '__wsbI_{}__wsbF_{}'.format(
         folder_name, num_outer_loops, num_inner_loops, eta, alpha, epsilon,
-        delta, decay_factor, FLAG_ANALYTICAL_GRADIENT)
+        delta, decay_factor, FLAG_ANALYTICAL_GRADIENT, zeta, armijo_constant,
+        max_backtracking_iters, FLAG_BETA_WARM_START,
+        warm_start_beta_init, warm_start_beta_factor)
 with open(filename, 'w') as fp:
     json.dump(dat, fp)
     

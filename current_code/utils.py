@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import entropy
 # import matplotlib.pyplot as plt
 import pdb
 
@@ -12,13 +13,13 @@ def plot_grid(ax, xlim=4, ylim=5):
     for x in x_center:
         for y in y_center:
             if int((x - 0.5) * ylim + (y - 0.5)) == 0:
-                ax.scatter(x, y, s=200, color='tab:blue', marker='s',
+                ax.scatter(x, y, s=1500, color='tab:blue', marker='s',
                            label='start', alpha=0.5)
             elif int((x - 0.5) * ylim + (y - 0.5)) in [1, 2, 3]:
-                ax.scatter(x, y, s=200, color='tab:red', marker='x',
+                ax.scatter(x, y, s=1500, color='tab:red', marker='x',
                            label='chasm', alpha=0.5)
             elif int((x - 0.5) * ylim + (y - 0.5)) == 4:
-                ax.scatter(x, y, s=200, color='tab:green', marker='o',
+                ax.scatter(x, y, s=1500, color='tab:green', marker='s',
                            label='end', alpha=0.5)
             else:
                 ax.scatter(x, y, s=0.1, color='purple')
@@ -40,21 +41,20 @@ def plot_policy(ax, pi, xlim=4, ylim=5):
 
             # down
             ax.quiver(x_center, y_center, 0, -diff[0],
-                      color='tab:orange', width=0.007, headwidth=2,
-                      headlength=4,
-                      scale=1, scale_units='xy', linewidth=0.1)
+                      color='tab:orange', width=0.013, headwidth=2,
+                      headlength=4, scale=1, scale_units='xy', linewidth=1)
             # up
             ax.quiver(x_center, y_center, 0, +diff[1],
-                      color='tab:blue', width=0.007, headwidth=2, headlength=4,
-                      scale=1, scale_units='xy', linewidth=0.1)
+                      color='tab:blue', width=0.013, headwidth=2, 
+                      headlength=4, scale=1, scale_units='xy', linewidth=1)
             # left
             ax.quiver(x_center, y_center, -diff[2], 0,
-                      color='tab:red', width=0.007, headwidth=2, headlength=4,
-                      scale=1, scale_units='xy', linewidth=0.1)
+                      color='tab:red', width=0.013, headwidth=2,
+                      headlength=4, scale=1, scale_units='xy', linewidth=1)
             # right
             ax.quiver(x_center, y_center, +diff[3], 0,
-                      color='tab:green', width=0.007, headwidth=2, headlength=4,
-                      scale=1, scale_units='xy', linewidth=0.1)
+                      color='tab:green', width=0.013, headwidth=2, 
+                      headlength=4, scale=1, scale_units='xy', linewidth=1)
 
 #----------------------------------------------------------------------
 # utility functions
@@ -65,7 +65,7 @@ def take_action(env, pi, state):
     return action, action_prob
 
 def softmax(x):
-    e_x = np.exp(x - np.max(x))
+    e_x = np.exp(x - np.max(x, 1).reshape(-1, 1))
     out = e_x / e_x.sum(1).reshape(-1, 1)
     return out
 
@@ -172,7 +172,10 @@ def compute_trpo_loss(dpi_t, qpi_t, pi):
     return J
 
 def compute_trpo_constraint(dpi_t, pi_t, pi):
-    C = (dpi_t * (pi_t * np.log(pi_t / pi)).sum(1)).sum()
+    # C = (dpi_t * (pi_t * np.log(pi_t / pi)).sum(1)).sum()
+    # an equivalent, but better, way that avoids NaN values from 0/0 division
+    # see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.entropy.html
+    C = (dpi_t * entropy(pi_t, pi, axis=1)).sum()
     return C
 
 def trpo_update(omega, pi_t, dpi_t, qpi_t, delta, decay_factor,
@@ -202,6 +205,48 @@ def trpo_update(omega, pi_t, dpi_t, qpi_t, delta, decay_factor,
         
     return omega_tmp
 
+def trpo_kl_ls_update(omega, pi_t, dpi_t, qpi_t, decay_factor, zeta, 
+                      armijo_constant=0, max_backtracking_iters=None,
+                      warm_start_beta_init=10, warm_start_beta_factor=10):
+    pi = softmax(omega)
+    J_old = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi) \
+        + zeta * compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi)
+    grad = calc_grad_trpo_kl(omega=omega, pi_t=pi_t, dpi_t=dpi_t, qpi_t=qpi_t,
+                             zeta=zeta)
+
+    if np.linalg.norm(grad) < 1e-8 or np.allclose(np.zeros(grad.shape), grad):
+        beta = 0
+        return omega, beta
+    else:
+        beta = warm_start_beta_factor * warm_start_beta_init
+                
+    # end after finite number of iterations (say 100)
+    backtracking_iter = 0
+    while True: # backtracking line search
+        omega_tmp = omega + beta * grad
+        pi_tmp = softmax(omega_tmp)
+        J_tmp = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi_tmp) \
+            + zeta * compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi_tmp)
+
+        # print(beta, J_tmp - J_old)
+        if np.isnan(J_tmp - J_old):
+            pdb.set_trace()
+        # Armijo's line search condition
+        if J_tmp >= J_old + armijo_constant * beta * np.linalg.norm(grad)**2:
+            break
+
+        # just make a super small increment
+        if max_backtracking_iters is not None:
+            if backtracking_iter > max_backtracking_iters:
+                omega_tmp = omega + 1e-8 * grad
+                break
+
+        beta = decay_factor * beta
+        
+    # print values of beta at each run
+    # print('beta', beta)
+    return omega_tmp, beta
+    
 def calc_grad_ppo(omega, pi_t, adv_t, dpi_t, epsilon):
     pi = softmax(omega)
     ratio = pi / pi_t
@@ -221,6 +266,7 @@ def calc_grad_trpo_kl(omega, pi_t, dpi_t, qpi_t, zeta):
     grad = grad_t1 + grad_t2
     
     return grad
+
 
 #----------------------------------------------------------------------
 # advantage estimation
@@ -312,7 +358,10 @@ def run_experiment(env, pg_method, num_iters, eta, delta, decay_factor, epsilon,
                    FLAG_ANALYTICAL_GRADIENT, num_inner_updates, alpha,
                    FLAG_TRUE_ADVANTAGE, adv_estimate_alg,
                    num_traj_estimate_adv, adv_estimate_stepsize,
-                   FLAG_SAVE_INNER_STEPS, zeta):    
+                   FLAG_SAVE_INNER_STEPS, zeta, armijo_constant,
+                   max_backtracking_iters,
+                   FLAG_BETA_WARM_START,
+                   warm_start_beta_init, warm_start_beta_factor):    
     num_states = env.state_space
     num_actions = env.action_space
 
@@ -329,7 +378,6 @@ def run_experiment(env, pg_method, num_iters, eta, delta, decay_factor, epsilon,
 
     # learning loop
     for T in range(num_iters):
-        # print(T)
         dpi = env.calc_dpi(pi)
         
         if FLAG_TRUE_ADVANTAGE:
@@ -352,12 +400,14 @@ def run_experiment(env, pg_method, num_iters, eta, delta, decay_factor, epsilon,
                 tmp_list = [env.calc_vpi(pi, FLAG_RETURN_V_S0=True)]
                 
             omega = theta.copy()
+            warm_start_beta_init__current_k = warm_start_beta_init
             for k in range(num_inner_updates):
+                # print(T, k)
                 # do one gradient ascent step
                 if pg_method in ['sPPO', 'MDPO']:
                     grad = calc_grad_fmapg(
                         omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi, eta=eta,
-                        pg_method=pg_method)
+                         pg_method=pg_method)
                     omega = omega + alpha * grad                    
                 elif pg_method == 'TRPO':
                     omega_tmp = trpo_update(
@@ -374,6 +424,18 @@ def run_experiment(env, pg_method, num_iters, eta, delta, decay_factor, epsilon,
                     grad = calc_grad_trpo_kl(
                         omega=omega, pi_t=pi, dpi_t=dpi, qpi_t=qpi, zeta=zeta)
                     omega = omega + alpha * grad
+                elif pg_method == 'TRPO_KL_LS':
+                    omega_tmp, beta_init_tmp = \
+                        trpo_kl_ls_update(
+                            omega=omega, pi_t=pi, dpi_t=dpi, qpi_t=qpi,
+                            decay_factor=decay_factor, zeta=zeta,
+                            armijo_constant=armijo_constant,
+                            max_backtracking_iters=max_backtracking_iters,
+                            warm_start_beta_init=warm_start_beta_init__current_k,
+                            warm_start_beta_factor=warm_start_beta_factor)
+                    omega = omega_tmp.copy()
+                    if FLAG_BETA_WARM_START:
+                        warm_start_beta_init = beta_init_tmp
                 else:
                     raise NotImplementedError()
                     
