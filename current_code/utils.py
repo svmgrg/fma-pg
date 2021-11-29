@@ -97,15 +97,23 @@ def analytical_update_fmapg(pi_old, eta, adv, pg_method):
 
 # computes the true gradient of the FMA-PG loss wrt policy parameters omega
 # again refer to the "notes_fmapg.pdf" document
-def calc_grad_fmapg(omega, pi_t, adv_t, dpi_t, eta, pg_method):
+def calc_grad_fmapg(omega, pi_t, adv_t, dpi_t, eta, pg_method,
+                    version_grad='numerically_stable'):
     pi = softmax(omega)
     if pg_method == 'sPPO':
         grad = dpi_t.reshape(-1, 1) * (pi_t * (adv_t + 1 / eta) - pi / eta)
     elif pg_method == 'MDPO':
-        KL = (pi * np.log(pi / pi_t)).sum(1).reshape(-1, 1)
-        adv_sum = (pi * adv_t).sum(1).reshape(-1, 1)
-        grad = (dpi_t.reshape(-1, 1) / eta) * pi \
-            * (eta * adv_t - eta * adv_sum - np.log(pi / pi_t) + KL)
+        if version_grad == 'naive':
+            KL = (pi * np.log(pi / pi_t)).sum(1).reshape(-1, 1)
+            adv_sum = (pi * adv_t).sum(1).reshape(-1, 1)
+            grad = (dpi_t.reshape(-1, 1) / eta) * pi \
+                * (eta * adv_t - eta * adv_sum - np.log(pi / pi_t) + KL)
+        elif version_grad == 'numerically_stable':
+            # for numerical stability, use the following:
+            KL2 = entropy(pi, pi_t, axis=1).reshape(-1, 1)
+            clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1 - 1e-6)
+            grad = (dpi_t.reshape(-1, 1) / eta) * pi \
+                * (eta * adv_t - eta * adv_sum - np.log(pi / clipped_pi_t) + KL2)
     else:
         raise NotImplementedError()
     return grad
