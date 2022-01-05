@@ -354,7 +354,8 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
         vpi_list_outer.append(env.calc_vpi(pi, FLAG_RETURN_V_S0=True))
 
         if FLAG_ANALYTICAL_GRADIENT: 
-            pi = analytical_update_fmapg(pi, eta, adv, pg_method)
+            pi = analytical_update_fmapg(pi_old=pi, eta=eta, adv=adv,
+                                         pg_method=pg_method)
         else:
             # multiple gradient based updates
             if FLAG_SAVE_INNER_STEPS:
@@ -412,6 +413,14 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
             if FLAG_SAVE_INNER_STEPS:
                 vpi_list_inner.append(tmp_list)
 
+            # update the policy to the new approximate point
+            theta = omega.copy()
+            pi = softmax(theta)
+
+    vpi_list_outer = np.array(vpi_list_outer)
+    if FLAG_SAVE_INNER_STEPS:
+        vpi_list_inner = np.array(vpi_list_inner)
+                
     return vpi_list_outer, vpi_list_inner, pi
 
 #----------------------------------------------------------------------
