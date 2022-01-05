@@ -69,48 +69,43 @@ def make_single_inner_loop_update(constrained_optim, stepsize_type, omega,
     return omega_tmp, alpha
 
 #----------------------------------------------------------------------
-# sPPO
+# Old functions for calculating sPPO and MDPO gradients. They compute
+# the true gradient of the FMA-PG loss wrt policy parameters omega.
+# (Kept here as a check for the new functions)
 #----------------------------------------------------------------------
-# updates the policy using the closed form analytical sPPO update
-# (refer Sec. 4.2 Tabular Param, https://arxiv.org/pdf/2108.05828.pdf)
-def analytical_update_sPPO(pi_old, eta, adv):
-    pi_new = pi_old * np.maximum(1 + eta * adv, 0)  # exact FMA-PG update
-    pi_new = pi_new / pi_new.sum(1).reshape(-1, 1) # normalize
-    return pi_new
-
-# computes the true gradient of the FMA-PG loss wrt policy parameters omega
-# again refer to the "notes_fmapg.pdf" document
 def calc_grad_sPPO(omega, pi_t, adv_t, dpi_t, eta):
     pi = softmax(omega)
     grad = dpi_t.reshape(-1, 1) * (pi_t * (adv_t + 1 / eta) - pi / eta)
     return grad
-
-#----------------------------------------------------------------------
-# MDPO
-#----------------------------------------------------------------------
-# updates the MDPO policy using the exact FMA-PG update
-# (for instance, see Eq. 2, https://arxiv.org/pdf/2005.09814.pdf)
-def analytical_update_MDPO(pi_old, eta, adv):
-    pi_new = pi_old * np.exp(eta * adv) # exact FMA-PG update
-    pi_new = pi_new / pi_new.sum(1).reshape(-1, 1) # normalize 
-    return pi_new
 
 def calc_grad_MDPO(omega, pi_t, adv_t, dpi_t, eta):
     pi = softmax(omega)
     KL = entropy(pi, pi_t, axis=1).reshape(-1, 1)
     adv_sum = (pi * adv_t).sum(1).reshape(-1, 1)
     clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1 - 1e-6)
-    grad = (dpi_t.reshape(-1, 1) / eta) * pi \
+    grad = (dpi_t.reshape(-1, 1) 1/ eta) * pi \
         * (eta * adv_t - eta * adv_sum - np.log(pi / clipped_pi_t) + KL)
     return grad
 
 #----------------------------------------------------------------------
 # Combined Functions
 #----------------------------------------------------------------------
+def analytical_update_fmapg(pi_old, eta, adv, pg_method):
+    assert pg_method in ['sPPO', 'MDPO']
+    
+    if pg_method == 'sPPO':
+        pi_new = pi_old * np.maximum(1 + eta * adv, 0)  # exact sPPO update
+    elif pg_method == 'MDPO':
+        pi_new = pi_old * np.exp(eta * adv) # exact MDPO update
+
+    pi_new = pi_new / pi_new.sum(1).reshape(-1, 1) # normalize
+    return pi_new
+
 def calc_objective(pi, pi_t, adv_t, qpi_t, dpi_t, pg_method, epsilon=None):
     pi = softmax(omega)
     if pg_method in ['sPPO']:
-        obj = (dpi_t * (pi_t * adv_t).sum(1)).sum()
+        clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1-1e-6)        
+        obj = (dpi_t * (pi_t * adv_t * np.log(pi / clipped_pi_t)).sum(1)).sum()
     elif pg_method in ['MDPO']:
         obj = (dpi_t * (pi * adv_t).sum(1)).sum()
     elif pg_method in ['TRPO']:
@@ -158,6 +153,7 @@ def calc_cst_grad(omega, pi_t, dpi_t, pg_method):
         cst_grad = dpi_t.reshape(-1, 1) * pi * (np.log(pi / clipped_pi_t) - KL)
 
     return cst_grad
+
 #----------------------------------------------------------------------
 # PPO
 #----------------------------------------------------------------------
@@ -355,12 +351,7 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
         vpi_list_outer.append(env.calc_vpi(pi, FLAG_RETURN_V_S0=True))
 
         if FLAG_ANALYTICAL_GRADIENT: 
-            if pg_method == 'sPPO':
-                pi = analytical_update_sPPO(pi, eta, adv)
-            elif pg_method == 'MDPO':
-                pi = analytical_update_MDPO(pi, eta, adv)
-            else:
-                raise NotImplementedError()
+            pi = analytical_update_fmapg(pi, eta, adv, pg_method)
         else:
             # multiple gradient based updates
             if FLAG_SAVE_INNER_STEPS:

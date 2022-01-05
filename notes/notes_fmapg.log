@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.12.11)  5 JAN 2022 12:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.12.11)  5 JAN 2022 13:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -600,6 +600,9 @@ l.377 \end{document}
 
 LaTeX Warning: There were undefined references.
 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package rerunfilecheck Info: File `notes_fmapg.out' has not changed.
 (rerunfilecheck)             Checksum: BEEDE7EC1008E5A189AC07DCEB9300AA;3518.
  ) 
@@ -634,7 +637,7 @@ st/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2021/texmf-dist
 onts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2021/texmf-dist/fo
 nts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2021/texmf-dis
 t/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on notes_fmapg.pdf (10 pages, 597474 bytes).
+Output written on notes_fmapg.pdf (10 pages, 597479 bytes).
 PDF statistics:
  2466 PDF objects out of 2487 (max. 8388607)
  1690 compressed objects within 17 object streams
