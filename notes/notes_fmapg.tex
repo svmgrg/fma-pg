@@ -112,15 +112,15 @@ Our goal is to find the closed form solution to the following optimization probl
   \pi_{t+1} = \arg\max_{\pi \in \Pi} \underbrace{\left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \left(A^{\pi_t}(s, a) + \frac{1}{\eta} \right) \log \frac{p^\pi(s, a)}{p^{\pi_t}(s, a)} \right]}_{=: \ell^{\pi_t}_{\text{sPPO}}}, \label{eq: optim_problem_sppo}
 \end{equation}
 subject to the constraints on policy $p^\pi$. We will solve this problem by assuming the policy $\pi \equiv p^\pi$ as an $|\mathcal{S}| \times |\mathcal{A}|$ table satisfying the standard constraints
-\begin{IEEEeqnarray*}{rCll}
-  \sum_a p^\pi(a | s) &=& 1, & \quad \forall s \in \mathcal{S} \\
-  p^\pi(a | s) &\geq& 0, & \quad \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}.
-\end{IEEEeqnarray*}
+\begin{align*}
+  \sum_a p^\pi(a | s) &= 1,  \quad \forall s \in \mathcal{S} \\
+  p^\pi(a | s) &\geq 0,  \quad \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}.
+\end{align*}
 We begin by formulating this problem using Lagrange multipliers $\{\lambda_s\}_{s \in \mathcal{S}}$ and $\{\lambda_{s, a}\}_{s, a \in \mathcal{S} \times \mathcal{A}}$ for all states $s$ and actions $a$:
-\begin{IEEEeqnarray}{rCl}
-  \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \left(A^{\pi_t}(s, a) + \frac{1}{\eta} \right) \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} \nonumber \\
-  && - \sum_{s, a} \lambda_{s, a} p^\pi(a | s) - \sum_s \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg),
-\end{IEEEeqnarray}
+\begin{align}
+  \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &= \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \left(A^{\pi_t}(s, a) + \frac{1}{\eta} \right) \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} \nonumber \\
+  & \quad \; - \sum_{s, a} \lambda_{s, a} p^\pi(a | s) - \sum_s \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg),
+\end{align}
 where we abused the notation, in $\mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a})$, by using $\lambda_s$ to represent the set $\{\lambda_s\}_{s \in \mathcal{S}}$ and $\lambda_{s, a}$ to represent the set $\{\lambda_{s, a}\}_{s, a \in \mathcal{S} \times \mathcal{A}}$. The KKT conditions (Theorem 12.1, Nocedal and Wright, 2006) for this constrained optimization problem can be written as:
 \begin{align}
   \nabla_{p^\pi(b|x)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &= 0, \quad \forall x \in \mathcal{S}, \; \forall b \in \mathcal{A} \tag{C1} \label{eq: KKT1} \\
@@ -199,10 +199,10 @@ The optimization problem (Eq. \ref{eq: optim_problem_mdpo}) then simplifies to
 \end{equation}
 
 Proceeding analogously to the previous subsection, we use Lagrange multipliers $\lambda_s$, $\lambda_{s, a}$ for all states $s$ and actions $a$ to obtain the function
-\begin{IEEEeqnarray}{rCl}
-  \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a|s) Q^{\pi_t}(s, a) \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \frac{1}{\eta} \sum_s d^{\pi_t}(s) \sum_{a'} p^\pi(a' | s) \log \frac{p^\pi(a' | s)}{p^{\pi_t}(a' | s)} \nonumber \\
-  && - \sum_{s, a} \lambda_{s, a} p^\pi(a | s) - \sum_s \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg).
-\end{IEEEeqnarray}
+\begin{align}
+  \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &= \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a|s) Q^{\pi_t}(s, a) \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \frac{1}{\eta} \sum_s d^{\pi_t}(s) \sum_{a'} p^\pi(a' | s) \log \frac{p^\pi(a' | s)}{p^{\pi_t}(a' | s)} \nonumber \\
+  & \quad \; - \sum_{s, a} \lambda_{s, a} p^\pi(a | s) - \sum_s \lambda_{s} \bigg( \sum_a p^\pi(a | s) - 1 \bigg).
+\end{align}
 The KKT conditions are exactly the same as before (Eq. \ref{eq: KKT1} to Eq. \ref{eq: KKT6}).
 
 Again, we begin by solving the first KKT condition:
@@ -262,11 +262,11 @@ Then using the law of total derivative gives us
   &= - \sum_{x, b} \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | x) \Big) p^{\pi_\theta}(b | x) \cdot d^{\pi_t}(x) \frac{p^{\pi_t}(b | x)}{p^{\pi_\theta}(b | x)} \nonumber \\
   &= - d^{\pi_t}(s) \sum_b \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | s) \Big) p^{\pi_t}(b | s) \nonumber \\
   &= - d^{\pi_t}(s) \left[ \sum_b \mathbb{I}(b = a) p^{\pi_t}(b | s) - p^{\pi_\theta}(a | s) \sum_b p^{\pi_t}(b | s) \right] \nonumber \\
-  &= - d^{\pi_t}(s) \Big[ p^{\pi_\theta}(a | s) - p^{\pi_t}(a | s) \Big]. \label{eq: trpo_kl_mid}
+  &= d^{\pi_t}(s) \Big[ p^{\pi_\theta}(a | s) - p^{\pi_t}(a | s) \Big]. \label{eq: trpo_kl_mid}
 \end{align}
 Finally, using the above result yields
 \begin{IEEEeqnarray}{lrCl}
-  & \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{TRPO}} &=& \frac{\partial}{\partial \theta(s, a)} d^{\pi_t}(s') \Big[ p^{\pi_\theta}(a | s) - p^{\pi_t}(a | s) \Big] \nonumber \\
+  & \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{TRPO}} &=& \frac{\partial}{\partial \theta(s, a)} d^{\pi_t}(s') \Big[ p^{\pi_\theta}(a' | s') - p^{\pi_t}(a' | s') \Big] \nonumber \\
   &&=& d^{\pi_t}(s') \cdot \frac{\partial}{\partial \theta(s, a)} p^{\pi_\theta}(a' | s') \nonumber \\
   &&=& \mathbb{I}(s'=s) \cdot d^{\pi_t}(s') \Big( \mathbb{I}(a'=a) - p^{\pi_\theta}(a | s') \Big) p^{\pi_\theta}(a' | s') \\
   \Rightarrow \quad & A_{(s, :), (s, :)} &=& d^{\pi_t}(s) \Big( \text{diag} (p^{\pi_\theta}(\cdot | s)) - p^{\pi_\theta}(\cdot | s) p^{\pi_\theta}(\cdot | s)^\top \Big),
@@ -280,7 +280,7 @@ We also study a variant of TRPO where instead of satisfying the KL constraint on
 \end{equation}
 Note that this objective is almost the same as PPO with KL penalty (Eq. 8, Schulman et al., 2017) except that PPO uses the advantage function and we used the action value function. It is also similar to the objective stated in the TRPO paper (Section 4, Schulman et al., 2015) except that it has an average KL divergence instead of the max KL divergence. We can reuse Eq. \ref{eq: trpo_gradient} and Eq. \ref{eq: trpo_kl_mid} to compute its gradient:
 \begin{align}
-  \frac{\partial \mathcal{J}_{\text{TRPO-KL}}}{\partial \theta(s, a)} &= d^{\pi_t}(s) p^{\pi_\theta}(a | s) \left[ Q^{\pi_t}(s, a) - \sum_b p^{\pi_\theta}(b | s) Q^{\pi_t}(s, b) \right] + \delta d^{\pi_t}(s) \Big[ p^{\pi_\theta}(a | s) - p^{\pi_t}(a | s) \Big].
+  \frac{\partial \mathcal{J}_{\text{TRPO-KL}}}{\partial \theta(s, a)} &= d^{\pi_t}(s) p^{\pi_\theta}(a | s) \left[ Q^{\pi_t}(s, a) - \sum_b p^{\pi_\theta}(b | s) Q^{\pi_t}(s, b) \right] - \delta d^{\pi_t}(s) \Big[ p^{\pi_\theta}(a | s) - p^{\pi_t}(a | s) \Big].
 \end{align}
 
 \subsection{Proximal Policy Optimization (PPO)}
@@ -305,6 +305,60 @@ Repeating our usual drill, we assume a softmax policy to obtain:
     &= d^{\pi_t}(s) p^{\pi_\theta}(a | s) \left[ \mathbb{I} \Big( \text{cond}(s, a) \Big) A^{\pi_t}(s, a) - \sum_b p^{\pi_\theta}(b | s) \mathbb{I} \Big( \text{cond}(s, b) \Big) A^{\pi_t}(s, b) \right]. \label{eq: ppo_gradient}
 \end{align}
 The PPO gradient (Eq. \ref{eq: ppo_gradient}) is exactly the same as the TRPO gradient (Eq. \ref{eq: trpo_gradient}) except for the additional condition on choosing only specific state-action pairs while calculating the difference between advantage under the current policy and the approximate change in advantage under the updated policy.
+
+\subsection{Ablation Study}
+\begin{table}[!hbt]
+  \centering
+  \begin{tabular}{c|l|c}
+    \textbf{PG Alg.} & \hspace{2cm} \textbf{Objective} $(\mathcal{J})$ & \textbf{Constraint} $(\mathcal{C})$ \\
+    \hline \hline
+    sPPO &
+    $\sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) A^{\pi_t}(s, a) \log \frac{p^{\pi_\theta}(s, a)}{p^{\pi_t}(s, a)}$ &
+    $\sum_s d^{\pi_t}(s) \cdot \text{KL}(p^{\pi_t}(\cdot | s) \| p^{\pi_\theta}(\cdot | s))$\\
+    \hline
+    TRPO &
+    $\sum_s d^{\pi_t}(s) \sum_a p^{\pi_\theta}(a | s) Q^{\pi_t}(s, a)$ &
+    \texttt{(same as above)} \\
+    \hline
+    MDPO &
+    $\sum_s d^{\pi_t}(s) \sum_a p^{\pi_\theta}(a | s) A^{\pi_t}(s, a)$ &
+    $\sum_s d^{\pi_t}(s) \cdot \text{KL}(p^{\pi_\theta}(\cdot | s) \| p^{\pi_t}(\cdot | s))$
+  \end{tabular}
+  
+  \caption{The objectives and constraints corresponding to the different PG algorithms. Note that the objective $\mathcal{J}$ for both TRPO and MDPO is essentially equivalent to each other, since maximizing either of them would lead to the same solution. The reason for this is that the difference between the two objectives is $\sum_s d^{\pi_t} V^{\pi_t}(s)$, which is independent of the policy weight $\theta$).} 
+  \label{table: ablation_study}
+\end{table}
+
+For the regularized version\footnote{Note that for TRPO, this objective is almost the same as PPO with KL penalty (Eq. 8, Schulman et al., 2017) except that PPO uses the advantage function and we used the action value function (which, as we discussed above, really doesn't matter). It is also similar to the objective stated in the TRPO paper (Section 4, Schulman et al., 2015) except that it has an average KL divergence instead of the max KL divergence.},
+\begin{equation}
+  \max_\theta \; \mathcal{J}_{\text{PG-Alg}} - \frac{1}{\eta} \mathcal{C}_{\text{PG-Alg}},
+\end{equation}
+and for the constrained version,
+\begin{equation}
+  \max_\theta \; \mathcal{J}_{\text{PG-Alg}} \quad \text{subject to } \quad \mathcal{C}_{\text{PG-Alg}} \leq \delta.  
+\end{equation}
+
+\begin{table}[!hbt]
+  \centering
+  \begin{tabular}{c|l|c}
+    \textbf{PG Alg.} & \hspace{1cm} \textbf{Grad. objective} $(\nabla_{\theta(s, a)} \mathcal{J})$ & \textbf{Grad. constraint} $(\nabla_{\theta(s, a)} \mathcal{C})$ \\
+    \hline \hline
+    sPPO &
+    $d^{\pi_t}(s) p^{\pi_t}(a|s) A^{\pi_t}(s, a)$ &
+    $d^{\pi_t}(s) \left[ p^\pi(a | s) - p^{\pi_t}(a|s) \right]$ \\
+    \hline
+    TRPO &
+    $d^{\pi_t}(s) p^\pi(a | s) \left[ Q^{\pi_t}(s, a) - \sum_b p^\pi(b | s) Q^{\pi_t}(s, b) \right]$ &
+    \texttt{(same as above)} \\
+    \hline
+    MDPO &
+    $d^{\pi_t}(s) p^\pi(a | s) \left[ A^{\pi_t}(s, a) - \sum_b p^\pi(b|s) A^{\pi_t}(s, b) \right]$ &
+    $\begin{array}{c} d^{\pi_t}(s) p^\pi(a | s) \times \\ \left[ \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} - \text{KL}(p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s)) \right] \end{array}$
+  \end{tabular}
+  
+  \caption{The gradients of the objectives and constraints wrt. the policy parameter corresponding to the different PG algorithms. Note that the gradient of the objective for both TRPO and MDPO is exactly equal to each other.}
+  \label{table: ablation_study_grad}
+\end{table}
 
 \section*{References}
 

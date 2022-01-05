@@ -1,13 +1,14 @@
-\BOOKMARK [1][-]{section.1}{Appendix}{}% 1
-\BOOKMARK [2][-]{subsection.1.1}{Experiments on the Tabular CliffWorld Environment}{section.1}% 2
-\BOOKMARK [3][-]{subsubsection.1.1.1}{Learning Curves and Parameter Sensitivity Plots}{subsection.1.1}% 3
-\BOOKMARK [3][-]{subsubsection.1.1.2}{Conclusions}{subsection.1.1}% 4
-\BOOKMARK [2][-]{subsection.1.2}{Softmax PPO with Tabular Parameterization}{section.1}% 5
-\BOOKMARK [3][-]{subsubsection.1.2.1}{Closed Form Update with Direct Representation}{subsection.1.2}% 6
-\BOOKMARK [3][-]{subsubsection.1.2.2}{Gradient of the Loss Function with Softmax Policy Representation}{subsection.1.2}% 7
-\BOOKMARK [2][-]{subsection.1.3}{Mirror Descent Policy Optimization \(MDPO\)}{section.1}% 8
-\BOOKMARK [3][-]{subsubsection.1.3.1}{Closed Form Update with Direct Parameterization}{subsection.1.3}% 9
-\BOOKMARK [3][-]{subsubsection.1.3.2}{Gradient of the MDPO Loss Function with Tabular Softmax Representation}{subsection.1.3}% 10
-\BOOKMARK [2][-]{subsection.1.4}{Trust Region Policy Optimization \(TRPO\)}{section.1}% 11
-\BOOKMARK [2][-]{subsection.1.5}{TRPO with KL Regularization}{section.1}% 12
-\BOOKMARK [2][-]{subsection.1.6}{Proximal Policy Optimization \(PPO\)}{section.1}% 13
+\BOOKMARK [1][-]{section.1}{\376\377\000A\000p\000p\000e\000n\000d\000i\000x}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{\376\377\000E\000x\000p\000e\000r\000i\000m\000e\000n\000t\000s\000\040\000o\000n\000\040\000t\000h\000e\000\040\000T\000a\000b\000u\000l\000a\000r\000\040\000C\000l\000i\000f\000f\000W\000o\000r\000l\000d\000\040\000E\000n\000v\000i\000r\000o\000n\000m\000e\000n\000t}{section.1}% 2
+\BOOKMARK [3][-]{subsubsection.1.1.1}{\376\377\000L\000e\000a\000r\000n\000i\000n\000g\000\040\000C\000u\000r\000v\000e\000s\000\040\000a\000n\000d\000\040\000P\000a\000r\000a\000m\000e\000t\000e\000r\000\040\000S\000e\000n\000s\000i\000t\000i\000v\000i\000t\000y\000\040\000P\000l\000o\000t\000s}{subsection.1.1}% 3
+\BOOKMARK [3][-]{subsubsection.1.1.2}{\376\377\000C\000o\000n\000c\000l\000u\000s\000i\000o\000n\000s}{subsection.1.1}% 4
+\BOOKMARK [2][-]{subsection.1.2}{\376\377\000S\000o\000f\000t\000m\000a\000x\000\040\000P\000P\000O\000\040\000w\000i\000t\000h\000\040\000T\000a\000b\000u\000l\000a\000r\000\040\000P\000a\000r\000a\000m\000e\000t\000e\000r\000i\000z\000a\000t\000i\000o\000n}{section.1}% 5
+\BOOKMARK [3][-]{subsubsection.1.2.1}{\376\377\000C\000l\000o\000s\000e\000d\000\040\000F\000o\000r\000m\000\040\000U\000p\000d\000a\000t\000e\000\040\000w\000i\000t\000h\000\040\000D\000i\000r\000e\000c\000t\000\040\000R\000e\000p\000r\000e\000s\000e\000n\000t\000a\000t\000i\000o\000n}{subsection.1.2}% 6
+\BOOKMARK [3][-]{subsubsection.1.2.2}{\376\377\000G\000r\000a\000d\000i\000e\000n\000t\000\040\000o\000f\000\040\000t\000h\000e\000\040\000L\000o\000s\000s\000\040\000F\000u\000n\000c\000t\000i\000o\000n\000\040\000w\000i\000t\000h\000\040\000S\000o\000f\000t\000m\000a\000x\000\040\000P\000o\000l\000i\000c\000y\000\040\000R\000e\000p\000r\000e\000s\000e\000n\000t\000a\000t\000i\000o\000n}{subsection.1.2}% 7
+\BOOKMARK [2][-]{subsection.1.3}{\376\377\000M\000i\000r\000r\000o\000r\000\040\000D\000e\000s\000c\000e\000n\000t\000\040\000P\000o\000l\000i\000c\000y\000\040\000O\000p\000t\000i\000m\000i\000z\000a\000t\000i\000o\000n\000\040\000\050\000M\000D\000P\000O\000\051}{section.1}% 8
+\BOOKMARK [3][-]{subsubsection.1.3.1}{\376\377\000C\000l\000o\000s\000e\000d\000\040\000F\000o\000r\000m\000\040\000U\000p\000d\000a\000t\000e\000\040\000w\000i\000t\000h\000\040\000D\000i\000r\000e\000c\000t\000\040\000P\000a\000r\000a\000m\000e\000t\000e\000r\000i\000z\000a\000t\000i\000o\000n}{subsection.1.3}% 9
+\BOOKMARK [3][-]{subsubsection.1.3.2}{\376\377\000G\000r\000a\000d\000i\000e\000n\000t\000\040\000o\000f\000\040\000t\000h\000e\000\040\000M\000D\000P\000O\000\040\000L\000o\000s\000s\000\040\000F\000u\000n\000c\000t\000i\000o\000n\000\040\000w\000i\000t\000h\000\040\000T\000a\000b\000u\000l\000a\000r\000\040\000S\000o\000f\000t\000m\000a\000x\000\040\000R\000e\000p\000r\000e\000s\000e\000n\000t\000a\000t\000i\000o\000n}{subsection.1.3}% 10
+\BOOKMARK [2][-]{subsection.1.4}{\376\377\000T\000r\000u\000s\000t\000\040\000R\000e\000g\000i\000o\000n\000\040\000P\000o\000l\000i\000c\000y\000\040\000O\000p\000t\000i\000m\000i\000z\000a\000t\000i\000o\000n\000\040\000\050\000T\000R\000P\000O\000\051}{section.1}% 11
+\BOOKMARK [2][-]{subsection.1.5}{\376\377\000T\000R\000P\000O\000\040\000w\000i\000t\000h\000\040\000K\000L\000\040\000R\000e\000g\000u\000l\000a\000r\000i\000z\000a\000t\000i\000o\000n}{section.1}% 12
+\BOOKMARK [2][-]{subsection.1.6}{\376\377\000P\000r\000o\000x\000i\000m\000a\000l\000\040\000P\000o\000l\000i\000c\000y\000\040\000O\000p\000t\000i\000m\000i\000z\000a\000t\000i\000o\000n\000\040\000\050\000P\000P\000O\000\051}{section.1}% 13
+\BOOKMARK [2][-]{subsection.1.7}{\376\377\000A\000b\000l\000a\000t\000i\000o\000n\000\040\000S\000t\000u\000d\000y}{section.1}% 14
