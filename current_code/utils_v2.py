@@ -117,6 +117,9 @@ def calc_objective(omega, pi_t, adv_t, qpi_t, dpi_t, pg_method, epsilon=None):
         raise NotImplementedError()
     return obj
 
+# The KL is essentially C = (dpi_t * (pi_t * np.log(pi_t / pi)).sum(1)).sum()
+# But we use a better way that avoids NaN values from 0/0 division. See
+# https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.entropy.html
 def calc_constraint(omega, pi_t, dpi_t, pg_method):
     pi = softmax(omega)
     if pg_method in ['sPPO', 'TRPO']:
@@ -132,6 +135,7 @@ def calc_obj_grad(omega, pi_t, adv_t, qpi_t, dpi_t, pg_method, epsilon=None):
     if pg_method in ['sPPO']:
         obj_grad = dpi_t.reshape(-1, 1) * pi_t * adv_t
     elif pg_method in ['TRPO']:
+        raise CheckThisCodeInPDB() # might need to flatten the gradient???
         qpi_exp = (pi * qpi_t).sum(1).reshape(-1, 1)
         obj_grad = dpi_t.reshape(-1, 1) * pi * (qpi_t - qpi_exp)
     elif pg_method in ['MDPO']:
@@ -156,19 +160,6 @@ def calc_cst_grad(omega, pi_t, dpi_t, pg_method):
         cst_grad = dpi_t.reshape(-1, 1) * pi * (np.log(pi / clipped_pi_t) - KL)
 
     return cst_grad
-
-#----------------------------------------------------------------------
-# PPO
-#----------------------------------------------------------------------
-def calc_grad_ppo(omega, pi_t, adv_t, dpi_t, epsilon):
-    pi = softmax(omega)
-    ratio = pi / pi_t
-    cond = np.logical_or(np.logical_and(adv_t > 0, ratio < 1 + epsilon),
-                         np.logical_and(adv_t < 0, ratio > 1 - epsilon))
-
-    grad = dpi_t.reshape(-1, 1) * pi \
-        * (cond * adv_t - (pi * cond * adv_t).sum(1).reshape(-1, 1))
-    return grad
 
 #----------------------------------------------------------------------
 # TRPO
@@ -268,59 +259,6 @@ def trpo_update(omega, pi_t, dpi_t, qpi_t, delta, decay_factor,
         
     return omega_tmp
 
-def trpo_kl_ls_update(omega, pi_t, dpi_t, qpi_t, decay_factor, zeta, 
-                      armijo_const=0, max_backtracking_iters=None,
-                      warm_start_beta_init=10, warm_start_beta_factor=10):
-    pi = softmax(omega)
-    J_old = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi) \
-        - zeta * compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi)
-    grad = calc_grad_trpo_kl(omega=omega, pi_t=pi_t, dpi_t=dpi_t, qpi_t=qpi_t,
-                             zeta=zeta)
-
-    if np.allclose(np.zeros(grad.shape), grad):# or np.linalg.norm(grad) < 1e-8:
-        beta = 0
-        return omega, beta
-    else:
-        beta = warm_start_beta_factor * warm_start_beta_init
-
-    # end after finite number of iterations (say 100)
-    backtracking_iter = 0
-    while True: # backtracking line search
-        omega_tmp = omega + beta * grad
-        pi_tmp = softmax(omega_tmp)
-        J_tmp = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi_tmp) \
-            - zeta * compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi_tmp)
-
-        # print(beta, J_tmp - J_old)
-        # if np.isnan(J_tmp - J_old):
-        #     pdb.set_trace()
-        # Armijo's line search condition
-        if J_tmp >= J_old + armijo_const * beta * np.linalg.norm(grad)**2:
-            break
-
-        # if too many backtracking steps, just make a super small increment
-        if max_backtracking_iters is not None:
-            if backtracking_iter > max_backtracking_iters:
-                omega_tmp = omega + 1e-8 * grad
-                break
-
-        beta = decay_factor * beta
-        backtracking_iter += 1
-        
-    # print values of beta at each run
-    # print('beta', beta)
-    return omega_tmp, beta
-
-def calc_grad_trpo_kl(omega, pi_t, dpi_t, qpi_t, zeta):
-    pi = softmax(omega)
-    
-    grad_t1 = dpi_t.reshape(-1, 1) * pi \
-        * (qpi_t - (pi * qpi_t).sum(1).reshape(-1, 1))
-    grad_t2 = zeta * dpi_t.reshape(-1, 1) * (pi - pi_t)
-    grad = grad_t1 + grad_t2
-    
-    return grad
-
 #----------------------------------------------------------------------
 # function for running full experiments
 #----------------------------------------------------------------------
@@ -376,6 +314,16 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
                     update_direction = obj_grad - (1 \ eta) * cst_grad
                     objective_grad = update_direction
                 elif optim_type == 'constrained':
+                    # calc update direction
+                    grad_flatten = calc_obj_grad(
+                        omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi,
+                        pg_method=pg_method, epsilon=epsilon).reshape(-1, 1)
+                    # s_flatten = np.linalg.solve(A, grad_flatten)
+                    # had problems with A being singular; so used pseudo-inverse
+                    update_direction_flatten = np.matmul(
+                        np.linalg.pinv(A), grad_flatten)    
+                    update_direction = update_direction_flatten.reshape(
+                        grad.shape)
                     raise NotImplementedError
 
                 if stepsize_type == 'fixed_stepsize':
@@ -394,15 +342,21 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
                     else:
                         alpha_init = alpha_max
 
-                # make a single inner loop update
-                updated_omega, used_alpha = make_single_inner_loop_update(
-                    optim_type=optim_type, stepsize_type=stepsize_type,
-                    omega=omega, update_direction=update_direction,
-                    calc_objective_fn=calc_objective_fn,
-                    calc_constraint_fn=calc_constraint_fn,
-                    objective_grad=objective_grad, eta=eta, epsilon=epsilon,
-                    delta=delta, alpha_fixed=alpha_fixed, alpha_init=alpha_init,
-                    decay_factor=decay_factor, armijo_const=armijo_const)
+                        
+                if np.allclose(np.zeros(grad.shape), grad):
+                    # or np.linalg.norm(grad) < 1e-8:
+                    updated_omega = omega.copy()
+                    used_alpha = 0
+                else: # make a single inner loop update
+                    updated_omega, used_alpha = make_single_inner_loop_update(
+                        optim_type=optim_type, stepsize_type=stepsize_type,
+                        omega=omega, update_direction=update_direction,
+                        calc_objective_fn=calc_objective_fn,
+                        calc_constraint_fn=calc_constraint_fn,
+                        objective_grad=objective_grad, eta=eta,
+                        epsilon=epsilon, delta=delta, alpha_fixed=alpha_fixed,
+                        alpha_init=alpha_init, decay_factor=decay_factor,
+                        armijo_const=armijo_const)
                 
                 omega = updated_omega.copy()
 
@@ -421,110 +375,4 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
     if FLAG_SAVE_INNER_STEPS:
         vpi_list_inner = np.array(vpi_list_inner)
                 
-    return vpi_list_outer, vpi_list_inner, pi
-
-#----------------------------------------------------------------------
-# function for running full experiments
-#----------------------------------------------------------------------
-def run_experiment(env, pg_method, num_iters, eta, delta, decay_factor, epsilon,
-                   FLAG_ANALYTICAL_GRADIENT, num_inner_updates, alpha,
-                   FLAG_TRUE_ADVANTAGE, adv_estimate_alg,
-                   num_traj_estimate_adv, adv_estimate_stepsize,
-                   FLAG_SAVE_INNER_STEPS, zeta, armijo_const,
-                   max_backtracking_iters,
-                   FLAG_BETA_WARM_START,
-                   warm_start_beta_init, warm_start_beta_factor):    
-    num_states = env.state_space
-    num_actions = env.action_space
-
-    # initialize pi (uniform random tabular policy with direct representation)
-    theta = init_theta(num_states, num_actions, theta_init=0)
-    pi = softmax(theta)
-    
-    # store the quality of the policies
-    vpi_list_outer = [env.calc_vpi(pi, FLAG_RETURN_V_S0=True)]
-    vpi_list_inner = [] if FLAG_SAVE_INNER_STEPS else None
-
-    if not FLAG_TRUE_ADVANTAGE:
-        qpi_estimate = np.zeros((env.state_space, env.action_space))
-
-    # learning loop
-    for T in range(num_iters):
-        # print(T)
-        dpi = env.calc_dpi(pi)
-        
-        if FLAG_TRUE_ADVANTAGE:
-            qpi = env.calc_qpi(pi)
-            adv = qpi - env.calc_vpi(pi).reshape(-1, 1)
-        else:
-            adv, qpi_estimate = estimate_advantage(
-                env, pi=pi, num_traj=num_traj_estimate_adv,
-                alg=adv_estimate_alg, qpi_old=qpi_estimate,
-                stepsize=adv_estimate_stepsize)
-            qpi = qpi_estimate.copy()
-
-        # gradient based update
-        vpi_list_outer.append(env.calc_vpi(pi, FLAG_RETURN_V_S0=True))
-
-        if FLAG_ANALYTICAL_GRADIENT: # only for sPPO and MDPO
-            pi = analytical_update_fmapg(pi, eta, adv, pg_method)
-        else:
-            if FLAG_SAVE_INNER_STEPS:
-                tmp_list = [env.calc_vpi(pi, FLAG_RETURN_V_S0=True)]
-                
-            omega = theta.copy()
-            warm_start_beta_init__current_k = warm_start_beta_init
-            for k in range(num_inner_updates):
-                # do one gradient ascent step
-                if pg_method in ['sPPO', 'MDPO']:
-                    grad = calc_grad_fmapg(
-                        omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi, eta=eta,
-                        pg_method=pg_method)
-                    omega = omega + alpha * grad                    
-                elif pg_method == 'TRPO':
-                    omega_tmp = trpo_update(
-                        omega=omega, pi_t=pi, dpi_t=dpi, qpi_t=qpi, delta=delta,
-                        decay_factor=decay_factor, num_states=num_states,
-                        num_actions=num_actions)
-                    omega = omega_tmp.copy()
-                elif pg_method == 'PPO':
-                    grad = calc_grad_ppo(
-                        omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi,
-                        epsilon=epsilon)
-                    omega = omega + alpha * grad
-                elif pg_method == 'TRPO_KL':
-                    grad = calc_grad_trpo_kl(
-                        omega=omega, pi_t=pi, dpi_t=dpi, qpi_t=qpi, zeta=zeta)
-                    omega = omega + alpha * grad
-                elif pg_method == 'TRPO_KL_LS':
-                    omega_tmp, beta_init_tmp = \
-                        trpo_kl_ls_update(
-                            omega=omega, pi_t=pi, dpi_t=dpi, qpi_t=qpi,
-                            decay_factor=decay_factor, zeta=zeta,
-                            armijo_const=armijo_const,
-                            max_backtracking_iters=max_backtracking_iters,
-                            warm_start_beta_init=warm_start_beta_init__current_k,
-                            warm_start_beta_factor=warm_start_beta_factor)
-                    omega = omega_tmp.copy()
-                    if FLAG_BETA_WARM_START:
-                        warm_start_beta_init = beta_init_tmp
-                else:
-                    raise NotImplementedError()
-                    
-                # save the optimization objective
-                if FLAG_SAVE_INNER_STEPS:
-                    pi_tmp = softmax(omega)
-                    tmp_list.append(env.calc_vpi(pi_tmp, FLAG_RETURN_V_S0=True))
-
-            if FLAG_SAVE_INNER_STEPS:
-                vpi_list_inner.append(tmp_list)
-
-            # update the policy to the new approximate point
-            theta = omega.copy()
-            pi = softmax(theta)
-
-    vpi_list_outer = np.array(vpi_list_outer)
-    if FLAG_SAVE_INNER_STEPS:
-        vpi_list_inner = np.array(vpi_list_inner)
-        
     return vpi_list_outer, vpi_list_inner, pi
