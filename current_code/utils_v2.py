@@ -23,9 +23,10 @@ def generate_uniform_policy(num_states, num_actions):
 def init_theta(num_states, num_actions, theta_init=0):
     return theta_init * np.ones((num_states, num_actions))
 
-def make_single_inner_loop_update(constrained_optim, stepsize_type, omega,
+def make_single_inner_loop_update(optim_type, stepsize_type, omega,
                                   update_direction, calc_objective_fn,
-                                  calc_constraint_fn=None, eta=None,
+                                  calc_constraint_fn=None,
+                                  objective_grad=None, eta=None,
                                   epsilon=None, delta=None, alpha_fixed=0.1,
                                   alpha_init=100, decay_factor=0.1,
                                   armijo_const=0, max_backtracking_steps=100):
@@ -36,13 +37,13 @@ def make_single_inner_loop_update(constrained_optim, stepsize_type, omega,
     calc_objective_fn() is used to calculate the objective value, 
     calc_constraint_fn() is used to check whether the constraint is satisfied.
     '''
-    assert constrained_optim in [True, False]
+    assert optim_type in ['regularized', 'constrained']
     assert stepsize_type in ['fixed_stepsize', 'line_search']
 
     if stepsize_type == 'fixed_stepsize':
-        if constrained_optim == False:
+        if optim_type == 'regularized':
             omega_tmp = omega + alpha_fixed * update_direction
-        elif constrained_optim == True:
+        elif optim_type == 'constrained':
             raise NotImplementedError()
     elif stepsize_type == 'line_search':
         J_old = calc_objective_fn(omega)
@@ -54,9 +55,11 @@ def make_single_inner_loop_update(constrained_optim, stepsize_type, omega,
         while True:
             omega_tmp = omega + alpha * update_step
             J_tmp = calc_objective_fn(omega_tmp)
-            if ((constrained_optim == False and J_tmp >= J_old + alpha * cm)
-                or (constrained_optim == True and J_tmp >= J_old + alpha * cm
-                    and C_tmp <= delta)):
+            C_tmp = calc_constraint_fn(omega_tmp)
+            if ((optim_type == 'regularized' and J_tmp >= J_old + alpha * cm)
+                or
+                (optim_type == 'constrained' and
+                 J_tmp >= J_old + alpha * cm and C_tmp <= delta)):
                 break # use this alpha
             elif t > max_backtracking_steps:
                 alpha = 1e-6
@@ -101,7 +104,7 @@ def analytical_update_fmapg(pi_old, eta, adv, pg_method):
     pi_new = pi_new / pi_new.sum(1).reshape(-1, 1) # normalize
     return pi_new
 
-def calc_objective(pi, pi_t, adv_t, qpi_t, dpi_t, pg_method, epsilon=None):
+def calc_objective(omega, pi_t, adv_t, qpi_t, dpi_t, pg_method, epsilon=None):
     pi = softmax(omega)
     if pg_method in ['sPPO']:
         clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1-1e-6)        
@@ -114,7 +117,7 @@ def calc_objective(pi, pi_t, adv_t, qpi_t, dpi_t, pg_method, epsilon=None):
         raise NotImplementedError()
     return obj
 
-def calc_constraint(pi, pi_t, dpi_t, pg_method):
+def calc_constraint(omega, pi_t, dpi_t, pg_method):
     pi = softmax(omega)
     if pg_method in ['sPPO', 'TRPO']:
         cst = (dpi_t * entropy(pi_t, pi, axis=1)).sum()
@@ -325,10 +328,10 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
                    FLAG_ANALYTICAL_GRADIENT, FLAG_SAVE_INNER_STEPS,
                    alpha_max, FLAG_WARM_START, warm_start_factor,
                    max_backtracking_iters,
-                   constrained_optim, stepsize_type, eta, epsilon, delta,
+                   optim_type, stepsize_type, eta, epsilon, delta,
                    alpha_fixed, decay_factor, armijo_const):
     assert pg_method in ['sPPO', 'MDPO', 'PPO', 'TRPO']
-    assert constrained_optim in [True, False]
+    assert optim_type in ['regularized', 'constrained']
     assert stepsize_type in ['fixed_stepsize', 'line_search']
 
     num_states = env.state_space
@@ -358,16 +361,42 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
                 tmp_list = [env.calc_vpi(pi, FLAG_RETURN_V_S0=True)]
 
             omega = theta.copy()
+            used_alpha = None
                             
             # inner learning loop
             for k in range(num_inner_loop_iter): # do one grad ascent step
 
-                # a bunch of computation
+                if optim_type == 'regularized':
+                    obj_grad = calc_obj_grad(omega=omega, pi_t=pi, adv_t=adv,
+                                             dpi_t=dpi, pg_method=pg_method,
+                                             epsilon=epsilon)
+                    cst_grad = calc_cst_grad(omega=omega, pi_t=pi, dpi_t=dpi,
+                                             pg_method=pg_method)
+                    update_direction = obj_grad - (1 \ eta) * cst_grad
+                    objective_grad = update_direction
+                elif optim_type == 'constrained':
+                    raise NotImplementedError
 
+                if stepsize_type == 'fixed_stepsize':
+                    calc_objective_fn = None
+                    calc_constraint_fn = None
+                    alpha_init = None
+                elif stepsize_type == 'line_search':
+                    calc_objective_fn = lambda omega: calc_objective(
+                        omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi,
+                        pg_method=pg_method, epsilon=epsilon)
+                    calc_constraint_fn = lambda omega: calc_constraint(
+                        omega=omega, pi_t=pi, dpi_t=dpi, pg_method=pg_method)
+
+                    if FLAG_WARM_START and used_alpha is not None:
+                        alpha_init = warm_start_factor * used_alpha
+                    else:
+                        alpha_init = alpha_max
+
+                # make a single inner loop update
                 updated_omega, used_alpha = make_single_inner_loop_update(
-                    constrained_optim=constrained_optim,
-                    stepsize_type=stepsize_type, omega=omega,
-                    update_direction=update_direction,
+                    optim_type=optim_type, stepsize_type=stepsize_type,
+                    omega=omega, update_direction=update_direction,
                     calc_objective_fn=calc_objective_fn,
                     calc_constraint_fn=calc_constraint_fn,
                     objective_grad=objective_grad, eta=eta, epsilon=epsilon,
@@ -383,7 +412,8 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
             if FLAG_SAVE_INNER_STEPS:
                 vpi_list_inner.append(tmp_list)
 
-        
+    return vpi_list_outer, vpi_list_inner, pi
+
 #----------------------------------------------------------------------
 # function for running full experiments
 #----------------------------------------------------------------------
