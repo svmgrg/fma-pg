@@ -292,9 +292,11 @@ Repeating our usual drill, we assume a softmax policy to obtain:
 \end{align}
 The PPO gradient (Eq. \ref{eq: ppo_gradient}) is exactly the same as the TRPO gradient (Eq. \ref{eq: trpo_gradient}) except for the additional condition on choosing only specific state-action pairs while calculating the difference between advantage under the current policy and the approximate change in advantage under the updated policy.
 
-\subsection{Ablation Study}
+\section{Ablation Study}
 \begin{table}[!hbt]
   \centering
+  \renewcommand{\arraystretch}{1.5}
+  \renewcommand{\tabcolsep}{0.2cm}
   \begin{tabular}{c|l|c}
     \textbf{PG Alg.} & \hspace{2cm} \textbf{Objective} $(\mathcal{J})$ & \textbf{Constraint} $(\mathcal{C})$ \\
     \hline \hline
@@ -303,11 +305,11 @@ The PPO gradient (Eq. \ref{eq: ppo_gradient}) is exactly the same as the TRPO gr
     $\sum_s d^{\pi_t}(s) \cdot \text{KL}(p^{\pi_t}(\cdot | s) \| p^{\pi_\theta}(\cdot | s))$\\
     \hline
     TRPO &
-    $\sum_s d^{\pi_t}(s) \sum_a p^{\pi_\theta}(a | s) Q^{\pi_t}(s, a)$ &
+    $\sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) Q^{\pi_t}(s, a) \frac{p^{\pi_\theta}(s, a)}{p^{\pi_t}(s, a)}$ &
     \texttt{(same as above)} \\
     \hline
     MDPO &
-    $\sum_s d^{\pi_t}(s) \sum_a p^{\pi_\theta}(a | s) A^{\pi_t}(s, a)$ &
+    $\sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) A^{\pi_t}(s, a) \frac{p^{\pi_\theta}(s, a)}{p^{\pi_t}(s, a)}$ &
     $\sum_s d^{\pi_t}(s) \cdot \text{KL}(p^{\pi_\theta}(\cdot | s) \| p^{\pi_t}(\cdot | s))$
   \end{tabular}
   
@@ -326,6 +328,8 @@ and for the constrained version,
 
 \begin{table}[!hbt]
   \centering
+  \renewcommand{\arraystretch}{1.5}
+  \renewcommand{\tabcolsep}{0.2cm}
   \begin{tabular}{c|l|c}
     \textbf{PG Alg.} & \hspace{1cm} \textbf{Grad. objective} $(\nabla_{\theta(s, a)} \mathcal{J})$ & \textbf{Grad. constraint} $(\nabla_{\theta(s, a)} \mathcal{C})$ \\
     \hline \hline
