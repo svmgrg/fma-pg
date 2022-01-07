@@ -15,14 +15,6 @@ def softmax(x):
     out = e_x / e_x.sum(1).reshape(-1, 1)
     return out
 
-# generate a uniformly random tabular policy (direct representation)
-def generate_uniform_policy(num_states, num_actions):
-    return np.ones((num_states, num_actions)) / num_actions
-
-# generate action preferences (for softmax policy representation)
-def init_theta(num_states, num_actions, theta_init=0):
-    return theta_init * np.ones((num_states, num_actions))
-
 def make_single_inner_loop_update(optim_type, stepsize_type, omega,
                                   update_direction, calc_objective_fn,
                                   calc_constraint_fn=None,
@@ -37,15 +29,17 @@ def make_single_inner_loop_update(optim_type, stepsize_type, omega,
     calc_objective_fn() is used to calculate the objective value, 
     calc_constraint_fn() is used to check whether the constraint is satisfied.
     '''
-    assert optim_type in ['regularized', 'constrained']
+    assert optim_type in ['unconstrained', 'constrained']
     assert stepsize_type in ['fixed_stepsize', 'line_search']
 
     if stepsize_type == 'fixed_stepsize':
-        if optim_type == 'regularized':
+        if optim_type == 'unconstrained':
             omega_tmp = omega + alpha_fixed * update_direction
+            alpha = alpha_fixed
         elif optim_type == 'constrained':
             raise NotImplementedError()
     elif stepsize_type == 'line_search':
+        assert calc_objective_fn is not None
         J_old = calc_objective_fn(omega)
         # the term cm comes from
         # https://en.wikipedia.org/wiki/Backtracking_line_search#Motivation
@@ -55,11 +49,13 @@ def make_single_inner_loop_update(optim_type, stepsize_type, omega,
         while True:
             omega_tmp = omega + alpha * update_step
             J_tmp = calc_objective_fn(omega_tmp)
-            C_tmp = calc_constraint_fn(omega_tmp)
-            if ((optim_type == 'regularized' and J_tmp >= J_old + alpha * cm)
+            if calc_constrain_fn is not None:
+                C_tmp = calc_constraint_fn(omega_tmp)
+                
+            if ((optim_type == 'unconstrained' and J_tmp >= J_old + alpha * cm)
                 or
-                (optim_type == 'constrained' and
-                 J_tmp >= J_old + alpha * cm and C_tmp <= delta)):
+                (optim_type == 'constrained' and # no Armijo condition here
+                 J_tmp > J_old and C_tmp <= delta)):
                 break # use this alpha
             elif t > max_backtracking_steps:
                 alpha = 1e-6
@@ -98,26 +94,28 @@ def analytical_update_fmapg(pi_old, eta, adv, pg_method):
     
     if pg_method == 'sPPO':
         pi_new = pi_old * np.maximum(1 + eta * adv, 0)  # exact sPPO update
+        cnt_neg = numpy.count_nonzero(1 + eta * adv < 0)
     elif pg_method == 'MDPO':
         pi_new = pi_old * np.exp(eta * adv) # exact MDPO update
+        cnt_neg = None
 
     pi_new = pi_new / pi_new.sum(1).reshape(-1, 1) # normalize
-    return pi_new
+    return pi_new, cnt_neg
 
 def calc_objective(omega, pi_t, adv_t, qpi_t, dpi_t, pg_method, epsilon=None):
     pi = softmax(omega)
     if pg_method in ['sPPO']:
         clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1-1e-6)        
         obj = (dpi_t * (pi_t * adv_t * np.log(pi / clipped_pi_t)).sum(1)).sum()
-    elif pg_method in ['MDPO']:
-        obj = (dpi_t * (pi * adv_t).sum(1)).sum()
     elif pg_method in ['TRPO']:
         obj = (dpi_t * (pi * qpi_t).sum(1)).sum()
+    elif pg_method in ['MDPO']:
+        obj = (dpi_t * (pi * adv_t).sum(1)).sum()
     elif pg_method in ['PPO']:
         raise NotImplementedError()
     return obj
 
-# The KL is essentially C = (dpi_t * (pi_t * np.log(pi_t / pi)).sum(1)).sum()
+# The KL is essentially KL = (dpi_t * (pi_t * np.log(pi_t / pi)).sum(1)).sum()
 # But we use a better way that avoids NaN values from 0/0 division. See
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.entropy.html
 def calc_constraint(omega, pi_t, dpi_t, pg_method):
@@ -128,25 +126,25 @@ def calc_constraint(omega, pi_t, dpi_t, pg_method):
         cst = (dpi_t * entropy(pi, pi_t, axis=1)).sum()
     return cst
 
+# calculates the grad vector, but stored as an S x A matrix,
 def calc_obj_grad(omega, pi_t, adv_t, qpi_t, dpi_t, pg_method, epsilon=None):
     # note that the objective gradients for both TRPO and MDPO are exactly equal
-    pi = softmax(omega)
-    
+    pi = softmax(omega)    
     if pg_method in ['sPPO']:
         obj_grad = dpi_t.reshape(-1, 1) * pi_t * adv_t
     elif pg_method in ['TRPO']:
-        raise CheckThisCodeInPDB() # might need to flatten the gradient???
-        qpi_exp = (pi * qpi_t).sum(1).reshape(-1, 1)
-        obj_grad = dpi_t.reshape(-1, 1) * pi * (qpi_t - qpi_exp)
+        qpi_avg = (pi * qpi_t).sum(1).reshape(-1, 1)
+        obj_grad = dpi_t.reshape(-1, 1) * pi * (qpi_t - qpi_avg)
     elif pg_method in ['MDPO']:
-        adv_exp = (pi * adv_t).sum(1).reshape(-1, 1)
-        obj_grad = dpi_t.reshape(-1, 1) * pi * (adv_t - adv_exp)
+        adv_avg = (pi * adv_t).sum(1).reshape(-1, 1)
+        obj_grad = dpi_t.reshape(-1, 1) * pi * (adv_t - adv_avg)
     elif pg_method in ['PPO']:
-        ratio = pi / pi_t
+        clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1-1e-6)  
+        ratio = pi / clipped_pi_t
         cond = np.logical_or(np.logical_and(adv_t > 0, ratio < 1 + epsilon),
                              np.logical_and(adv_t < 0, ratio > 1 - epsilon))
-        obj_grad = dpi_t.reshape(-1, 1) * pi \
-            * (cond * adv_t - (pi * cond * adv_t).sum(1).reshape(-1, 1))
+        cond_adv_avg = (pi * cond * adv_t).sum(1).reshape(-1, 1)
+        obj_grad = dpi_t.reshape(-1, 1) * pi * (cond * adv_t - cond_adv_avg)
 
     return obj_grad
         
@@ -161,22 +159,26 @@ def calc_cst_grad(omega, pi_t, dpi_t, pg_method):
 
     return cst_grad
 
+def calc_A_matrix(num_states, num_actions, omega, dpi_t, pg_method):
+    pi = softmax(omega)
+    n = num_states * num_actions
+    A = np.zeros((n, n))
+
+    if pg_method == 'TRPO':
+        for state_i in range(num_states):
+            pi_s = pi[state_i, :]
+            beg = num_actions * state_i
+            end = beg + num_actions
+            A[beg:end, beg:end] \
+                = dpi_t[state_i] * (np.diag(pi_s) - np.outer(pi_s, pi_s))
+    else:
+        raise NotImplementedError()
+    
+    return A
+
 #----------------------------------------------------------------------
 # TRPO
 #----------------------------------------------------------------------
-# returns the A matrix: an SA x SA matrix computed using equations given
-# in Section 3 of the notes
-def calc_A_matrix(num_states, num_actions, dpi_t, pi):
-    n = num_states * num_actions
-    A = np.zeros((n, n))
-    for state_i in range(num_states):
-        pi_s = pi[state_i, :]
-        beg = num_actions * state_i
-        end = beg + num_actions
-        A[beg:end, beg:end] \
-            = dpi_t[state_i] * (np.diag(pi_s) - np.outer(pi_s, pi_s))
-    return A
-
 # calc_A_matrix_slow is an alternate way of calculating the above matrix, and
 # serves as a check for the function calc_A_matrix()
 def calc_A_matrix_slow(num_states, num_actions, dpi_t, pi):
@@ -194,70 +196,14 @@ def calc_A_matrix_slow(num_states, num_actions, dpi_t, pi):
                         * pi[state_j, action_j]
     return A
 
-# this is the TRPO grad vector, but stored as an S x A matrix,
-# again computed using equations given in Section 3 of the notes
-def calc_grad_vector(dpi_t, qpi_t, pi):
-    grad = dpi_t.reshape(-1, 1) * pi \
-        * (qpi_t - (pi * qpi_t).sum(1).reshape(-1, 1))
-    return grad
-
-# this calc the update direction s = A^{-1} grad. We first flatten grad,
-# calculate s using this equation, and then reshape s again into an
-# S x A matrix
-def calc_update_direction(grad, A):
-    grad_flatten = grad.reshape(-1, 1)
-    # s_flatten = np.linalg.solve(A, grad_flatten)
-    # had a lot of problem with A being singular --- so use pseudo-inverse
-    update_direction_flatten = np.matmul(np.linalg.pinv(A), grad_flatten)    
-    update_direction = update_direction_flatten.reshape(grad.shape)
-    return update_direction
-
-# compute the maximum stepsize beta using the equations given in App. C of
+# compute the maximum stepsize using the equations given in Appendix C of
 # Schulman et al. (2015)
-def calc_max_stepsize_beta(update_direction, A, delta):
+def calc_max_TRPO_stepsize(update_direction, A, delta):
     update_direction_flatten = update_direction.reshape(-1, 1)
-    beta = np.sqrt(2 * delta \
-                   / np.matmul(np.matmul(update_direction_flatten.T, A),
-                               update_direction_flatten).item())
-    return beta
-
-def compute_trpo_loss(dpi_t, qpi_t, pi):
-    J = (dpi_t * (pi * qpi_t).sum(1)).sum()
-    return J
-
-# C = (dpi_t * (pi_t * np.log(pi_t / pi)).sum(1)).sum()
-# a better way that avoids NaN values from 0/0 division; see
-# https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.entropy.html
-def compute_trpo_constraint(dpi_t, pi_t, pi):
-    C = (dpi_t * entropy(pi_t, pi, axis=1)).sum()
-    return C
-
-def trpo_update(omega, pi_t, dpi_t, qpi_t, delta, decay_factor,
-                num_states, num_actions):
-    pi = softmax(omega)
-    J_old = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi)
-    A = calc_A_matrix(
-        num_states=num_states, num_actions=num_actions, dpi_t=dpi_t, pi=pi)
-    grad = calc_grad_vector(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi)
-    # A2 = calc_A_matrix_slow(
-    #     num_states=num_states, num_actions=num_actions, dpi_t=dpi_t, pi=pi)
-    # assert np.allclose(A, A2)
-    update_direction = calc_update_direction(grad=grad, A=A) # grad
-    if np.allclose(np.zeros(update_direction.shape), update_direction):
-        beta = 0
-    else:
-        beta = calc_max_stepsize_beta(update_direction=update_direction,
-                                      A=A, delta=delta)
-    while True: # backtracking line search
-        omega_tmp = omega + beta * update_direction
-        pi_tmp = softmax(omega_tmp)
-        J_tmp = compute_trpo_loss(dpi_t=dpi_t, qpi_t=qpi_t, pi=pi_tmp)
-        C_tmp = compute_trpo_constraint(dpi_t=dpi_t, pi_t=pi_t, pi=pi_tmp)
-        if C_tmp <= delta and J_tmp >= J_old:
-            break
-        beta = decay_factor * beta
-        
-    return omega_tmp
+    alpha_max = 2 * delta / np.matmul(np.matmul(update_direction_flatten.T, A),
+                                      update_direction_flatten).item()
+    alpha_max = np.sqrt(alpha_max)
+    return alpha_max
 
 #----------------------------------------------------------------------
 # function for running full experiments
@@ -265,23 +211,26 @@ def trpo_update(omega, pi_t, dpi_t, qpi_t, delta, decay_factor,
 def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
                    FLAG_ANALYTICAL_GRADIENT, FLAG_SAVE_INNER_STEPS,
                    alpha_max, FLAG_WARM_START, warm_start_factor,
-                   max_backtracking_iters,
+                   max_backtracking_steps,
                    optim_type, stepsize_type, eta, epsilon, delta,
                    alpha_fixed, decay_factor, armijo_const):
     assert pg_method in ['sPPO', 'MDPO', 'PPO', 'TRPO']
-    assert optim_type in ['regularized', 'constrained']
+    assert optim_type in ['unconstrained', 'constrained']
     assert stepsize_type in ['fixed_stepsize', 'line_search']
 
     num_states = env.state_space
     num_actions = env.action_space
 
     # initialize pi (uniform random tabular policy with direct rep)
-    theta = init_theta(num_states, num_actions, theta_init=0)
+    theta = np.zeros((num_states, num_actions))
     pi = softmax(theta)
     
     # store the quality of the policies
-    vpi_list_outer = [env.calc_vpi(pi, FLAG_RETURN_V_S0=True)]
+    vpi_list_outer = []
     vpi_list_inner = [] if FLAG_SAVE_INNER_STEPS else None
+
+    # store how many times does (1 + eta * adv) < 0 for analytical sPPO update
+    cnt_neg_list = [] if pg_method == 'sPPO' else None
 
     # outer learning loop
     for T in range(num_outer_loop_iter):
@@ -292,8 +241,10 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
         vpi_list_outer.append(env.calc_vpi(pi, FLAG_RETURN_V_S0=True))
 
         if FLAG_ANALYTICAL_GRADIENT: 
-            pi = analytical_update_fmapg(pi_old=pi, eta=eta, adv=adv,
-                                         pg_method=pg_method)
+            pi, cnt_neg = analytical_update_fmapg(pi_old=pi, eta=eta, adv=adv,
+                                                  pg_method=pg_method)
+            if pg_method == 'sPPO':
+                cnt_neg_list.append(cnt_neg)
         else:
             # multiple gradient based updates
             if FLAG_SAVE_INNER_STEPS:
@@ -305,43 +256,57 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
             # inner learning loop
             for k in range(num_inner_loop_iter): # do one grad ascent step
 
-                if optim_type == 'regularized':
+                #--------------------------------------------------------
+                # Calculate the objective_grad and the update_direction
+                #--------------------------------------------------------
+                if optim_type == 'unconstrained':
                     obj_grad = calc_obj_grad(omega=omega, pi_t=pi, adv_t=adv,
                                              dpi_t=dpi, pg_method=pg_method,
                                              epsilon=epsilon)
                     cst_grad = calc_cst_grad(omega=omega, pi_t=pi, dpi_t=dpi,
                                              pg_method=pg_method)
-                    update_direction = obj_grad - (1 \ eta) * cst_grad
+                    update_direction = obj_grad - (1 / eta) * cst_grad
                     objective_grad = update_direction
                 elif optim_type == 'constrained':
-                    # calc update direction
-                    grad_flatten = calc_obj_grad(
+                    # calc update_direction = A^{-1} grad.
+                    # We first flatten grad, calculate update_direction using
+                    # the above equation, and then reshape it again into an
+                    # S x A matrix
+                    grad = calc_obj_grad(
                         omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi,
-                        pg_method=pg_method, epsilon=epsilon).reshape(-1, 1)
+                        pg_method=pg_method, epsilon=epsilon)
+                    grad_flatten = grad.reshape(-1, 1)
+                    A = calc_A_matrix(num_states=num_states,
+                                      num_actions=num_actions, omega=omega,
+                                      dpi_t=dpi, pg_method=pg_method)
                     # s_flatten = np.linalg.solve(A, grad_flatten)
                     # had problems with A being singular; so used pseudo-inverse
                     update_direction_flatten = np.matmul(
                         np.linalg.pinv(A), grad_flatten)    
                     update_direction = update_direction_flatten.reshape(
                         grad.shape)
-                    raise NotImplementedError
 
+                #--------------------------------------------------------
+                # Calculate objective_fn, constraint_fn, and alpha_init
+                #--------------------------------------------------------
                 if stepsize_type == 'fixed_stepsize':
                     calc_objective_fn = None
                     calc_constraint_fn = None
                     alpha_init = None
                 elif stepsize_type == 'line_search':
                     calc_objective_fn = lambda omega: calc_objective(
-                        omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi,
+                        omega=omega, pi_t=pi, adv_t=adv, qpi_t=qpi, dpi_t=dpi,
                         pg_method=pg_method, epsilon=epsilon)
                     calc_constraint_fn = lambda omega: calc_constraint(
                         omega=omega, pi_t=pi, dpi_t=dpi, pg_method=pg_method)
 
-                    if FLAG_WARM_START and used_alpha is not None:
+                    if pg_method == 'TRPO' and optim_type == 'constrained':
+                        alpha_init = calc_max_TRPO_stepsize(
+                            update_direction=update_direction, A=A, delta=delta)
+                    elif FLAG_WARM_START and used_alpha is not None:
                         alpha_init = warm_start_factor * used_alpha
                     else:
                         alpha_init = alpha_max
-
                         
                 if np.allclose(np.zeros(grad.shape), grad):
                     # or np.linalg.norm(grad) < 1e-8:
@@ -356,7 +321,8 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
                         objective_grad=objective_grad, eta=eta,
                         epsilon=epsilon, delta=delta, alpha_fixed=alpha_fixed,
                         alpha_init=alpha_init, decay_factor=decay_factor,
-                        armijo_const=armijo_const)
+                        armijo_const=armijo_const,
+                        max_backtracking_steps=max_backtracking_steps)
                 
                 omega = updated_omega.copy()
 
@@ -374,5 +340,7 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
     vpi_list_outer = np.array(vpi_list_outer)
     if FLAG_SAVE_INNER_STEPS:
         vpi_list_inner = np.array(vpi_list_inner)
+    if pg_method == 'sPPO':
+        cnt_neg_list = np.array(cnt_neg_list)
                 
-    return vpi_list_outer, vpi_list_inner, pi
+    return vpi_list_outer, cnt_neg_list, vpi_list_inner, pi
