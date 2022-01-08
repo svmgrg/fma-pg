@@ -7,17 +7,16 @@ import json
 from environments import *
 from utils_v2 import *
 
-# $ python run_exp.py --num_outer_loops 2000 --num_inner_loops 1 --pg_alg 'TRPO_KL_LS' --eta -1 --alpha -1 --epsilon -1 --delta -1 --decay_factor 0.9 --use_analytical_grad 0 --zeta 128 --armijo_constant 0 --max_backtracking_iters -1 --flag_warm_start 1 --warm_start_beta_init 10 --warm_start_beta_factor 10 
+# $ python run_exp_v2.py --pg_method 'sPPO' --num_outer_loop 2000 --num_inner_loop -1 --FLAG_SAVE_INNER_STEPS 'False' --alpha_max -1 --FLAG_WARM_START -1 --warm_start_factor -1 --max_backtracking_steps -1 --optim_type 'analytical' --stepsize_type 'fixed' --eta 1 --epsilon -1 --delta -1 --alpha_fixed -1 --decay_factor -1 --armijo_const -1
 
 # read command line arguments to get parameter configurations
 parser = argparse.ArgumentParser()
 parser.add_argument('-pa', '--pg_method', required=True, type=str)
 parser.add_argument('-nol', '--num_outer_loop', required=True, type=int)
 parser.add_argument('-nil', '--num_inner_loop', required=True, type=int)
-parser.add_argument('-fag', '--FLAG_ANALYTICAL_GRAD', required=True, type=int)
-parser.add_argument('-fsis', '--FLAG_SAVE_INNER_STEPS', required=True, type=int)
+parser.add_argument('-fsis', '--FLAG_SAVE_INNER_STEPS', required=True, type=str)
 parser.add_argument('-am', '--alpha_max', required=True, type=float)
-parser.add_argument('-fws', '--FLAG_WARM_START', required=True, type=int)
+parser.add_argument('-fws', '--FLAG_WARM_START', required=True, type=str)
 parser.add_argument('-wsf', '--warm_start_factor', required=True, type=float)
 parser.add_argument('-mbs', '--max_backtracking_steps', required=True, type=int)
 parser.add_argument('-ot', '--optim_type', required=True, type=str)
@@ -27,17 +26,16 @@ parser.add_argument('-eps', '--epsilon', required=True, type=float)
 parser.add_argument('-del', '--delta', required=True, type=float)
 parser.add_argument('-af', '--alpha_fixed', required=True, type=float)
 parser.add_argument('-df', '--decay_factor', required=True, type=float)
-parser.add_argument('-ac', '--armijo_constant', required=True, type=float)
+parser.add_argument('-ac', '--armijo_const', required=True, type=float)
 
 args = parser.parse_args()
 
 pg_method = args.pg_method
 num_outer_loop = args.num_outer_loop
 num_inner_loop = args.num_inner_loop if args.num_inner_loop >= 0 else None
-FLAG_ANALYTICAL_GRAD = False if args.FLAG_ANALYTICAL_GRAD == 0 else True
-FLAG_SAVE_INNER_STEPS = False if args.FLAG_SAVE_INNER_STEPS == 0 else True
-alpha_max = args.alpha_max
-FLAG_WARM_START = False if args.FLAG_WARM_START == 0 else True
+FLAG_SAVE_INNER_STEPS = True if args.FLAG_SAVE_INNER_STEPS == 'True' else False
+alpha_max = args.alpha_max if args.alpha_max >=0 else None
+FLAG_WARM_START = True if args.FLAG_WARM_START == 'True' else False
 warm_start_factor = args.warm_start_factor \
     if args.warm_start_factor >= 0 else None
 max_backtracking_steps = args.max_backtracking_steps \
@@ -49,7 +47,7 @@ epsilon = args.epsilon if args.epsilon >= 0 else None
 delta = args.delta if args.delta >= 0 else None
 alpha_fixed = args.alpha_fixed if args.alpha_fixed >= 0 else None
 decay_factor = args.decay_factor if args.decay_factor >= 0 else None
-armijo_constant = args.armijo_constant if args.armijo_constant >= 0 else None
+armijo_const = args.armijo_const if args.armijo_const >= 0 else None
 
 #----------------------------------------------------------------------
 # create the environment
@@ -68,7 +66,7 @@ env = CliffWorld(P=P, r=r, mu=mu, terminal_states=terminal_states,
 tic = time.time()
 dat = run_experiment(
     env=env, pg_method=pg_method, num_outer_loop=num_outer_loop,
-    num_inner_loop=num_inner_loop, FLAG_ANALYTICAL_GRAD=FLAG_ANALYTICAL_GRAD,
+    num_inner_loop=num_inner_loop,
     FLAG_SAVE_INNER_STEPS=FLAG_SAVE_INNER_STEPS, alpha_max=alpha_max,
     FLAG_WARM_START=FLAG_WARM_START, warm_start_factor=warm_start_factor,
     max_backtracking_steps=max_backtracking_steps, optim_type=optim_type,
@@ -81,17 +79,17 @@ print('Total time taken: {}'.format(time.time() - tic))
 # save the data
 #----------------------------------------------------------------------
 # folder details
-folder_name = 'fmaPG_exp/CliffWorld_{}'.format(pg_method)
+folder_name = 'fmapg_DAT/CliffWorld_{}'.format(pg_method)
 os.makedirs(folder_name, exist_ok='True')
 
-filename='{}/numOuterLoop_{}__numInnerLoop_{}__flagAnalyticalGrad_{}'\
-    '__flagSaveInnerSteps_{}__alphaMax_{}__flagWarmStart_{}__warmStartFactor_{}'\
-    '__maxBacktrackingSteps_{}__optimType_{}__eta_{}__epsilon_{}__delta_{}'\
-    '__alphaFixed_{}__decayFactor_{}__armijoConstant_{}'.format(
-        folder_name, num_outer_loop, num_inner_loop, FLAG_ANALYTICAL_GRAD,
+filename='{}/nmOtrLp_{}__nmInrLp_{}'\
+    '__SvInrStps_{}__alphMx_{}__WrmStr_{}__wrmStrFac_{}'\
+    '__mxBktStps_{}__optmTyp_{}__stpTyp_{}__eta_{}__eps_{}'\
+    '__del_{}__alphFxd_{}__dcyFac_{}__armjoCnst_{}'.format(
+        folder_name, num_outer_loop, num_inner_loop,
         FLAG_SAVE_INNER_STEPS, alpha_max, FLAG_WARM_START, warm_start_factor,
-        max_backtracking_steps, optim_type, stepsize_type, eta, epsilon, delta,
-        alpha_fixed, decay_factor, armijo_constant)
+        max_backtracking_steps, optim_type, stepsize_type, eta, epsilon,
+        delta, alpha_fixed, decay_factor, armijo_const)
 
 with open(filename, 'w') as fp:
     json.dump(dat, fp)
@@ -99,6 +97,13 @@ with open(filename, 'w') as fp:
 #----------------------------------------------------------------------
 # misc plotting
 #----------------------------------------------------------------------
+
+import matplotlib.pyplot as plt
+plt.plot(dat['vpi_outer_list'])
+plt.ylim([0, 0.9**6 + 0.05])
+plt.show()
+
+# import matplotlib.pyplot as plt
 # fig, axs = plt.subplots(1, 2, figsize=(10, 4))
 # plot_grid(axs[0])
 # plot_policy(axs[0], pi)
