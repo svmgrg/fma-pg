@@ -208,8 +208,8 @@ def calc_max_TRPO_stepsize(update_direction, A, delta):
 #----------------------------------------------------------------------
 # function for running full experiments
 #----------------------------------------------------------------------
-def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
-                   FLAG_ANALYTICAL_GRADIENT, FLAG_SAVE_INNER_STEPS,
+def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
+                   FLAG_ANALYTICAL_GRAD, FLAG_SAVE_INNER_STEPS,
                    alpha_max, FLAG_WARM_START, warm_start_factor,
                    max_backtracking_steps,
                    optim_type, stepsize_type, eta, epsilon, delta,
@@ -233,14 +233,14 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
     cnt_neg_list = [] if pg_method == 'sPPO' else None
 
     # outer learning loop
-    for T in range(num_outer_loop_iter):
+    for T in range(num_outer_loop):
         dpi = env.calc_dpi(pi)
         qpi = env.calc_qpi(pi)
         adv = qpi - env.calc_vpi(pi).reshape(-1, 1)
 
         vpi_list_outer.append(env.calc_vpi(pi, FLAG_RETURN_V_S0=True))
 
-        if FLAG_ANALYTICAL_GRADIENT: 
+        if FLAG_ANALYTICAL_GRAD: 
             pi, cnt_neg = analytical_update_fmapg(pi_old=pi, eta=eta, adv=adv,
                                                   pg_method=pg_method)
             if pg_method == 'sPPO':
@@ -254,7 +254,7 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
             used_alpha = None
                             
             # inner learning loop
-            for k in range(num_inner_loop_iter): # do one grad ascent step
+            for k in range(num_inner_loop): # do one grad ascent step
 
                 #--------------------------------------------------------
                 # Calculate the objective_grad and the update_direction
@@ -336,11 +336,5 @@ def run_experiment(env, pg_method, num_outer_loop_iter, num_inner_loop_iter,
             # update the policy to the new approximate point
             theta = omega.copy()
             pi = softmax(theta)
-
-    vpi_list_outer = np.array(vpi_list_outer)
-    if FLAG_SAVE_INNER_STEPS:
-        vpi_list_inner = np.array(vpi_list_inner)
-    if pg_method == 'sPPO':
-        cnt_neg_list = np.array(cnt_neg_list)
                 
     return vpi_list_outer, cnt_neg_list, vpi_list_inner, pi
