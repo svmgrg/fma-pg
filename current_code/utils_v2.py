@@ -336,5 +336,11 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
             # update the policy to the new approximate point
             theta = omega.copy()
             pi = softmax(theta)
+
+    dat = dict()
+    dat['vpi_outer_list'] = vpi_list_outer
+    dat['cnt_neg_list'] = cnt_neg_list
+    dat['vpi_inner_list'] = vpi_list_inner
+    dat['pi'] = pi
                 
-    return vpi_list_outer, cnt_neg_list, vpi_list_inner, pi
+    return dat

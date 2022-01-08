@@ -51,10 +51,6 @@ alpha_fixed = args.alpha_fixed if args.alpha_fixed >= 0 else None
 decay_factor = args.decay_factor if args.decay_factor >= 0 else None
 armijo_constant = args.armijo_constant if args.armijo_constant >= 0 else None
 
-# folder details
-folder_name = 'fmaPG_exp/CliffWorld_{}'.format(pg_method)
-os.makedirs(folder_name, exist_ok='True')
-
 #----------------------------------------------------------------------
 # create the environment
 #----------------------------------------------------------------------
@@ -70,7 +66,7 @@ env = CliffWorld(P=P, r=r, mu=mu, terminal_states=terminal_states,
 # learning curves against the number of outer loop iterations
 #----------------------------------------------------------------------
 tic = time.time()
-vpi_list_outer, cnt_neg_list, vpi_list_inner, pi = run_experiment(
+dat = run_experiment(
     env=env, pg_method=pg_method, num_outer_loop=num_outer_loop,
     num_inner_loop=num_inner_loop, FLAG_ANALYTICAL_GRAD=FLAG_ANALYTICAL_GRAD,
     FLAG_SAVE_INNER_STEPS=FLAG_SAVE_INNER_STEPS, alpha_max=alpha_max,
@@ -84,17 +80,15 @@ print('Total time taken: {}'.format(time.time() - tic))
 #----------------------------------------------------------------------
 # save the data
 #----------------------------------------------------------------------
-dat = dict()
-dat['vpi_outer_list'] = vpi_list_outer
-dat['cnt_neg_list'] = cnt_neg_list
-dat['vpi_inner_list'] = vpi_list_inner
-dat['pi'] = pi
+# folder details
+folder_name = 'fmaPG_exp/CliffWorld_{}'.format(pg_method)
+os.makedirs(folder_name, exist_ok='True')
 
 filename='{}/numOuterLoop_{}__numInnerLoop_{}__flagAnalyticalGrad_{}'\
     '__flagSaveInnerSteps_{}__alphaMax_{}__flagWarmStart_{}__warmStartFactor_{}'\
     '__maxBacktrackingSteps_{}__optimType_{}__eta_{}__epsilon_{}__delta_{}'\
     '__alphaFixed_{}__decayFactor_{}__armijoConstant_{}'.format(
-        num_outer_loop, num_inner_loop, FLAG_ANALYTICAL_GRAD,
+        folder_name, num_outer_loop, num_inner_loop, FLAG_ANALYTICAL_GRAD,
         FLAG_SAVE_INNER_STEPS, alpha_max, FLAG_WARM_START, warm_start_factor,
         max_backtracking_steps, optim_type, stepsize_type, eta, epsilon, delta,
         alpha_fixed, decay_factor, armijo_constant)
