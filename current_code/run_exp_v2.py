@@ -97,12 +97,18 @@ with open(filename, 'w') as fp:
 #----------------------------------------------------------------------
 # misc plotting
 #----------------------------------------------------------------------
-
 import matplotlib.pyplot as plt
-plt.plot(dat['vpi_outer_list'])
-plt.ylim([0, 0.9**6 + 0.05])
+fig, axs = plt.subplots(1, 3)
+axs[0].plot(dat['vpi_outer_list'])
+axs[0].set_ylim([0, 0.9**6 + 0.05])
+
+axs[1].plot(dat['vpi_outer_list'])
+axs[2].scatter(range(len(np.array(dat['alpha_used_list']).flatten())),
+               np.array(dat['alpha_used_list']).flatten(), s=0.1)
+# axs[2].plot(np.array(dat['update_mag_list']).flatten())
 plt.show()
 
+# pdb.set_trace()
 # import matplotlib.pyplot as plt
 # fig, axs = plt.subplots(1, 2, figsize=(10, 4))
 # plot_grid(axs[0])
@@ -114,4 +120,6 @@ plt.show()
 # plt.show()  
 # plt.close()
 
+# python run_exp_v2.py --pg_method 'TRPO' --num_outer_loop 2000 --num_inner_loop 10 --FLAG_SAVE_INNER_STEPS 'True' --alpha_max 100 --FLAG_WARM_START 'True' --warm_start_factor 2 --max_backtracking_steps 100 --optim_type 'regularized' --stepsize_type 'line_search' --eta 0.1 --epsilon -1 --delta -1 --alpha_fixed -1 --decay_factor 0.9 --armijo_const 0.5
 
+# python run_exp_v2.py --pg_method 'MDPO' --num_outer_loop 2000 --num_inner_loop 100 --FLAG_SAVE_INNER_STEPS 'True' --alpha_max -1 --FLAG_WARM_START 'False' --warm_start_factor -1 --max_backtracking_steps -1 --optim_type 'regularized' --stepsize_type 'fixed' --eta 1 --epsilon -1 --delta -1 --alpha_fixed 0.1 --decay_factor -1 --armijo_const -1

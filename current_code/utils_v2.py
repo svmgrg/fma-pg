@@ -43,13 +43,13 @@ def make_single_inner_loop_update(optim_type, stepsize_type, omega,
         J_old = calc_objective_fn(omega)
         # the term cm comes from
         # https://en.wikipedia.org/wiki/Backtracking_line_search#Motivation
-        cm = armijo_const * np.dot(objective_grad, update_direction)
+        cm = armijo_const * (objective_grad * update_direction).sum()
         alpha = alpha_init
         t = 0
         while True:
-            omega_tmp = omega + alpha * update_step
+            omega_tmp = omega + alpha * update_direction
             J_tmp = calc_objective_fn(omega_tmp)
-            if calc_constrain_fn is not None:
+            if calc_constraint_fn is not None:
                 C_tmp = calc_constraint_fn(omega_tmp)
                 
             if ((optim_type == 'regularized' and J_tmp >= J_old + alpha * cm)
@@ -59,7 +59,7 @@ def make_single_inner_loop_update(optim_type, stepsize_type, omega,
                 break # use this alpha
             elif t > max_backtracking_steps:
                 alpha = 1e-6
-                omega_tmp = omega + alpha * update_step
+                omega_tmp = omega + alpha * update_direction
                 break
             else:
                 alpha = decay_factor * alpha
@@ -224,11 +224,20 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
 
     # initialize pi (uniform random tabular policy with direct rep)
     theta = np.zeros((num_states, num_actions))
+
+    # theta[:, 1] = 5
+    # theta[0, 1] = 0
+    # theta[0, 3] = 5
+    # theta[9, 1] = 0
+    # theta[9, 2] = 5
+    
     pi = softmax(theta)
     
     # store the quality of the policies
     vpi_outer_list = []
     vpi_inner_list = [] if FLAG_SAVE_INNER_STEPS else None
+    alpha_used_list = [] if FLAG_SAVE_INNER_STEPS else None
+    update_mag_list = [] if FLAG_SAVE_INNER_STEPS else None
 
     # store how many times does (1 + eta * adv) < 0 for analytical sPPO update
     cnt_neg_list = [] if pg_method == 'sPPO' else None
@@ -236,6 +245,7 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
 
     # outer learning loop
     for T in range(num_outer_loop):
+        print(T)
         dpi = env.calc_dpi(pi)
         qpi = env.calc_qpi(pi)
         adv = qpi - env.calc_vpi(pi).reshape(-1, 1)
@@ -252,6 +262,8 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
             # multiple gradient based updates
             if FLAG_SAVE_INNER_STEPS:
                 tmp_list = [env.calc_vpi(pi, FLAG_RETURN_V_S0=True)]
+                alpha_tmp_list = []
+                update_mag_tmp_list = []
 
             omega = theta.copy()
             used_alpha = None
@@ -311,7 +323,7 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
                         alpha_init = warm_start_factor * used_alpha
                     else:
                         alpha_init = alpha_max
-                        
+
                 if np.allclose(np.zeros(update_direction.shape),
                                update_direction):
                     # or np.linalg.norm(grad) < 1e-8:
@@ -334,9 +346,13 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
                 if FLAG_SAVE_INNER_STEPS:
                     pi_tmp = softmax(omega)
                     tmp_list.append(env.calc_vpi(pi_tmp, FLAG_RETURN_V_S0=True))
+                    alpha_tmp_list.append(used_alpha)
+                    update_mag_tmp_list.append(np.linalg.norm(update_direction))
                     
             if FLAG_SAVE_INNER_STEPS:
                 vpi_inner_list.append(tmp_list)
+                alpha_used_list.append(alpha_tmp_list)
+                update_mag_list.append(update_mag_tmp_list)
 
             # update the policy to the new approximate point
             theta = omega.copy()
@@ -347,6 +363,8 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
     dat['cnt_neg_list'] = cnt_neg_list
     dat['cnt_neg_adv_list'] = cnt_neg_adv_list
     dat['vpi_inner_list'] = vpi_inner_list
-    dat['pi'] = pi.tolist()
+    dat['alpha_used_list'] = alpha_used_list
+    dat['update_mag_list'] = update_mag_list
+    dat['omega'] = omega.tolist()
                 
     return dat
