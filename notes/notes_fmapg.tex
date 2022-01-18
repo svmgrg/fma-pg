@@ -132,10 +132,10 @@ where we abused the notation, in $\mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a})$
 \end{align}
 
 We now solve this system. Simplifying Eq. \ref{eq: KKT1} for an arbitrary state-action pair $(x, b)$ gives us:
-\begin{IEEEeqnarray}{lrCl}
-  & \nabla_{p^\pi(b | x)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& d^{\pi_t}(x) p^{\pi_t}(b|x) \left( A^{\pi_t}(x, b) + \frac{1}{\eta} \right) \frac{1}{p^\pi(b|x)} - \lambda_{x, b} - \lambda_x = 0 \nonumber \\
-  \Rightarrow & p^\pi(b | x) &=& \frac{d^{\pi_t}(x) p^{\pi_t}(b|x) (1 + \eta A^{\pi_t}(x, b))}{\eta (\lambda_x + \lambda_{x, b})}. \label{eq: lagrangian_derivative_sppo}
-\end{IEEEeqnarray}
+\begin{align}
+  \nabla_{p^\pi(b | x)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &= d^{\pi_t}(x) p^{\pi_t}(b|x) \left( A^{\pi_t}(x, b) + \frac{1}{\eta} \right) \frac{1}{p^\pi(b|x)} - \lambda_{x, b} - \lambda_x = 0 \nonumber \\
+  \Rightarrow \qquad \qquad \qquad \quad p^\pi(b | x) &= \frac{d^{\pi_t}(x) p^{\pi_t}(b|x) (1 + \eta A^{\pi_t}(x, b))}{\eta (\lambda_x + \lambda_{x, b})}. \label{eq: lagrangian_derivative_sppo}
+\end{align}
 Let us set 
 \begin{equation}
   \lambda_{s, a} = 0, \quad \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}.
@@ -206,13 +206,13 @@ Proceeding analogously to the previous subsection, we use Lagrange multipliers $
 The KKT conditions are exactly the same as before (Eq. \ref{eq: KKT1} to Eq. \ref{eq: KKT6}).
 
 Again, we begin by solving the first KKT condition:
-\begin{IEEEeqnarray}{lrCl}
-  & \nabla_{p^\pi(b | x)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &=& d^{\pi_t}(x) p^{\pi_t}(b|x) \frac{Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} - \frac{d^{\pi_t}(x)}{\eta} \left[ \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} + 1 \right] - \lambda_{x, b} - \lambda_x \nonumber \\
-  &&=& \frac{d^{\pi_t}(x)}{\eta} \left[ \eta Q^{\pi_t}(x, b) - \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} - 1 - \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} \right] \nonumber \\
-  &&=& 0 \nonumber \\
-  \Rightarrow & \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} &=& \eta Q^{\pi_t}(x, b) - \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} - 1 \nonumber \\
-  \Rightarrow & p^\pi(b | x) &=& p^{\pi_t}(b | x) \cdot e^{\eta Q^{\pi_t}(x, b)} \cdot e^{- \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} - 1}, \label{eq: lagrangian_derivative_mdpo}
-\end{IEEEeqnarray}
+\begin{align}
+  \nabla_{p^\pi(b | x)} \mathcal{L}(p^\pi, \lambda_s, \lambda_{s, a}) &= d^{\pi_t}(x) p^{\pi_t}(b|x) \frac{Q^{\pi_t}(x, b)}{p^{\pi_t}(b | x)} - \frac{d^{\pi_t}(x)}{\eta} \left[ \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} + 1 \right] - \lambda_{x, b} - \lambda_x \nonumber \\
+  &= \frac{d^{\pi_t}(x)}{\eta} \left[ \eta Q^{\pi_t}(x, b) - \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} - 1 - \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} \right] \nonumber \\
+  &= 0 \nonumber \\
+  \Rightarrow \qquad \qquad \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} &= \eta Q^{\pi_t}(x, b) - \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} - 1 \nonumber \\
+  \Rightarrow \qquad \qquad \qquad p^\pi(b | x) &= p^{\pi_t}(b | x) \cdot e^{\eta Q^{\pi_t}(x, b)} \cdot e^{- \frac{\eta (\lambda_{x, b} + \lambda_x)}{d^{\pi_t}(x)} - 1}, \label{eq: lagrangian_derivative_mdpo}
+\end{align}
 where in the fourth line, we used the assumption that $d^{\pi_t}(x) > 0$ for all states $x$. We again set
 \begin{equation}
   \lambda_{s, a} = 0, \quad \forall s \in \mathcal{S}, \; \forall a \in \mathcal{A}.
@@ -265,7 +265,7 @@ Finally, using the above result yields
   \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{TRPO}} &= \frac{\partial}{\partial \theta(s, a)} d^{\pi_t}(s') \Big[ p^{\pi_\theta}(a' | s') - p^{\pi_t}(a' | s') \Big] \nonumber \\
   &= d^{\pi_t}(s') \cdot \frac{\partial}{\partial \theta(s, a)} p^{\pi_\theta}(a' | s') \nonumber \\
   &= \mathbb{I}(s'=s) \cdot d^{\pi_t}(s') \Big( \mathbb{I}(a'=a) - p^{\pi_\theta}(a | s') \Big) p^{\pi_\theta}(a' | s') \\
-  \Rightarrow \qquad \qquad \qquad \qquad A_{(s, :), (s, :)} &= d^{\pi_t}(s) \Big( \text{diag} (p^{\pi_\theta}(\cdot | s)) - p^{\pi_\theta}(\cdot | s) p^{\pi_\theta}(\cdot | s)^\top \Big),
+  \Rightarrow \qquad \qquad \qquad \quad A_{(s, :), (s, :)} &= d^{\pi_t}(s) \Big( \text{diag} (p^{\pi_\theta}(\cdot | s)) - p^{\pi_\theta}(\cdot | s) p^{\pi_\theta}(\cdot | s)^\top \Big),
 \end{align}
 where $p^{\pi_\theta}(\cdot | s) \in \mathbb{R}^{|\mathcal{A}|}$ is the vector defined as $[p^{\pi_\theta}(\cdot | s)]_a = p^{\pi_\theta}(a | s)$ and $A_{(s, :), (s, :)}$ denotes the square sub-block of the matrix $A$ corresponding to the given state $s$ and all the actions. In our experiments, since our $A$ matrix is small, we directly take its inverse to compute the update direction, thereby bypassing the conjugate method. Once we have the update direction, we then compute the maximal stepsize $\beta$ and perform an exponential backtracking line search as explained in the TRPO paper.
 
@@ -354,37 +354,41 @@ and for the constrained version,
 \begin{align}
   & \frac{\partial}{\partial p^\pi(b | x)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{MDPO}} \nonumber \\
   &= \frac{\partial}{\partial p^\pi(b | x)} d^{\pi_t}(s') p^\pi(a' | s') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - \sum_c p^\pi(c | s') \log \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')} \right) \nonumber \\
-  &= \mathbb{I}(x = s') d^{\pi_t}(s') \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - \sum_c p^\pi(c | s') \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')} \right) + p^\pi(a' | s') \frac{\mathbb{I}(b = a')}{p^\pi(a' | s')} \nonumber \\
-    & \qquad \qquad \qquad \qquad \quad - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg] \nonumber \\
+  &= \mathbb{I}(x = s') d^{\pi_t}(s') \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - \sum_c p^\pi(c | s') \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')} \right) \nonumber \\
+    & \qquad \qquad \qquad \qquad \quad + p^\pi(a' | s') \frac{\mathbb{I}(b = a')}{p^\pi(a' | s')} - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg] \nonumber \\
   &= \mathbb{I}(x = s') d^{\pi_t}(s') \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg],
 \end{align}
-where we introduced the intermediate variable $T_{\text{KL}}(s') :=\text{KL}(p^\pi(\cdot | s') \| p^{\pi_t}(\cdot | s') = \sum_c p^\pi(c | s') \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')}$.
-
+where we introduced the intermediate variable $T_{\text{KL}}(s') :=\text{KL}(p^\pi(\cdot | s') \| p^{\pi_t}(\cdot | s') = \sum_c p^\pi(c | s') \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')}$. Then using the law of total derivative, we obtain
 \begin{align}
   \frac{\partial}{\partial \theta(s, a)} \frac{\partial \mathcal{C}_{\text{MDPO}}}{\partial \theta(s', a')} &= \sum_{x, b} \frac{\partial p^\pi(b | x)}{\partial \theta(s, a)} \frac{\partial}{\partial p^\pi(b | x)} \frac{\partial \mathcal{C}_{\text{MDPO}}}{\partial \theta(s', a')} \nonumber \\
-  &= {\color{red!67!black}{\sum_{{\color{black}{x}}, b}}} \mathbb{I}(x = s) {\color{red!67!black}{\Big[ \mathbb{I}(b = a) - p^\pi(a | x) \Big] p^\pi(b | x)}} \times \mathbb{I}(x = s') d^{\pi_t}(s') \nonumber \\
-  & \qquad \quad {\color{red!67!black}{\times \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg]}} \nonumber \\
-  &= \mathbb{I}(s = s') d^{\pi_t}(s') \times {\color{red!67!black}{T_{\text{aux}}}},
+  &= \sum_{x, b} \mathbb{I}(x = s) \Big[ \mathbb{I}(b = a) - p^\pi(a | x) \Big] p^\pi(b | x) \times \mathbb{I}(x = s') d^{\pi_t}(s') \nonumber \\
+  & \qquad \quad \times \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg] \nonumber \\
+  &= \mathbb{I}(s = s') d^{\pi_t}(s') \times T_{\text{aux}},
 \end{align}
-where the auxillary term $T_{\text{aux}}$ is
+where the auxillary term $T_{\text{aux}}$ is defined as
 \begin{align}
-  T_{\text{aux}} &= \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \sum_{b} \mathbb{I}(b = a) p^\pi(b | s) \mathbb{I}(b = a') \nonumber \\
-  & \qquad - p^\pi(a' | s') \sum_{b} \mathbb{I}(b = a) p^\pi(b | s) \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \nonumber \\
-  & \qquad - p^\pi(a | s) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \sum_{b} p^\pi(b | s) \mathbb{I}(b = a') \nonumber \\
-  & \qquad + p^\pi(a' | s') p^\pi(a | s) \sum_{b} p^\pi(b | s) \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \nonumber \\  
-  &= \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) p^\pi(a | s) \mathbb{I}(a = a') - p^\pi(a' | s') p^\pi(a | s) \left( \log \frac{p^\pi(a | s')}{p^{\pi_t}(a | s')} + 1 \right) \nonumber \\
-  & \qquad - p^\pi(a | s) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) p^\pi(a' | s) + p^\pi(a' | s') p^\pi(a | s) \left( T_{\text{KL}}(s') + 1 \right) \nonumber \\
-  &= \mathbb{I}(a = a') p^\pi(a | s) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \nonumber \\
-  & \qquad - 2 p^\pi(a' | s') p^\pi(a | s) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) + p^\pi(a' | s') p^\pi(a | s).
+  T_{\text{aux}} &= \sum_b \Big[ \mathbb{I}(b = a) - p^\pi(a | s') \Big] p^\pi(b | s') \times \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \nonumber \\
+    & \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg]
+\end{align}
+Let us now simplify $T_{\text{aux}}$:
+\begin{align}
+  T_{\text{aux}} &= \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \sum_{b} \mathbb{I}(b = a) p^\pi(b | s') \mathbb{I}(b = a') \nonumber \\
+  & \qquad - p^\pi(a' | s') \sum_{b} \mathbb{I}(b = a) p^\pi(b | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \nonumber \\
+  & \qquad - p^\pi(a | s') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \sum_{b} p^\pi(b | s') \mathbb{I}(b = a') \nonumber \\
+  & \qquad + p^\pi(a' | s') p^\pi(a | s') \sum_{b} p^\pi(b | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \nonumber \\  
+  &= \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) p^\pi(a | s') \mathbb{I}(a = a') - p^\pi(a' | s') p^\pi(a | s') \left( \log \frac{p^\pi(a | s')}{p^{\pi_t}(a | s')} + 1 \right) \nonumber \\
+  & \qquad - p^\pi(a | s') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) p^\pi(a' | s') + p^\pi(a' | s') p^\pi(a | s') \left( T_{\text{KL}}(s') + 1 \right) \nonumber \\
+  &= \mathbb{I}(a = a') p^\pi(a | s') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \nonumber \\
+  & \qquad - 2 p^\pi(a' | s') p^\pi(a | s') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) + p^\pi(a' | s') p^\pi(a | s').
 \end{align}
 Therefore, 
 \begin{align}
-  & \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{MDPO}} \nonumber \\
-  &= \mathbb{I}(s = s') d^{\pi_t}(s') \left[ p^\pi(a | s) \Big(\mathbb{I}(a = a') - 2 \Big) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) + p^\pi(a' | s') p^\pi(a | s) \right],
+  \frac{\partial}{\partial \theta(s, a)} \frac{\partial \mathcal{C}_{\text{MDPO}}}{\partial \theta(s', a')} &= \mathbb{I}(s = s') d^{\pi_t}(s') \bigg[ p^\pi(a | s') \Big(\mathbb{I}(a = a') - 2 p^\pi(a' | s') \Big) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \nonumber \\
+    & \qquad \qquad \qquad \qquad \quad + p^\pi(a' | s') p^\pi(a | s') \bigg],
 \end{align}
 and
 \begin{align}
-  A_{(s, :), (s, :)} &= d^{\pi_t}(s) \cdot \Big(\mathbf{I} - \mathbf{1}_{|\mathcal{A}| \times |\mathcal{A}|} \Big) \odot p^\pi(\cdot | s) \Big[ \log \Big( p^\pi(\cdot | s) \oslash p^{\pi_t}(\cdot | s) \Big) - \Big(T_{\text{KL}}(s) - 1 \Big) \mathbf{1}_{|\mathcal{A}|} \Big]^\top \nonumber \\
+  A_{(s, :), (s, :)} &= d^{\pi_t}(s) \cdot \Big[ \text{diag} (p^{\pi}(\cdot | s)) - 2 p^{\pi}(\cdot | s) p^{\pi}(\cdot | s)^\top \Big] \Big[ \log \Big( p^\pi(\cdot | s) \oslash p^{\pi_t}(\cdot | s) \Big) - \Big(T_{\text{KL}}(s) - 1 \Big) \mathbf{1}_{|\mathcal{A}|} \Big]^\top \nonumber \\
   & \qquad + d^{\pi_t}(s) \cdot p^{\pi}(\cdot | s) p^{\pi}(\cdot | s)^\top.
 \end{align}
 

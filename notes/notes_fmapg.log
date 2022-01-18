@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.12.11)  18 JAN 2022 11:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.12.11)  18 JAN 2022 13:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -590,13 +590,13 @@ Overfull \hbox (10.86612pt too wide) detected at line 237
 e{table.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.368 \end{align}
-                 pdfTeX warning (ext4): destination with the same identifier (n
-ame{table.2}) has been already used, duplicate ignored
+l.360 \end{align}
+                 ] [11pdfTeX warning (ext4): destination with the same identifi
+er (name{table.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.368 \end{align}
-                 ] [11] [12] (./notes_fmapg.aux)
+l.383 \end{align}
+                 ] [12] (./notes_fmapg.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -604,13 +604,13 @@ Package rerunfilecheck Info: File `notes_fmapg.out' has not changed.
 (rerunfilecheck)             Checksum: 1207D79772820A543607D5850C6D3394;3673.
  ) 
 Here is how much of TeX's memory you used:
- 11778 strings out of 478994
- 173406 string characters out of 5858189
- 648414 words of memory out of 5000000
- 28978 multiletter control sequences out of 15000+600000
+ 11777 strings out of 478994
+ 173384 string characters out of 5858189
+ 651414 words of memory out of 5000000
+ 28976 multiletter control sequences out of 15000+600000
  413059 words of font info for 64 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 71i,18n,75p,1444b,403s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,18n,75p,1444b,346s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
 }</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb>
 </usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><
@@ -634,10 +634,10 @@ st/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2021/texmf-dist
 onts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2021/texmf-dist/fo
 nts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2021/texmf-dis
 t/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on notes_fmapg.pdf (12 pages, 604691 bytes).
+Output written on notes_fmapg.pdf (12 pages, 605055 bytes).
 PDF statistics:
- 2487 PDF objects out of 2487 (max. 8388607)
- 1708 compressed objects within 18 object streams
- 79 named destinations out of 1000 (max. 500000)
+ 2488 PDF objects out of 2984 (max. 8388607)
+ 1709 compressed objects within 18 object streams
+ 80 named destinations out of 1000 (max. 500000)
  128 words of extra memory for PDF output out of 10000 (max. 10000000)
 
