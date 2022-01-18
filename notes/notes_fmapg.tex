@@ -230,7 +230,7 @@ This leaves one last problem: Can we ensure that $\lambda_s \geq 0$ for all stat
 \subsubsection{Gradient of the MDPO Loss Function with Tabular Softmax Representation}
 We again take the softmax policy representation given by Eq. \ref{eq: softmax}, and compute $\nabla_{\theta(s, a)} \ell^{\pi_t}_{\text{MDPO}}$ for the MDPO loss (we substitute $Q^{\pi_t}$ with $A^{\pi_t}$ in this calculation):
 \begin{align}
-  \frac{\partial}{\partial \theta(s, a)} \ell^{\pi_t}_{\text{MDPO}} &= \sum_{x, b} \left[ \frac{\partial}{\partial \theta(s, a)} p^\pi(b | x) \right] \left[ \frac{\partial}{\partial p^\pi(b | x)} \ell^{\pi_t} \right] \tag*{(using total derivative)} \\
+  \frac{\partial}{\partial \theta(s, a)} \ell^{\pi_t}_{\text{MDPO}} &= \sum_{x, b} \left[ \frac{\partial}{\partial \theta(s, a)} p^\pi(b | x) \right] \left[ \frac{\partial}{\partial p^\pi(b | x)} \ell^{\pi_t}_{\text{MDPO}} \right] \tag*{(using total derivative)} \\
   &= \sum_{x, b} \Big[ \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^\pi(a | x) \Big) p^\pi(b | x) \Big] \left[ \frac{d^{\pi_t}(x)}{\eta} \left( \eta A^{\pi_t}(x, b) - \log \frac{p^\pi(b | x)}{p^{\pi_t}(b | x)} - 1 \right) \right] \nonumber \\
   &= \frac{d^{\pi_t}(s)}{\eta} \sum_b \Big( \mathbb{I}(b = a) - p^\pi(a | s) \Big) p^\pi(b | s) \left[ \eta A^{\pi_t}(s, b) - \log \frac{p^\pi(b | s)}{p^{\pi_t}(b | s)} - 1 \right] \nonumber \\
   &= \frac{d^{\pi_t}(s)}{\eta} p^\pi(a | s) \left[ \eta A^{\pi_t}(s, a) - \eta \sum_b p^\pi(b|s) A^{\pi_t}(s, b) - \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} + \text{KL}(p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s)) \right], \nonumber
@@ -261,12 +261,12 @@ For calculating the matrix $A$, we use the law of total derivative to obtain
   &= d^{\pi_t}(s) \Big[ p^{\pi_\theta}(a | s) - p^{\pi_t}(a | s) \Big]. \label{eq: trpo_kl_mid}
 \end{align}
 Finally, using the above result yields
-\begin{IEEEeqnarray}{lrCl}
-  & \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{TRPO}} &=& \frac{\partial}{\partial \theta(s, a)} d^{\pi_t}(s') \Big[ p^{\pi_\theta}(a' | s') - p^{\pi_t}(a' | s') \Big] \nonumber \\
-  &&=& d^{\pi_t}(s') \cdot \frac{\partial}{\partial \theta(s, a)} p^{\pi_\theta}(a' | s') \nonumber \\
-  &&=& \mathbb{I}(s'=s) \cdot d^{\pi_t}(s') \Big( \mathbb{I}(a'=a) - p^{\pi_\theta}(a | s') \Big) p^{\pi_\theta}(a' | s') \\
-  \Rightarrow \quad & A_{(s, :), (s, :)} &=& d^{\pi_t}(s) \Big( \text{diag} (p^{\pi_\theta}(\cdot | s)) - p^{\pi_\theta}(\cdot | s) p^{\pi_\theta}(\cdot | s)^\top \Big),
-\end{IEEEeqnarray}
+\begin{align}
+  \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{TRPO}} &= \frac{\partial}{\partial \theta(s, a)} d^{\pi_t}(s') \Big[ p^{\pi_\theta}(a' | s') - p^{\pi_t}(a' | s') \Big] \nonumber \\
+  &= d^{\pi_t}(s') \cdot \frac{\partial}{\partial \theta(s, a)} p^{\pi_\theta}(a' | s') \nonumber \\
+  &= \mathbb{I}(s'=s) \cdot d^{\pi_t}(s') \Big( \mathbb{I}(a'=a) - p^{\pi_\theta}(a | s') \Big) p^{\pi_\theta}(a' | s') \\
+  \Rightarrow \qquad \qquad \qquad \qquad A_{(s, :), (s, :)} &= d^{\pi_t}(s) \Big( \text{diag} (p^{\pi_\theta}(\cdot | s)) - p^{\pi_\theta}(\cdot | s) p^{\pi_\theta}(\cdot | s)^\top \Big),
+\end{align}
 where $p^{\pi_\theta}(\cdot | s) \in \mathbb{R}^{|\mathcal{A}|}$ is the vector defined as $[p^{\pi_\theta}(\cdot | s)]_a = p^{\pi_\theta}(a | s)$ and $A_{(s, :), (s, :)}$ denotes the square sub-block of the matrix $A$ corresponding to the given state $s$ and all the actions. In our experiments, since our $A$ matrix is small, we directly take its inverse to compute the update direction, thereby bypassing the conjugate method. Once we have the update direction, we then compute the maximal stepsize $\beta$ and perform an exponential backtracking line search as explained in the TRPO paper.
 
 \subsection{Proximal Policy Optimization (PPO)}
@@ -349,6 +349,45 @@ and for the constrained version,
   \caption{The gradients of the objectives and constraints w.r.t. the policy parameter corresponding to the different PG algorithms. Note that the gradient of the objective for both TRPO and MDPO is exactly equal to each other.}
   \label{table: ablation_study_grad}
 \end{table}
+
+\subsection{MDPO with Constraints}
+\begin{align}
+  & \frac{\partial}{\partial p^\pi(b | x)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{MDPO}} \nonumber \\
+  &= \frac{\partial}{\partial p^\pi(b | x)} d^{\pi_t}(s') p^\pi(a' | s') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - \sum_c p^\pi(c | s') \log \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')} \right) \nonumber \\
+  &= \mathbb{I}(x = s') d^{\pi_t}(s') \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - \sum_c p^\pi(c | s') \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')} \right) + p^\pi(a' | s') \frac{\mathbb{I}(b = a')}{p^\pi(a' | s')} \nonumber \\
+    & \qquad \qquad \qquad \qquad \quad - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg] \nonumber \\
+  &= \mathbb{I}(x = s') d^{\pi_t}(s') \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg],
+\end{align}
+where we introduced the intermediate variable $T_{\text{KL}}(s') :=\text{KL}(p^\pi(\cdot | s') \| p^{\pi_t}(\cdot | s') = \sum_c p^\pi(c | s') \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')}$.
+
+\begin{align}
+  \frac{\partial}{\partial \theta(s, a)} \frac{\partial \mathcal{C}_{\text{MDPO}}}{\partial \theta(s', a')} &= \sum_{x, b} \frac{\partial p^\pi(b | x)}{\partial \theta(s, a)} \frac{\partial}{\partial p^\pi(b | x)} \frac{\partial \mathcal{C}_{\text{MDPO}}}{\partial \theta(s', a')} \nonumber \\
+  &= {\color{red!67!black}{\sum_{{\color{black}{x}}, b}}} \mathbb{I}(x = s) {\color{red!67!black}{\Big[ \mathbb{I}(b = a) - p^\pi(a | x) \Big] p^\pi(b | x)}} \times \mathbb{I}(x = s') d^{\pi_t}(s') \nonumber \\
+  & \qquad \quad {\color{red!67!black}{\times \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg]}} \nonumber \\
+  &= \mathbb{I}(s = s') d^{\pi_t}(s') \times {\color{red!67!black}{T_{\text{aux}}}},
+\end{align}
+where the auxillary term $T_{\text{aux}}$ is
+\begin{align}
+  T_{\text{aux}} &= \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \sum_{b} \mathbb{I}(b = a) p^\pi(b | s) \mathbb{I}(b = a') \nonumber \\
+  & \qquad - p^\pi(a' | s') \sum_{b} \mathbb{I}(b = a) p^\pi(b | s) \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \nonumber \\
+  & \qquad - p^\pi(a | s) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \sum_{b} p^\pi(b | s) \mathbb{I}(b = a') \nonumber \\
+  & \qquad + p^\pi(a' | s') p^\pi(a | s) \sum_{b} p^\pi(b | s) \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \nonumber \\  
+  &= \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) p^\pi(a | s) \mathbb{I}(a = a') - p^\pi(a' | s') p^\pi(a | s) \left( \log \frac{p^\pi(a | s')}{p^{\pi_t}(a | s')} + 1 \right) \nonumber \\
+  & \qquad - p^\pi(a | s) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) p^\pi(a' | s) + p^\pi(a' | s') p^\pi(a | s) \left( T_{\text{KL}}(s') + 1 \right) \nonumber \\
+  &= \mathbb{I}(a = a') p^\pi(a | s) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) \nonumber \\
+  & \qquad - 2 p^\pi(a' | s') p^\pi(a | s) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) + p^\pi(a' | s') p^\pi(a | s).
+\end{align}
+Therefore, 
+\begin{align}
+  & \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{MDPO}} \nonumber \\
+  &= \mathbb{I}(s = s') d^{\pi_t}(s') \left[ p^\pi(a | s) \Big(\mathbb{I}(a = a') - 2 \Big) \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - T_{\text{KL}}(s') + 1 \right) + p^\pi(a' | s') p^\pi(a | s) \right],
+\end{align}
+and
+\begin{align}
+  A_{(s, :), (s, :)} &= d^{\pi_t}(s) \cdot \Big(\mathbf{I} - \mathbf{1}_{|\mathcal{A}| \times |\mathcal{A}|} \Big) \odot p^\pi(\cdot | s) \Big[ \log \Big( p^\pi(\cdot | s) \oslash p^{\pi_t}(\cdot | s) \Big) - \Big(T_{\text{KL}}(s) - 1 \Big) \mathbf{1}_{|\mathcal{A}|} \Big]^\top \nonumber \\
+  & \qquad + d^{\pi_t}(s) \cdot p^{\pi}(\cdot | s) p^{\pi}(\cdot | s)^\top.
+\end{align}
+
 
 \section*{References}
 
