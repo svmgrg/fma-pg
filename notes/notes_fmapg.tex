@@ -368,9 +368,9 @@ where the auxillary term $T_{\text{aux}}$ is
 \begin{align}
   T_{\text{aux}} &:= \sum_b \Big[ \mathbb{I}(b = a) - p^\pi(a | s) \Big] p^\pi(b | s) \Bigg[ \mathbb{I}(b = a') \cdot T_{\text{itd}}(s, a') - p^\pi(a' | s) \left( \log \frac{p^\pi(b | s)}{p^{\pi_t}(b | s)} + 1 \right) \Bigg] \\
   &= T_{\text{itd}}(s, a') \sum_{b} \mathbb{I}(b = a) p^\pi(b | s) \mathbb{I}(b = a') - p^\pi(a' | s) \sum_{b} \mathbb{I}(b = a) p^\pi(b | s) \left( \log \frac{p^\pi(b | s)}{p^{\pi_t}(b | s)} + 1 \right) \nonumber \\
-  & \qquad - p^\pi(a | s) \cdot T_{\text{itd}}(s, a') \sum_{b} p^\pi(b | s) \mathbb{I}(b = a') + p^\pi(a' | s) p^\pi(a | s) \sum_{b} p^\pi(b | s) \left( \log \frac{p^\pi(b | s)}{p^{\pi_t}(b | s)} + 1 \right) \nonumber \\  
+  & \qquad - p^\pi(a | s) T_{\text{itd}}(s, a') \sum_{b} p^\pi(b | s) \mathbb{I}(b = a') + p^\pi(a' | s) p^\pi(a | s) \sum_{b} p^\pi(b | s) \left( \log \frac{p^\pi(b | s)}{p^{\pi_t}(b | s)} + 1 \right) \nonumber \\  
   &= T_{\text{itd}}(s, a') p^\pi(a | s) \mathbb{I}(a = a') - p^\pi(a' | s) p^\pi(a | s) \left( \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} + 1 \right) \nonumber \\
-  & \qquad - p^\pi(a | s) T_{\text{itd}}(s, a') p^\pi(a' | s) + p^\pi(a' | s) p^\pi(a | s) \left( T_{\text{KL}}(s) + 1 \right) \nonumber \\
+  & \qquad - p^\pi(a | s) T_{\text{itd}}(s, a') p^\pi(a' | s) + p^\pi(a' | s) p^\pi(a | s) \Big( \text{KL}( p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s) ) + 1 \Big) \nonumber \\
   &= \mathbb{I}(a = a') p^\pi(a | s) T_{\text{itd}}(s, a') - 2 p^\pi(a' | s) p^\pi(a | s) T_{\text{itd}}(s, a') + p^\pi(a' | s) p^\pi(a | s).
 \end{align}
 Therefore, 
@@ -382,7 +382,7 @@ Therefore,
 where we use introduced yet another intermediate term $T_{\text{vec}}(s)$, defined as
 \begin{align}
   T_{\text{vec}}(s) &:= p^{\pi}(\cdot | s) \odot T_{\text{itd}}(s, \cdot) \\
-  &= p^{\pi}(\cdot | s) \odot \left[ \log \Big( p^\pi(\cdot | s) \oslash p^{\pi_t}(\cdot | s) \Big) - \Big( \text{KL} ( p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s) ) - 1 \Big) \mathbf{1}_{|\mathcal{A}|} \right].
+  &= p^{\pi}(\cdot | s) \odot \left[ \log \Big( p^\pi(\cdot | s) \oslash p^{\pi_t}(\cdot | s) \Big) - \text{KL} (p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s)) \mathbf{1}_{|\mathcal{A}|} + \mathbf{1}_{|\mathcal{A}|} \right].
 \end{align}
 
 \section*{References}
