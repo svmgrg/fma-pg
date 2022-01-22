@@ -93,7 +93,8 @@ def analytical_update_fmapg(pi_old, eta, adv, pg_method):
     assert pg_method in ['sPPO', 'MDPO']
     
     if pg_method == 'sPPO':
-        pi_new = pi_old * np.maximum(1 + eta * adv, 0)  # exact sPPO update
+        # pi_new = pi_old * np.maximum(1 + eta * adv, 0)  # exact sPPO update
+        pi_new = pi_old * np.maximum(1 + eta * adv, 1e-8)
         cnt_neg = np.count_nonzero(1 + eta * adv < 0)
         cnt_neg_adv = np.count_nonzero(adv < 0)
     elif pg_method == 'MDPO':
@@ -160,18 +161,31 @@ def calc_cst_grad(omega, pi_t, dpi_t, pg_method):
 
     return cst_grad
 
-def calc_A_matrix(num_states, num_actions, omega, dpi_t, pg_method):
+def calc_A_matrix(num_states, num_actions, omega, pi_t, dpi_t, pg_method):
     pi = softmax(omega)
     n = num_states * num_actions
     A = np.zeros((n, n))
 
-    if pg_method == 'TRPO':
+    if pg_method in ['TRPO', 'sPPO']:
         for state_i in range(num_states):
             pi_s = pi[state_i, :]
             beg = num_actions * state_i
             end = beg + num_actions
             A[beg:end, beg:end] \
                 = dpi_t[state_i] * (np.diag(pi_s) - np.outer(pi_s, pi_s))
+    elif pg_method in ['MDPO']:
+        for state_i in range(num_states):
+            pi_s = pi[state_i, :]
+            pi_t_s = pi_t[state_i, :]
+            clipped_pi_t_s = np.clip(pi_t_s, a_min=1e-6, a_max=1-1e-6)
+            T_vec = pi_s * (
+                np.log(pi_s / clipped_pi_t_s) - entropy(pi_s, pi_t_s) + 1)
+            beg = num_actions * state_i
+            end = beg + num_actions
+            
+            A[beg:end, beg:end] \
+                = dpi_t[state_i] * (np.diag(T_vec) - 2 * np.outer(pi_s, T_vec)
+                                    + np.outer(pi_s, pi_s))
     else:
         raise NotImplementedError()
     
@@ -199,11 +213,16 @@ def calc_A_matrix_slow(num_states, num_actions, dpi_t, pi):
 
 # compute the maximum stepsize using the equations given in Appendix C of
 # Schulman et al. (2015)
-def calc_max_TRPO_stepsize(update_direction, A, delta):
+def calc_max_stepsize(update_direction, A, delta):
     update_direction_flatten = update_direction.reshape(-1, 1)
+
+    if np.linalg.norm(update_direction_flatten) < 1e-8:
+        return 0
+    
     alpha_max = 2 * delta / np.matmul(np.matmul(update_direction_flatten.T, A),
                                       update_direction_flatten).item()
     alpha_max = np.sqrt(alpha_max)
+    
     return alpha_max
 
 #----------------------------------------------------------------------
@@ -235,20 +254,34 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
     
     # store the quality of the policies
     vpi_outer_list = []
+    grad_norm_list = []
+    grad_pi_norm_list = []
     vpi_inner_list = [] if FLAG_SAVE_INNER_STEPS else None
     alpha_used_list = [] if FLAG_SAVE_INNER_STEPS else None
-    update_mag_list = [] if FLAG_SAVE_INNER_STEPS else None
+    grad_lpi_inner_list = []
 
     # store how many times does (1 + eta * adv) < 0 for analytical sPPO update
-    cnt_neg_list = [] if pg_method == 'sPPO' else None
-    cnt_neg_adv_list = [] if pg_method == 'sPPO' else None
-
+    if pg_method == 'sPPO' and optim_type == 'analytical':
+        cnt_neg_list = []
+        cnt_neg_adv_list = []
+    else:
+        cnt_neg_list = cnt_neg_adv_list = None
+        
     # outer learning loop
     for T in range(num_outer_loop):
-        print(T)
         dpi = env.calc_dpi(pi)
         qpi = env.calc_qpi(pi)
         adv = qpi - env.calc_vpi(pi).reshape(-1, 1)
+
+        objective_pi_grad = dpi.reshape(-1, 1) * pi * adv
+        grad_pi_norm_list.append(
+            np.log10(np.linalg.norm(objective_pi_grad)))
+
+        if np.linalg.norm(objective_pi_grad) < 1e-16:
+            print('kill outside')
+            break
+        
+        # print(T, np.linalg.norm(objective_pi_grad))
 
         vpi_outer_list.append(env.calc_vpi(pi, FLAG_RETURN_V_S0=True))
 
@@ -261,16 +294,15 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
         else:
             # multiple gradient based updates
             if FLAG_SAVE_INNER_STEPS:
-                tmp_list = [env.calc_vpi(pi, FLAG_RETURN_V_S0=True)]
+                vpi_tmp_list = [env.calc_vpi(pi, FLAG_RETURN_V_S0=True)]
                 alpha_tmp_list = []
-                update_mag_tmp_list = []
+                grad_lpi_inner_tmp_list = []
 
             omega = theta.copy()
             used_alpha = None
                             
             # inner learning loop
             for k in range(num_inner_loop): # do one grad ascent step
-
                 #--------------------------------------------------------
                 # Calculate the objective_grad and the update_direction
                 #--------------------------------------------------------
@@ -288,19 +320,19 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
                     # We first flatten grad, calculate update_direction using
                     # the above equation, and then reshape it again into an
                     # S x A matrix
-                    grad = calc_obj_grad(
-                        omega=omega, pi_t=pi, adv_t=adv, dpi_t=dpi,
+                    objective_grad = calc_obj_grad(
+                        omega=omega, pi_t=pi, adv_t=adv, qpi_t=qpi, dpi_t=dpi,
                         pg_method=pg_method, epsilon=epsilon)
-                    grad_flatten = grad.reshape(-1, 1)
+                    objective_grad_flatten = objective_grad.reshape(-1, 1)
                     A = calc_A_matrix(num_states=num_states,
                                       num_actions=num_actions, omega=omega,
-                                      dpi_t=dpi, pg_method=pg_method)
-                    # s_flatten = np.linalg.solve(A, grad_flatten)
+                                      pi_t=pi, dpi_t=dpi, pg_method=pg_method)
+                    # s_flatten = np.linalg.solve(A, objective_grad_flatten)
                     # had problems with A being singular; so used pseudo-inverse
                     update_direction_flatten = np.matmul(
-                        np.linalg.pinv(A), grad_flatten)    
+                        np.linalg.pinv(A), objective_grad_flatten)
                     update_direction = update_direction_flatten.reshape(
-                        grad.shape)
+                        objective_grad.shape)
 
                 #--------------------------------------------------------
                 # Calculate objective_fn, constraint_fn, and alpha_init
@@ -316,19 +348,21 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
                     calc_constraint_fn = lambda omega: calc_constraint(
                         omega=omega, pi_t=pi, dpi_t=dpi, pg_method=pg_method)
 
-                    if pg_method == 'TRPO' and optim_type == 'constrained':
-                        alpha_init = calc_max_TRPO_stepsize(
+                    if optim_type == 'constrained':
+                        alpha_init = calc_max_stepsize(
                             update_direction=update_direction, A=A, delta=delta)
                     elif FLAG_WARM_START and used_alpha is not None:
                         alpha_init = warm_start_factor * used_alpha
                     else:
                         alpha_init = alpha_max
 
-                if np.allclose(np.zeros(update_direction.shape),
-                               update_direction):
-                    # or np.linalg.norm(grad) < 1e-8:
+                if np.linalg.norm(objective_grad) < 1e-16:
+                    # np.allclose(np.zeros(objective_grad.shape),objective_grad):
+                    # or np.linalg.norm(objective_grad) < 1e-8:
                     updated_omega = omega.copy()
                     used_alpha = 0
+                    print('kill inside')
+                    break
                 else: # make a single inner loop update
                     updated_omega, used_alpha = make_single_inner_loop_update(
                         optim_type=optim_type, stepsize_type=stepsize_type,
@@ -345,15 +379,40 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
 
                 if FLAG_SAVE_INNER_STEPS:
                     pi_tmp = softmax(omega)
-                    tmp_list.append(env.calc_vpi(pi_tmp, FLAG_RETURN_V_S0=True))
+                    vpi_tmp_list.append(
+                        env.calc_vpi(pi_tmp, FLAG_RETURN_V_S0=True))
+                    if k % 10 == 0:
+                        grad_lpi_inner_tmp_list.append(
+                            np.linalg.norm(objective_grad))
                     alpha_tmp_list.append(used_alpha)
-                    update_mag_tmp_list.append(np.linalg.norm(update_direction))
-                    
-            if FLAG_SAVE_INNER_STEPS:
-                vpi_inner_list.append(tmp_list)
-                alpha_used_list.append(alpha_tmp_list)
-                update_mag_list.append(update_mag_tmp_list)
 
+            if FLAG_SAVE_INNER_STEPS:
+                vpi_inner_list.append(vpi_tmp_list)
+                alpha_used_list.append(alpha_tmp_list)
+                grad_lpi_inner_list.append(grad_lpi_inner_tmp_list)
+
+            # # calculate the gradient of the objective wrt the policy pi
+            # if pg_method == 'MDPO':
+            #     clipped_pi_t = np.clip(pi, a_min=1e-6, a_max=1-1e-6)
+            #     log_term = np.log(softmax(omega) / clipped_pi_t)
+            #     objective_pi_grad = (dpi.reshape(-1, 1) / eta) \
+            #         * (eta * adv - log_term - 1)
+            # elif pg_method == 'sPPO':
+            #     clipped_pi = np.clip(softmax(omega), a_min=1e-6, a_max=1-1e-6)
+            #     objective_pi_grad = \
+            #         dpi.reshape(-1, 1) * (pi / clipped_pi) * (adv + 1 / eta)
+            # elif pg_method == 'TRPO':
+            #     clipped_pi = np.clip(softmax(omega), a_min=1e-6, a_max=1-1e-6)
+            #     objective_pi_grad = \
+            #         dpi.reshape(-1, 1) * (qpi + (1 / eta) * (pi / clipped_pi))
+            # else:
+            #     objective_pi_grad = None
+
+            objective_pi_grad = dpi.reshape(-1, 1) * pi * adv
+           
+            grad_norm_list.append(np.linalg.norm(objective_grad))
+            
+            
             # update the policy to the new approximate point
             theta = omega.copy()
             pi = softmax(theta)
@@ -364,7 +423,9 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
     dat['cnt_neg_adv_list'] = cnt_neg_adv_list
     dat['vpi_inner_list'] = vpi_inner_list
     dat['alpha_used_list'] = alpha_used_list
-    dat['update_mag_list'] = update_mag_list
-    dat['omega'] = omega.tolist()
-                
+    dat['grad_norm_list'] = grad_norm_list
+    dat['grad_pi_norm_list'] = grad_pi_norm_list
+    dat['theta'] = theta.tolist()
+    dat['grad_lpi_inner_list'] = grad_lpi_inner_list
+    
     return dat
