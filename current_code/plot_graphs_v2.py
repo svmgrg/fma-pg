@@ -7,36 +7,37 @@ import pdb
 
 VSTAR = 0.9**6
 color_dict = {'sPPO': 'blue', 'MDPO': 'red', 'PPO': 'green',
-              'TRPO': 'tab:purple', 'TRPO_KL': 'tab:purple',
+              'TRPO': 'orange', 'TRPO_KL': 'tab:purple',
               'TRPO_KL_LS': 'cyan'}
 linewidth = 1
 
-num_inner_loop_list = [1, 10, 100, 1000]
+num_inner_loop_list = [1, 10, 100, 1000, 10000]
 
+# inner lists
 eta_list = [2**i for i in range(-13, -2, 1)]
-delta_list = [2**i for i in range(-13, 14, 2)]
+delta_list = [2**i for i in range(-13, +14, 2)]
+epsilon_list = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]
 
+# outer lists
 alpha_list = [2**i for i in range(-13, 4, 1)]
-armijo_const_list = [0.0, 0.001, 0.01, 0.1, 0.5]
+armijo_const_list = [0.0] #, 0.001, 0.01, 0.1, 0.5]
 
-pg_method = 'MDPO'
-PLOT_TYPE = 'vpi_outer'
+pg_method = 'sPPO' # 'TRPO' #
+PLOT_TYPE = 'vpi_outer' # 'grad_jpi_outer' #
 
 num_outer_loop = 2000
 FLAG_SAVE_INNER_STEPS = False
-alpha_max = None
+alpha_max = None # 100000.0 #
 FLAG_WARM_START = False
 warm_start_factor = None
-max_backtracking_steps = None
-optim_type = 'regularized'
-stepsize_type = 'fixed'
-epsilon = None
+max_backtracking_steps = None # 1000 # 
+optim_type = 'analytical' #'constrained' # 
+stepsize_type = 'fixed' #'line_search' # 
 alpha_fixed = None
-decay_factor = None
+decay_factor = None # 0.9 # 
 
 folder_name = 'fmapg_DAT/CliffWorld_{}_{}_{}'.format(
     pg_method, optim_type, stepsize_type)
-delta = armijo_const = None
 
 num_cols = len(num_inner_loop_list)
 
@@ -75,22 +76,42 @@ def plot_sensitivity(ax, num_inner_loop, pg_method, final_perf_idx=-1,
     c1 = np.array(mpl.colors.to_rgb(color_dict[pg_method]))
     c2 = np.array(mpl.colors.to_rgb('white'))
 
-    outer_list = alpha_list if stepsize_type == 'fixed' else armijo_const_list
+    if optim_type == 'analytical':
+        outer_list = [None]
+    elif stepsize_type == 'fixed':
+        outer_list = alpha_list
+    elif stepsize_type == 'line_search':
+       outer_list = armijo_const_list
+
     for outer_idx, clr_mix in zip(outer_list, range(len(outer_list))):
-        alpha_fixed = float(outer_idx) if stepsize_type == 'fixed' else None
+        alpha_fixed = outer_idx if stepsize_type == 'fixed' else None
+        if alpha_fixed is not None:
+            alpha_fixed = float(alpha_fixed)
+        
         armijo_const = float(outer_idx) \
             if stepsize_type == 'line_search' else None
 
-        mix = (clr_mix + 1) / (len(outer_list) + 2)
+        mix = (clr_mix + 1) / (len(outer_list))
         plt_color = mpl.colors.to_hex(mix * c1 + (1 - mix) * c2)
 
         final_perf_list = []
 
-        inner_list = eta_list if optim_type == 'regularized' else delta_list
+        if pg_method == 'PPO':
+            inner_list = epsilon_list
+        elif optim_type in ['regularized', 'analytical']:
+            inner_list = eta_list
+        elif optim_type == 'constrained':
+            inner_list = delta_list
+
+        eta = delta = epsilon = None
         for inner_idx in inner_list:
-            eta = float(inner_idx) if optim_type == 'regularized' else None
-            delta = float(inner_idx) if optim_type == 'constrained' else None
-                            
+            if pg_method == 'PPO':
+                epsilon = float(inner_idx)
+            elif optim_type in ['regularized', 'analytical']:
+                eta = float(inner_idx)
+            elif optim_type == 'constrained':
+                delta = float(inner_idx)
+
             filename='{}/nmOtrLp_{}__nmInrLp_{}'\
                 '__SvInrStps_{}__alphMx_{}__WrmStr_{}__wrmStrFac_{}'\
                 '__mxBktStps_{}__eta_{}__eps_{}'\
@@ -104,50 +125,176 @@ def plot_sensitivity(ax, num_inner_loop, pg_method, final_perf_idx=-1,
 
             final_perf_list.append(dat[plot_type + '_list'][final_perf_idx])
 
-        ax.plot(np.log(eta_list) / np.log(2), final_perf_list,
+        if pg_method == 'PPO':
+            x_axis = inner_list
+        else:
+            x_axis = np.log(inner_list) / np.log(2)
+        ax.plot(x_axis, final_perf_list,
                 color=plt_color, label=r'$\alpha:{}$'.format(alpha_fixed),
                 linewidth=linewidth)
         
         if plot_type == 'vpi_outer':
-            ax.plot(np.log(eta_list) / np.log(2), [VSTAR] * len(eta_list),
+            ax.plot(x_axis, [VSTAR] * len(inner_list),
                     color='black', linestyle=':', linewidth=0.5)
+            ax.set_ylim([0, 0.6])
+        elif plot_type == 'grad_jpi_outer':
+            ax.set_yscale('log')
 
         # box = ax.get_position()
         # ax.set_position([box.x0, box.y0 + box.height * 0.1,
         #                        box.width, box.height * 0.9])
-    ax.invert_xaxis()
+    if pg_method != 'TRPO':
+        ax.invert_xaxis()
 
 #======================================================================
 # Plot sensitivity plots
 #======================================================================
+if optim_type == 'analytical':
+    num_inner_loop_list = [None]
 num_cols = len(num_inner_loop_list)
-fig, axs = plt.subplots(1, num_cols, figsize=(3 * num_cols, 1.7))
+fig, axs = plt.subplots(1, num_cols, sharey=True, figsize=(3 * num_cols, 1.7))
 final_perf_idx = -1
 for col, num_inner_loop in enumerate(num_inner_loop_list):
-    plot_sensitivity(ax=axs[col], num_inner_loop=num_inner_loop,
+    ax = axs[col] if num_cols > 1 else axs
+    
+    plot_sensitivity(ax=ax, num_inner_loop=num_inner_loop,
                      pg_method=pg_method, final_perf_idx=final_perf_idx,
                      plot_type=PLOT_TYPE, linewidth=linewidth)
-    axs[col].spines['right'].set_visible(False)
-    axs[col].spines['top'].set_visible(False)
-    if PLOT_TYPE == 'vpi_outer':
-        axs[col].set_ylim([0, 0.6])
-    elif PLOT_TYPE == 'grad':
-        axs[col].set_ylim([0, 30])
-    axs[col].set_title('m={}'.format(num_inner_loop))
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.set_title('m={}'.format(num_inner_loop))
 
-    if col == 2:
-        axs[col].legend(loc='upper center', bbox_to_anchor=(0.5, -0.5),
-                        fancybox=True, shadow=True, ncol=6)
-axs[0].set_xlabel(r'$\log_2(\eta)$')
+    # if col == 2:
+    #     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.5),
+    #                     fancybox=True, shadow=True, ncol=6)
+ax = axs[0] if num_cols > 1 else axs
+ax.set_xlabel(r'$\log_2(\eta)$')
 
-# plt.show()
 plt.savefig('{}_{}_{}_{}_sensitivity.pdf'.format(
     pg_method, optim_type, stepsize_type, PLOT_TYPE))
 exit()
 
-
-
 #======================================================================
+# Plot best learning curves
+#======================================================================
+def find_best_param_config(folder_name, pg_method, num_inner_loop, 
+                           optim_type, stepsize_type, decay_factor, alpha_max,
+                           max_backtracking_steps, best_config_type,
+                           final_perf_idx=-1):
+    assert best_config_type in ['min_grad_jpi', 'max_jpi']
+    
+    min_grad_jpi = np.inf
+    max_vpi = -np.inf
+    best_alpha_fixed = best_armijo_const = best_eta = best_delta = best_epsilon\
+        = None
+        
+    outer_list = alpha_list if stepsize_type == 'fixed' else armijo_const_list
+    for outer_idx, clr_mix in zip(outer_list, range(len(outer_list))):
+        alpha_fixed = float(outer_idx) if stepsize_type == 'fixed' else None
+        armijo_const = float(outer_idx) \
+            if stepsize_type == 'line_search' else None
+
+        if pg_method == 'PPO':
+            inner_list = epsilon_list
+        elif optim_type == 'regularized':
+            inner_list = eta_list
+        elif optim_type == 'constrained':
+            inner_list = delta_list
+            
+        eta = delta = epsilon = None
+        for inner_idx in inner_list:
+            if pg_method == 'PPO':
+                epsilon = float(inner_idx)
+            elif optim_type == 'regularized':
+                eta = float(inner_idx)
+            elif optim_type == 'constrained':
+                delta = float(inner_idx)
+
+            filename='{}/nmOtrLp_{}__nmInrLp_{}'\
+                '__SvInrStps_{}__alphMx_{}__WrmStr_{}__wrmStrFac_{}'\
+                '__mxBktStps_{}__eta_{}__eps_{}'\
+                '__del_{}__alphFxd_{}__dcyFac_{}__armjoCnst_{}'.format(
+                    folder_name, num_outer_loop, num_inner_loop,
+                    FLAG_SAVE_INNER_STEPS, alpha_max, FLAG_WARM_START,
+                    warm_start_factor, max_backtracking_steps, eta, epsilon,
+                    delta, alpha_fixed, dcy_fac, armijo_const)
+            with open(filename, 'r') as fp:
+                dat = json.load(fp)
+
+            grad = dat['grad_jpi_outer_list'][final_perf_idx]
+            perf = dat['vpi_outer_list'][final_perf_idx]
+
+            if best_config_type == 'min_grad_jpi':
+                best_param_condition = grad < min_grad_jpi
+            elif best_config_type == 'max_jpi':
+                best_param_condition = perf > max_vpi
+
+            if best_param_condition: # grad < min_grad_jpi:
+                min_grad_jpi = grad
+                max_vpi = perf
+                best_alpha_fixed = alpha_fixed
+                best_armijo_const = armijo_const
+                best_eta = eta
+                best_delta = delta
+                best_epsilon = epsilon
+
+    return best_alpha_fixed, best_armijo_const, best_eta,\
+        best_delta, best_epsilon
+
+num_inner_loop = 1000
+best_config_type = 'min_grad_jpi' # 'max_jpi' #
+fig, axs = plt.subplots(1, 2, figsize=(3 * 2, 1.7))
+
+for pg_method in ['sPPO', 'MDPO', 'TRPO', 'PPO']:
+    if pg_method == 'TRPO':
+        optim_type = 'constrained'
+        stepsize_type = 'line_search'
+        dcy_fac = decay_factor
+        alph_mx = alpha_max
+        mx_bkt_stps = max_backtracking_steps
+    else:
+        optim_type = 'regularized'
+        stepsize_type = 'fixed'
+        dcy_fac = None
+        alph_mx = None
+        mx_bkt_stps = None
+
+    folder_name = 'fmapg_DAT/CliffWorld_{}_{}_{}'.format(
+        pg_method, optim_type, stepsize_type)
+        
+    best_alpha_fixed, best_armijo_const, best_eta, best_delta, best_epsilon = \
+        find_best_param_config(
+            folder_name=folder_name, pg_method=pg_method,
+            num_inner_loop=num_inner_loop, optim_type=optim_type,
+            stepsize_type=stepsize_type, decay_factor=dcy_fac,
+            alpha_max=alph_mx, max_backtracking_steps=mx_bkt_stps,
+            best_config_type=best_config_type, final_perf_idx=-1)
+
+    filename='{}/nmOtrLp_{}__nmInrLp_{}'\
+        '__SvInrStps_{}__alphMx_{}__WrmStr_{}__wrmStrFac_{}'\
+        '__mxBktStps_{}__eta_{}__eps_{}'\
+        '__del_{}__alphFxd_{}__dcyFac_{}__armjoCnst_{}'.format(
+            folder_name, num_outer_loop, num_inner_loop,
+            FLAG_SAVE_INNER_STEPS, alph_mx, FLAG_WARM_START,
+            warm_start_factor, mx_bkt_stps, best_eta, best_epsilon,
+            best_delta, best_alpha_fixed, dcy_fac, best_armijo_const)
+    with open(filename, 'r') as fp:
+        dat = json.load(fp)
+
+    axs[0].plot(dat['vpi_outer_list'], color=color_dict[pg_method])
+    axs[1].plot(dat['grad_jpi_outer_list'], color=color_dict[pg_method])
+
+    axs[0].set_ylim([-0.1, 0.6])
+    axs[1].set_yscale('log')
+
+    axs[0].spines['right'].set_visible(False)
+    axs[0].spines['top'].set_visible(False)
+    axs[1].spines['right'].set_visible(False)
+    axs[1].spines['top'].set_visible(False)
+    
+plt.savefig('{}_m{}_learning_curve.pdf'.format(best_config_type, num_inner_loop))
+exit()
+
 #======================================================================
 #======================================================================
 #======================================================================

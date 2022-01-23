@@ -63,6 +63,8 @@ r[4, :] = +1 # positive reward for finding the goal terminal state
 mu = np.zeros(21)
 mu[0] = 1
 
+# mu[:] = 1 / 21
+
 terminal_states = [20]
 #======================================================================
         

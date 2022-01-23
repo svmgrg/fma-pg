@@ -55,16 +55,15 @@ def make_single_inner_loop_update(optim_type, stepsize_type, omega,
             if ((optim_type == 'regularized' and J_tmp >= J_old + alpha * cm)
                 or
                 (optim_type == 'constrained' and # no Armijo condition here
-                 J_tmp > J_old and C_tmp <= delta)):
+                 J_tmp >= J_old and C_tmp <= delta)):
                 break # use this alpha
             elif t > max_backtracking_steps:
-                alpha = 1e-6
+                alpha = 1e-16
                 omega_tmp = omega + alpha * update_direction
                 break
             else:
                 alpha = decay_factor * alpha
                 t += 1
-    
     return omega_tmp, alpha
 
 #----------------------------------------------------------------------
@@ -158,7 +157,7 @@ def calc_cst_grad(omega, pi_t, dpi_t, pg_method):
         KL = entropy(pi, pi_t, axis=1).reshape(-1, 1)
         clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1-1e-6)
         cst_grad = dpi_t.reshape(-1, 1) * pi * (np.log(pi / clipped_pi_t) - KL)
-
+    
     return cst_grad
 
 def calc_A_matrix(num_states, num_actions, omega, pi_t, dpi_t, pg_method):
@@ -213,17 +212,20 @@ def calc_A_matrix_slow(num_states, num_actions, dpi_t, pi):
 
 # compute the maximum stepsize using the equations given in Appendix C of
 # Schulman et al. (2015)
-def calc_max_stepsize(update_direction, A, delta):
-    update_direction_flatten = update_direction.reshape(-1, 1)
-
-    if np.linalg.norm(update_direction_flatten) < 1e-8:
-        return 0
-    
-    alpha_max = 2 * delta / np.matmul(np.matmul(update_direction_flatten.T, A),
-                                      update_direction_flatten).item()
-    alpha_max = np.sqrt(alpha_max)
-    
-    return alpha_max
+def calc_max_stepsize(update_direction, A, delta, alpha_max):
+    if np.linalg.norm(update_direction) < 1e-128:
+        alpha = alpha_max
+    else:
+        update_direction_flatten = update_direction.reshape(-1, 1)
+        alpha = 2 * delta / np.matmul(
+            np.matmul(update_direction_flatten.T, A),
+            update_direction_flatten).item()
+        alpha = np.sqrt(alpha)
+        
+    if alpha > alpha_max:
+        alpha = alpha_max
+        
+    return alpha
 
 #----------------------------------------------------------------------
 # function for running full experiments
@@ -280,7 +282,7 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
         #     print('kill outside')
         #     break
         
-        # print(T, np.linalg.norm(objective_pi_grad))
+        # print(T, np.linalg.norm(J_pi_grad))
 
         vpi_outer_list.append(env.calc_vpi(pi, FLAG_RETURN_V_S0=True))
 
@@ -310,9 +312,12 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
                                              qpi_t=qpi, dpi_t=dpi,
                                              pg_method=pg_method,
                                              epsilon=epsilon)
-                    cst_grad = calc_cst_grad(omega=omega, pi_t=pi, dpi_t=dpi,
-                                             pg_method=pg_method)
-                    update_direction = obj_grad - (1 / eta) * cst_grad
+                    if pg_method in ['PPO']:
+                        update_direction = obj_grad
+                    else:
+                        cst_grad = calc_cst_grad(omega=omega, pi_t=pi, dpi_t=dpi,
+                                                 pg_method=pg_method)
+                        update_direction = obj_grad - (1 / eta) * cst_grad
                     objective_grad = update_direction
                 elif optim_type == 'constrained':
                     # calc update_direction = A^{-1} grad.
@@ -349,7 +354,8 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
 
                     if optim_type == 'constrained':
                         alpha_init = calc_max_stepsize(
-                            update_direction=update_direction, A=A, delta=delta)
+                            update_direction=update_direction, A=A, delta=delta,
+                            alpha_max=alpha_max)
                     elif FLAG_WARM_START and used_alpha is not None:
                         alpha_init = warm_start_factor * used_alpha
                     else:
