@@ -78,17 +78,17 @@ print('Total time taken: {}'.format(time.time() - tic))
 #----------------------------------------------------------------------
 # save the data
 #----------------------------------------------------------------------
-# folder details
-folder_name = 'fmapg_DAT/CliffWorld_{}'.format(pg_method)
+folder_name = 'fmapg_DAT/CliffWorld_{}_{}_{}'.format(
+    pg_method, optim_type, stepsize_type)
 os.makedirs(folder_name, exist_ok='True')
 
 filename='{}/nmOtrLp_{}__nmInrLp_{}'\
     '__SvInrStps_{}__alphMx_{}__WrmStr_{}__wrmStrFac_{}'\
-    '__mxBktStps_{}__optmTyp_{}__stpTyp_{}__eta_{}__eps_{}'\
+    '__mxBktStps_{}__eta_{}__eps_{}'\
     '__del_{}__alphFxd_{}__dcyFac_{}__armjoCnst_{}'.format(
         folder_name, num_outer_loop, num_inner_loop,
         FLAG_SAVE_INNER_STEPS, alpha_max, FLAG_WARM_START, warm_start_factor,
-        max_backtracking_steps, optim_type, stepsize_type, eta, epsilon,
+        max_backtracking_steps, eta, epsilon,
         delta, alpha_fixed, decay_factor, armijo_const)
 
 with open(filename, 'w') as fp:
@@ -97,16 +97,16 @@ with open(filename, 'w') as fp:
 #----------------------------------------------------------------------
 # misc plotting
 #----------------------------------------------------------------------
-import matplotlib.pyplot as plt
-fig, axs = plt.subplots(1, 3)
-axs[0].plot(dat['vpi_outer_list'])
-axs[0].set_ylim([0, 0.9**6 + 0.05])
+# import matplotlib.pyplot as plt
+# fig, axs = plt.subplots(1, 3)
 
-axs[1].plot(dat['vpi_outer_list'])
-axs[2].scatter(range(len(np.array(dat['alpha_used_list']).flatten())),
-               np.array(dat['alpha_used_list']).flatten(), s=0.1)
-# axs[2].plot(np.array(dat['update_mag_list']).flatten())
-plt.show()
+# axs[0].plot(dat['vpi_outer_list'])
+# axs[1].plot(np.log10(np.array(dat['grad_lpi_inner_list'])))
+# axs[2].plot(dat['grad_jpi_outer_list'])
+
+# if dat['vpi_outer_list'][-1] > 0:
+#     axs[0].set_ylim([0, 0.9**6 + 0.05])
+# plt.show()
 
 # pdb.set_trace()
 # import matplotlib.pyplot as plt
@@ -122,4 +122,9 @@ plt.show()
 
 # python run_exp_v2.py --pg_method 'TRPO' --num_outer_loop 2000 --num_inner_loop 10 --FLAG_SAVE_INNER_STEPS 'True' --alpha_max 100 --FLAG_WARM_START 'True' --warm_start_factor 2 --max_backtracking_steps 100 --optim_type 'regularized' --stepsize_type 'line_search' --eta 0.1 --epsilon -1 --delta -1 --alpha_fixed -1 --decay_factor 0.9 --armijo_const 0.5
 
-# python run_exp_v2.py --pg_method 'MDPO' --num_outer_loop 2000 --num_inner_loop 100 --FLAG_SAVE_INNER_STEPS 'True' --alpha_max -1 --FLAG_WARM_START 'False' --warm_start_factor -1 --max_backtracking_steps -1 --optim_type 'regularized' --stepsize_type 'fixed' --eta 1 --epsilon -1 --delta -1 --alpha_fixed 0.1 --decay_factor -1 --armijo_const -1
+# python run_exp_v2.py --pg_method 'sPPO' --num_outer_loop 2000 --num_inner_loop 1000 --FLAG_SAVE_INNER_STEPS 'False' --alpha_max -1 --FLAG_WARM_START 'False' --warm_start_factor -1 --max_backtracking_steps -1 --optim_type 'regularized' --stepsize_type 'fixed' --eta 0.03125 --epsilon -1 --delta -1 --alpha_fixed 0.125 --decay_factor -1 --armijo_const -1
+
+
+# constrained
+
+# python run_exp_v2.py --pg_method 'MDPO' --num_outer_loop 2000 --num_inner_loop 10 --FLAG_SAVE_INNER_STEPS 'False' --alpha_max -1 --FLAG_WARM_START 'False' --warm_start_factor -1 --max_backtracking_steps 1000 --optim_type 'constrained' --stepsize_type 'line_search' --eta -1 --epsilon -1 --delta 0.1 --alpha_fixed -1 --decay_factor 0.9 --armijo_const 0

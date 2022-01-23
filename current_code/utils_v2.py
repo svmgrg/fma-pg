@@ -255,7 +255,7 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
     # store the quality of the policies
     vpi_outer_list = []
     grad_norm_list = []
-    grad_pi_norm_list = []
+    grad_jpi_outer_list = []
     vpi_inner_list = [] if FLAG_SAVE_INNER_STEPS else None
     alpha_used_list = [] if FLAG_SAVE_INNER_STEPS else None
     grad_lpi_inner_list = []
@@ -273,13 +273,12 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
         qpi = env.calc_qpi(pi)
         adv = qpi - env.calc_vpi(pi).reshape(-1, 1)
 
-        objective_pi_grad = dpi.reshape(-1, 1) * pi * adv
-        grad_pi_norm_list.append(
-            np.log10(np.linalg.norm(objective_pi_grad)))
+        J_pi_grad = dpi.reshape(-1, 1) * pi * adv
+        grad_jpi_outer_list.append(np.linalg.norm(J_pi_grad))
 
-        if np.linalg.norm(objective_pi_grad) < 1e-16:
-            print('kill outside')
-            break
+        # if np.linalg.norm(J_pi_grad) < 1e-16:
+        #     print('kill outside')
+        #     break
         
         # print(T, np.linalg.norm(objective_pi_grad))
 
@@ -356,9 +355,7 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
                     else:
                         alpha_init = alpha_max
 
-                if np.linalg.norm(objective_grad) < 1e-16:
-                    # np.allclose(np.zeros(objective_grad.shape),objective_grad):
-                    # or np.linalg.norm(objective_grad) < 1e-8:
+                if np.linalg.norm(objective_grad) < 1e-128:
                     updated_omega = omega.copy()
                     used_alpha = 0
                     print('kill inside')
@@ -391,41 +388,20 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
                 alpha_used_list.append(alpha_tmp_list)
                 grad_lpi_inner_list.append(grad_lpi_inner_tmp_list)
 
-            # # calculate the gradient of the objective wrt the policy pi
-            # if pg_method == 'MDPO':
-            #     clipped_pi_t = np.clip(pi, a_min=1e-6, a_max=1-1e-6)
-            #     log_term = np.log(softmax(omega) / clipped_pi_t)
-            #     objective_pi_grad = (dpi.reshape(-1, 1) / eta) \
-            #         * (eta * adv - log_term - 1)
-            # elif pg_method == 'sPPO':
-            #     clipped_pi = np.clip(softmax(omega), a_min=1e-6, a_max=1-1e-6)
-            #     objective_pi_grad = \
-            #         dpi.reshape(-1, 1) * (pi / clipped_pi) * (adv + 1 / eta)
-            # elif pg_method == 'TRPO':
-            #     clipped_pi = np.clip(softmax(omega), a_min=1e-6, a_max=1-1e-6)
-            #     objective_pi_grad = \
-            #         dpi.reshape(-1, 1) * (qpi + (1 / eta) * (pi / clipped_pi))
-            # else:
-            #     objective_pi_grad = None
-
-            objective_pi_grad = dpi.reshape(-1, 1) * pi * adv
-           
-            grad_norm_list.append(np.linalg.norm(objective_grad))
-            
-            
             # update the policy to the new approximate point
             theta = omega.copy()
             pi = softmax(theta)
 
     dat = dict()
     dat['vpi_outer_list'] = vpi_outer_list
+    dat['grad_jpi_outer_list'] = grad_jpi_outer_list
+    dat['final_theta'] = theta.tolist()
+
     dat['cnt_neg_list'] = cnt_neg_list
     dat['cnt_neg_adv_list'] = cnt_neg_adv_list
+    
     dat['vpi_inner_list'] = vpi_inner_list
-    dat['alpha_used_list'] = alpha_used_list
-    dat['grad_norm_list'] = grad_norm_list
-    dat['grad_pi_norm_list'] = grad_pi_norm_list
-    dat['theta'] = theta.tolist()
     dat['grad_lpi_inner_list'] = grad_lpi_inner_list
+    dat['alpha_used_list'] = alpha_used_list
     
     return dat
