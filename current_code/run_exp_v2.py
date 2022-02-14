@@ -11,6 +11,7 @@ from utils_v2 import *
 
 # read command line arguments to get parameter configurations
 parser = argparse.ArgumentParser()
+parser.add_argument('-env', '--environment', required=True, type=str)
 parser.add_argument('-pa', '--pg_method', required=True, type=str)
 parser.add_argument('-nol', '--num_outer_loop', required=True, type=int)
 parser.add_argument('-nil', '--num_inner_loop', required=True, type=int)
@@ -30,6 +31,7 @@ parser.add_argument('-ac', '--armijo_const', required=True, type=float)
 
 args = parser.parse_args()
 
+env_name = args.environment
 pg_method = args.pg_method
 num_outer_loop = args.num_outer_loop
 num_inner_loop = args.num_inner_loop if args.num_inner_loop >= 0 else None
@@ -56,7 +58,20 @@ gamma = 0.9
 episode_cutoff_length = 100
 reward_noise = 0
 
-env = CliffWorld(P=P, r=r, mu=mu, terminal_states=terminal_states,
+if env_name == 'CliffWorld':
+    P = P_CliffWorld
+    r = r_CliffWorld
+    mu = mu_CliffWorld
+    terminal_states = terminal_states_CliffWorld
+elif env_name == 'DeepSeaTreasure':
+    P = P_DeepSeaTreasure
+    r = r_DeepSeaTreasure
+    mu = mu_DeepSeaTreasure
+    terminal_states = terminal_states_DeepSeaTreasure
+else:
+    raise NotImplementedError()
+
+env = TabularMDP(P=P, r=r, mu=mu, terminal_states=terminal_states,
                  gamma=gamma, episode_cutoff_length=episode_cutoff_length,
                  reward_noise=reward_noise)
 
@@ -78,8 +93,8 @@ print('Total time taken: {}'.format(time.time() - tic))
 #----------------------------------------------------------------------
 # save the data
 #----------------------------------------------------------------------
-folder_name = 'fmapg_DAT/CliffWorld_{}_{}_{}'.format(
-    pg_method, optim_type, stepsize_type)
+folder_name = 'fmapg_DAT/{}_{}_{}_{}'.format(
+    env_name, pg_method, optim_type, stepsize_type)
 os.makedirs(folder_name, exist_ok='True')
 
 filename='{}/nmOtrLp_{}__nmInrLp_{}'\

@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 import pdb
 
 #======================================================================
@@ -23,7 +24,7 @@ import pdb
 # -------------------         3, 2, 1 are chasms  
 # | 3 | 8 | 13 | 18 |         0 is the start state
 # ------------------- 
-# | 2 | 7 | 12 | 17 |         all transitions are determinitic
+# | 2 | 7 | 12 | 17 |         all transitions are deterministic
 # -------------------         Actions: 0=down, 1=up, 2=left, 3=right
 # | 1 | 6 | 11 | 16 |
 # ------------------------    rewards are all zeros except at chasms (-100)
@@ -63,12 +64,65 @@ r[4, :] = +1 # positive reward for finding the goal terminal state
 mu = np.zeros(21)
 mu[0] = 1
 
-# mu[:] = 1 / 21
-
 terminal_states = [20]
+
+P_CliffWorld = copy.deepcopy(P)
+r_CliffWorld = copy.deepcopy(r)
+mu_CliffWorld = copy.deepcopy(mu)
+terminal_states_CliffWorld = copy.deepcopy(terminal_states)
+#======================================================================
+
+#======================================================================
+# Deep Sea Treasure
+#----------------------------------------------------------------------
+# ------------------------    20 is the goal state
+# | 4 | 9 | 14 | 19 | 24 |    0, 5, 10, 15, 20 are terminal states
+# ------------------------    4 is the start state
+# | 3 | 8 | 13 | 18 | 23 |    
+# ------------------------
+# | 2 | 7 | 12 | 17 | 22 |    all transitions are deterministic
+# ------------------------    Actions: 0=left, 1=right
+# | 1 | 6 | 11 | 16 | 21 |
+# ------------------------    rewards are all -0.01/5 except at state 20
+# | 0 | 5 | 10 | 15 | 20 |    reward for going into the goal state is +1
+# ------------------------
+#----------------------------------------------------------------------
+terminal_states = [0, 5, 10, 15, 20]
+
+# environment P: (i, j, k)th element = Pr{S' = s_k | S = s_i, A = a_j}
+P = np.zeros((25, 2, 25))
+for state_idx in range(25):
+    for action_idx in range(2):
+        if state_idx in terminal_states: # terminal states
+            new_state_idx = state_idx
+        else: # move according to the deterministic dynamics
+            x_new = x_old = state_idx // 5
+            y_new = y_old = state_idx % 5
+            if action_idx == 0: # left
+                x_new = np.clip(x_old - 1, 0, 4)
+            elif action_idx == 1: # right
+                x_new = np.clip(x_old + 1, 0, 4)
+            y_new = y_old - 1
+            new_state_idx = 5 * x_new + y_new
+
+        P[state_idx, action_idx, new_state_idx] = 1
+        
+r = (-0.01 / 5) * np.ones((25, 2))
+r[16, 1] = r[21, 1] = +1 # positive reward for finding the goal terminal state
+for s in terminal_states:
+    r[s, :] = 0
+
+mu = np.zeros(25)
+mu[4] = 1
+
+P_DeepSeaTreasure = copy.deepcopy(P)
+r_DeepSeaTreasure = copy.deepcopy(r)
+mu_DeepSeaTreasure = copy.deepcopy(mu)
+terminal_states_DeepSeaTreasure = copy.deepcopy(terminal_states)
+
 #======================================================================
         
-class CliffWorld():
+class TabularMDP():
     def __init__(self, P, r, mu, terminal_states, gamma, episode_cutoff_length,
                  reward_noise):
         self.P = P

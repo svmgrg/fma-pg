@@ -45,6 +45,7 @@ def make_single_inner_loop_update(optim_type, stepsize_type, omega,
         # https://en.wikipedia.org/wiki/Backtracking_line_search#Motivation
         cm = armijo_const * (objective_grad * update_direction).sum()
         alpha = alpha_init
+
         t = 0
         while True:
             omega_tmp = omega + alpha * update_direction
