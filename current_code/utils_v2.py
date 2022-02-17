@@ -15,6 +15,11 @@ def softmax(x):
     out = e_x / e_x.sum(1).reshape(-1, 1)
     return out
 
+def log_divide(p, q):
+    clip_p = np.clip(p, a_min=1e-8, a_max=1-1e-8) 
+    clip_q = np.clip(q, a_min=1e-8, a_max=1-1e-8)        
+    return np.log(clip_p / clip_q)
+
 def make_single_inner_loop_update(optim_type, stepsize_type, omega,
                                   update_direction, calc_objective_fn,
                                   calc_constraint_fn=None,
@@ -81,9 +86,8 @@ def make_single_inner_loop_update(optim_type, stepsize_type, omega,
 #     pi = softmax(omega)
 #     KL = entropy(pi, pi_t, axis=1).reshape(-1, 1)
 #     adv_sum = (pi * adv_t).sum(1).reshape(-1, 1)
-#     clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1 - 1e-6)
 #     grad = (dpi_t.reshape(-1, 1) / eta) * pi \
-#         * (eta * adv_t - eta * adv_sum - np.log(pi / clipped_pi_t) + KL)
+#         * (eta * adv_t - eta * adv_sum - np.log(pi / pi_t) + KL)
 #     return grad
 
 #----------------------------------------------------------------------
@@ -106,9 +110,8 @@ def analytical_update_fmapg(pi_old, eta, adv, pg_method):
 
 def calc_objective(omega, pi_t, adv_t, qpi_t, dpi_t, pg_method, epsilon=None):
     pi = softmax(omega)
-    if pg_method in ['sPPO']:
-        clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1-1e-6)        
-        obj = (dpi_t * (pi_t * adv_t * np.log(pi / clipped_pi_t)).sum(1)).sum()
+    if pg_method in ['sPPO']:      
+        obj = (dpi_t * (pi_t * adv_t * log_divide(pi, pi_t)).sum(1)).sum()
     elif pg_method in ['TRPO']:
         obj = (dpi_t * (pi * qpi_t).sum(1)).sum()
     elif pg_method in ['MDPO']:
@@ -141,7 +144,7 @@ def calc_obj_grad(omega, pi_t, adv_t, qpi_t, dpi_t, pg_method, epsilon=None):
         adv_avg = (pi * adv_t).sum(1).reshape(-1, 1)
         obj_grad = dpi_t.reshape(-1, 1) * pi * (adv_t - adv_avg)
     elif pg_method in ['PPO']:
-        clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1-1e-6)  
+        clipped_pi_t = np.clip(pi_t, a_min=1e-8, a_max=1-1e-8)  
         ratio = pi / clipped_pi_t
         cond = np.logical_or(np.logical_and(adv_t > 0, ratio < 1 + epsilon),
                              np.logical_and(adv_t < 0, ratio > 1 - epsilon))
@@ -156,8 +159,7 @@ def calc_cst_grad(omega, pi_t, dpi_t, pg_method):
         cst_grad =  dpi_t.reshape(-1, 1) * (pi - pi_t)
     elif pg_method in ['MDPO']:
         KL = entropy(pi, pi_t, axis=1).reshape(-1, 1)
-        clipped_pi_t = np.clip(pi_t, a_min=1e-6, a_max=1-1e-6)
-        cst_grad = dpi_t.reshape(-1, 1) * pi * (np.log(pi / clipped_pi_t) - KL)
+        cst_grad = dpi_t.reshape(-1, 1) * pi * (log_divide(pi, pi_t) - KL)
     
     return cst_grad
 
@@ -177,39 +179,63 @@ def calc_A_matrix(num_states, num_actions, omega, pi_t, dpi_t, pg_method):
         for state_i in range(num_states):
             pi_s = pi[state_i, :]
             pi_t_s = pi_t[state_i, :]
-            clipped_pi_t_s = np.clip(pi_t_s, a_min=1e-6, a_max=1-1e-6)
-            T_vec = pi_s * (
-                np.log(pi_s / clipped_pi_t_s) - entropy(pi_s, pi_t_s) + 1)
+            T_vec = pi_s * (log_divide(pi_s, pi_t_s)
+                            - entropy(pi_s, pi_t_s) + 1)
             beg = num_actions * state_i
             end = beg + num_actions
             
+            # A[beg:end, beg:end] \
+            #     = dpi_t[state_i] * (np.diag(T_vec) - 2 * np.outer(pi_s, T_vec)
+            #                         + np.outer(pi_s, pi_s))
             A[beg:end, beg:end] \
-                = dpi_t[state_i] * (np.diag(T_vec) - 2 * np.outer(pi_s, T_vec)
+                = dpi_t[state_i] * (np.diag(T_vec) - np.outer(pi_s, T_vec)
+                                    - np.outer(T_vec, pi_s)
                                     + np.outer(pi_s, pi_s))
     else:
         raise NotImplementedError()
     
     return A
 
-#----------------------------------------------------------------------
-# TRPO
-#----------------------------------------------------------------------
 # calc_A_matrix_slow is an alternate way of calculating the above matrix, and
 # serves as a check for the function calc_A_matrix()
-def calc_A_matrix_slow(num_states, num_actions, dpi_t, pi):
-    # only for verifying if calc_A_matrix() works correctly
-    n = num_states * num_actions
-    A = np.zeros((n, n))
-    for state_i in range(num_states):
-        for action_i in range(num_actions):
-            for state_j in range(num_states):
-                for action_j in range(num_actions):
-                    row = state_i * num_actions + action_i
-                    col = state_j * num_actions + action_j
-                    A[row, col] = (state_i == state_j) * dpi_t[state_j] \
-                        * ((action_i == action_j) - pi[state_j, action_i]) \
-                        * pi[state_j, action_j]
-    return A
+# def calc_A_matrix_slow(num_states, num_actions, omega, pi_t, dpi_t, pg_method):
+#     # only for verifying if calc_A_matrix() works correctly
+#     pi = softmax(omega)
+#     n = num_states * num_actions
+#     A = np.zeros((n, n))
+
+#     if pg_method in ['TRPO', 'sPPO']:
+#         for state_i in range(num_states):
+#             for action_i in range(num_actions):
+#                 for state_j in range(num_states):
+#                     for action_j in range(num_actions):
+#                         row = state_i * num_actions + action_i
+#                         col = state_j * num_actions + action_j
+#                         A[row, col] = (state_i == state_j) * dpi_t[state_j] \
+#                             * ((action_i == action_j) - pi[state_j, action_i]) \
+#                             * pi[state_j, action_j]
+#     elif pg_method in ['MDPO']:
+#         for state_i in range(num_states):
+#             for action_i in range(num_actions):
+#                 for state_j in range(num_states):
+#                     for action_j in range(num_actions):
+#                         row = state_i * num_actions + action_i
+#                         col = state_j * num_actions + action_j
+
+#                         clipped_pi_t = np.clip(pi_t[state_i, action_j],
+#                                                  a_min=1e-8, a_max=1-1e-8)
+#                         T_itd_s_aprime = \
+#                             np.log(pi[state_i, action_j] / clipped_pi_t) \
+#                             - entropy(pi[state_i, :], pi_t[state_i, :])
+                        
+#                         A[row, col] = (state_i == state_j) * dpi_t[state_j] \
+#                             * ((action_i == action_j) * pi[state_i, action_i] \
+#                                * T_itd_s_aprime - 2 * pi[state_i, action_j] \
+#                                * pi[state_i, action_i] * T_itd_s_aprime \
+#                                + pi[state_i, action_j] * pi[state_i, action_i])
+#     else:
+#         raise NotImplementedError() 
+#     return A
 
 # compute the maximum stepsize using the equations given in Appendix C of
 # Schulman et al. (2015)
@@ -218,11 +244,14 @@ def calc_max_stepsize(update_direction, A, delta, alpha_max):
         alpha = alpha_max
     else:
         update_direction_flatten = update_direction.reshape(-1, 1)
-        alpha = 2 * delta / np.matmul(
-            np.matmul(update_direction_flatten.T, A),
-            update_direction_flatten).item()
-        alpha = np.sqrt(alpha)
-        
+        denom = np.matmul(np.matmul(update_direction_flatten.T, A),
+                          update_direction_flatten).item()
+        if denom < 1e-128:
+            alpha = alpha_max
+        else:
+            alpha = 2 * delta / denom
+            alpha = np.sqrt(alpha)
+            
     if alpha > alpha_max:
         alpha = alpha_max
         
@@ -283,7 +312,7 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
         #     print('kill outside')
         #     break
         
-        # print(T, np.linalg.norm(J_pi_grad))
+        print(T, np.linalg.norm(J_pi_grad))
 
         vpi_outer_list.append(env.calc_vpi(pi, FLAG_RETURN_V_S0=True))
 
@@ -332,6 +361,10 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
                     A = calc_A_matrix(num_states=num_states,
                                       num_actions=num_actions, omega=omega,
                                       pi_t=pi, dpi_t=dpi, pg_method=pg_method)
+                    # A_slow = calc_A_matrix(
+                    #     num_states=num_states, num_actions=num_actions,
+                    #     omega=omega, pi_t=pi, dpi_t=dpi, pg_method=pg_method)
+                    
                     # s_flatten = np.linalg.solve(A, objective_grad_flatten)
                     # had problems with A being singular; so used pseudo-inverse
                     update_direction_flatten = np.matmul(
