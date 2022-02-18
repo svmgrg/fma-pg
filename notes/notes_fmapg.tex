@@ -63,7 +63,7 @@
 
 \section{Appendix}
 \subsection{Experiments on the Tabular CliffWorld Environment}
-In this section, we study the performance of five different policy gradient (PG) algorithms, sPPO (Softmax PPO\footnote{Note that this is NOT the sPPO of Section 6.2; we just overloaded this notation.}, FMA-PG with a softmax policy, see Eq. 8 in main text), MDPO, PPO, TRPO, and TRPO with KL regularization (which we call as TRPO-KL). We use a tabular gridworld environment called CliffWorld and a tabular softmax policy parameterization. The environment description and its properties are discussed in Figure \ref{fig: cliffworld}.
+In this section, we study the performance of five different policy gradient (PG) algorithms, sMDPO (Softmax PPO\footnote{Note that this is NOT the sMDPO of Section 6.2; we just overloaded this notation.}, FMA-PG with a softmax policy, see Eq. 8 in main text), MDPO, PPO, TRPO, and TRPO with KL regularization (which we call as TRPO-KL). We use a tabular gridworld environment called CliffWorld and a tabular softmax policy parameterization. The environment description and its properties are discussed in Figure \ref{fig: cliffworld}.
 
 \begin{figure}[!hbp]
   \centering
@@ -72,18 +72,18 @@ In this section, we study the performance of five different policy gradient (PG)
   \label{fig: cliffworld}
 \end{figure}
 
-To make the results easier to interpret and make them closely follow the theoretical properties of the PG methods, we assume full access to the environment dynamics and use the analytically calculated expected gradient updates for all the five algorithms. Doing so, essentially made this a study of the optimization properties of the above five PG algorithms. We trained each of the method for 2000 iterations. Each iteration consisted of one or multiple inner updates (we represent this number by $m$); these updates are performed in an off-policy fashion that is typical of all these algorithms (also see Algorithm 1, main paper). We also sweeped over the relevant parameters of the PG algorithms. For sPPO and MDPO, this was $\eta \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$ and inner loop stepsize $\alpha \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$. For PPO, we sweeped over the stepsize $\alpha \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$ and the clipping parameter $\epsilon \in \{0.1, 0.2, \ldots, 0.9\}$. For TRPO, we sweeped over the trust region size $\delta \in \{2^{-13}, 2^{-11}, \ldots, 2^{13}\}$ and the line search stepsize decay parameter $\text{df} \in \{0.1, 0.2, \ldots, 0.9\}$. And for TRPO-KL (see \S \ref{sec: trpo_kl}), this was KL regularization factor $\delta \in \{2^{-13}, 2^{-11}, \ldots, 2^{13}\}$ and inner loop stepsize $\alpha \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$.
+To make the results easier to interpret and make them closely follow the theoretical properties of the PG methods, we assume full access to the environment dynamics and use the analytically calculated expected gradient updates for all the five algorithms. Doing so, essentially made this a study of the optimization properties of the above five PG algorithms. We trained each of the method for 2000 iterations. Each iteration consisted of one or multiple inner updates (we represent this number by $m$); these updates are performed in an off-policy fashion that is typical of all these algorithms (also see Algorithm 1, main paper). We also sweeped over the relevant parameters of the PG algorithms. For sMDPO and MDPO, this was $\eta \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$ and inner loop stepsize $\alpha \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$. For PPO, we sweeped over the stepsize $\alpha \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$ and the clipping parameter $\epsilon \in \{0.1, 0.2, \ldots, 0.9\}$. For TRPO, we sweeped over the trust region size $\delta \in \{2^{-13}, 2^{-11}, \ldots, 2^{13}\}$ and the line search stepsize decay parameter $\text{df} \in \{0.1, 0.2, \ldots, 0.9\}$. And for TRPO-KL (see \S \ref{sec: trpo_kl}), this was KL regularization factor $\delta \in \{2^{-13}, 2^{-11}, \ldots, 2^{13}\}$ and inner loop stepsize $\alpha \in \{2^{-13}, 2^{-12}, \ldots, 2^3\}$.
 
 In the next section, we present the learning curves for these algorithms corresponding to the best hyperparameter configurations. After that we present the parameter sensitivity plots. We then describe our conclusions from these experiments. Finally, we also include the gradient calculations used in our implementations and associated details for all the methods.
 
 \subsubsection{Learning Curves and Parameter Sensitivity Plots}
 We show the performance of the five algorithms against the number of outer loop iterations in Figure \ref{fig: learning_curves}. The three different subplots correspond to a different number of inner updates\footnote{For TRPO, in the third subplot we just reused the performance from $m=100$. From our sensitivity plots (Figure \ref{fig: sensitivity}) we observed that the performance of TRPO saturated after $m = 10$; in particular the TRPO sensitivity plots are identical for $m=10$ and $m=100$. Therefore, its performance at $m=1000$ should be exactly equivalent to its performance at $m=100$ and consequently we skipped running that experiment.}. To select the hyperparameters for each setting, we ran sweeps over different configurations and chose the ones that resulted in the best final performance at the end of 2000 iterations.
 
-From this figure, we see that TRPO learned the optimal policy in less than 20 iterations. Whereas, PPO got stuck in a ``safe'' sub-optimal policy. MDPO, sPPO, and TRPO-KL were all able to achieve the optimal policy with 100 and 1000 number of inner iterations, but got stuck in the suboptimal policy with 10 number of inner iterations. We further observe that increasing the number of inner loop iterations helped all the methods, except TRPO (which was already super fast), to improve the convergence speed. We should also mention, although TRPO had the faster convergence, its update was also the costliest (more than ten times slower than the rest of the methods) in terms of wall time. 
+From this figure, we see that TRPO learned the optimal policy in less than 20 iterations. Whereas, PPO got stuck in a ``safe'' sub-optimal policy. MDPO, sMDPO, and TRPO-KL were all able to achieve the optimal policy with 100 and 1000 number of inner iterations, but got stuck in the suboptimal policy with 10 number of inner iterations. We further observe that increasing the number of inner loop iterations helped all the methods, except TRPO (which was already super fast), to improve the convergence speed. We should also mention, although TRPO had the faster convergence, its update was also the costliest (more than ten times slower than the rest of the methods) in terms of wall time. 
 
-We show the complete parameter sweeps for the different methods in Figure \ref{fig: sensitivity}. The different rows correspond to different algorithms and the columns correspond to different number of inner loop updates. Each algorithm has two parameters: the $x$ axis gives the value of one of these parameters and the shaded curves correspond to the other parameter. The $y$ axis shows the final performance of the algorithm at the end of 2000 iterations corresponding to the particular parameter configuration. We also include the sensitivity plots for sPPO and MDPO under analytical updates, which is equivalent of doing an infinite number of inner loop updates ($m = \infty$) with a small enough stepsize $\alpha$.
+We show the complete parameter sweeps for the different methods in Figure \ref{fig: sensitivity}. The different rows correspond to different algorithms and the columns correspond to different number of inner loop updates. Each algorithm has two parameters: the $x$ axis gives the value of one of these parameters and the shaded curves correspond to the other parameter. The $y$ axis shows the final performance of the algorithm at the end of 2000 iterations corresponding to the particular parameter configuration. We also include the sensitivity plots for sMDPO and MDPO under analytical updates, which is equivalent of doing an infinite number of inner loop updates ($m = \infty$) with a small enough stepsize $\alpha$.
 
-From this figure we see that for $m=1$ all the algorithms, except TRPO, had a poor performance. And as the value of $m$ increased, these algorithms were able to perform well with a large number of stepsizes. We also note that, each of sPPO, MDPO, and TRPO-KL achieved the optimal policy for some parameter configurations, whereas PPO failed to achieve the optimal policy for any stepsize configuration we tried. sPPO, MDPO, and TRPO-KL had good performance for a range of parameters. Also, not the that for all values of $\eta < 1 - \gamma = 0.1$, which was suggested by the theory for sPPO, worked well. TRPO had a very low sensitivity for all its parameters, probably because TRPO uses the (near) optimal steepest ascent direction with the maximal stepsize, achieved via line search. This gives TRPO much better convergence properties, especially in this case where there are no sampling or estimation errors. Also, we think that the trust region parameter $\delta = 4$ was already too small for this problem and therefore TRPO performed well for all the values below it. Interestingly, TRPO-KL (which corresponds to an unconstrained optimization problem and doesn't use line search) did not enjoy these properties. TRPO-KL's performance for certain values of $\delta$ was very similar to PPO; and for other values was superior to PPO. And it was slighltly less sensitive to the hyperparameters as compared to sPPO and MDPO.
+From this figure we see that for $m=1$ all the algorithms, except TRPO, had a poor performance. And as the value of $m$ increased, these algorithms were able to perform well with a large number of stepsizes. We also note that, each of sMDPO, MDPO, and TRPO-KL achieved the optimal policy for some parameter configurations, whereas PPO failed to achieve the optimal policy for any stepsize configuration we tried. sMDPO, MDPO, and TRPO-KL had good performance for a range of parameters. Also, not the that for all values of $\eta < 1 - \gamma = 0.1$, which was suggested by the theory for sMDPO, worked well. TRPO had a very low sensitivity for all its parameters, probably because TRPO uses the (near) optimal steepest ascent direction with the maximal stepsize, achieved via line search. This gives TRPO much better convergence properties, especially in this case where there are no sampling or estimation errors. Also, we think that the trust region parameter $\delta = 4$ was already too small for this problem and therefore TRPO performed well for all the values below it. Interestingly, TRPO-KL (which corresponds to an unconstrained optimization problem and doesn't use line search) did not enjoy these properties. TRPO-KL's performance for certain values of $\delta$ was very similar to PPO; and for other values was superior to PPO. And it was slighltly less sensitive to the hyperparameters as compared to sMDPO and MDPO.
 
 \begin{figure}[!bp]
   \centering
@@ -100,16 +100,16 @@ From this figure we see that for $m=1$ all the algorithms, except TRPO, had a po
 \end{figure}
 
 \subsubsection{Conclusions}
-The experiments for sPPO served as a verification of the theoretical properties of the FMA-PG framework studied in this paper. We also compared it against other popular policy gradient algorithms from a pure optimization perspective. Our results demonstrated that sPPO was competitive (or superior) to the popular PG methods. It was also somewhat robust to the hyperparameters; in particular we found that the algorithm, for all the value of $\eta$ suggested by theory, was able to converge to a locally optimal policy. The results also highlighted the importance of re-using data, i.e. doing multiple off-policy type of PG updates: as we increased the number of inner updates, the performance of all the methods seem to improve. They not only enjoyed faster convergence, but they also started to work for a wider range of parameters. This demonstrates the strength of these methods over simpler algorithms like REINFORCE (Williams, 1992) which only have a single update per batch of sampled data. To conclude, experiments with sPPO suggest that the FMA-PG framework is a systematic way of obtaining new policy gradient algorithms that enjoy desirable theoretical properties and can be competitive to existing PG method, as suggested by our empirical results. We also include the self-contained code for these experiments with the submission.
+The experiments for sMDPO served as a verification of the theoretical properties of the FMA-PG framework studied in this paper. We also compared it against other popular policy gradient algorithms from a pure optimization perspective. Our results demonstrated that sMDPO was competitive (or superior) to the popular PG methods. It was also somewhat robust to the hyperparameters; in particular we found that the algorithm, for all the value of $\eta$ suggested by theory, was able to converge to a locally optimal policy. The results also highlighted the importance of re-using data, i.e. doing multiple off-policy type of PG updates: as we increased the number of inner updates, the performance of all the methods seem to improve. They not only enjoyed faster convergence, but they also started to work for a wider range of parameters. This demonstrates the strength of these methods over simpler algorithms like REINFORCE (Williams, 1992) which only have a single update per batch of sampled data. To conclude, experiments with sMDPO suggest that the FMA-PG framework is a systematic way of obtaining new policy gradient algorithms that enjoy desirable theoretical properties and can be competitive to existing PG method, as suggested by our empirical results. We also include the self-contained code for these experiments with the submission.
 
-In the rest of this section, as promised, we give the calculations (the closed form analytical solutions for sPPO and MDPO, and the gradient expressions for all the five algorithms) employed in our empirical implementation.
+In the rest of this section, as promised, we give the calculations (the closed form analytical solutions for sMDPO and MDPO, and the gradient expressions for all the five algorithms) employed in our empirical implementation.
 
 \subsection{Softmax PPO with Tabular Parameterization}
 
 \subsubsection{Closed Form Update with Direct Representation}
 Our goal is to find the closed form solution to the following optimization problem (from Eq. 8, main paper):
 \begin{equation}
-  \pi_{t+1} = \arg\max_{\pi \in \Pi} \underbrace{\left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \left(A^{\pi_t}(s, a) + \frac{1}{\eta} \right) \log \frac{p^\pi(s, a)}{p^{\pi_t}(s, a)} \right]}_{=: \ell^{\pi_t}_{\text{sPPO}}}, \label{eq: optim_problem_sppo}
+  \pi_{t+1} = \arg\max_{\pi \in \Pi} \underbrace{\left[ \sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) \left(A^{\pi_t}(s, a) + \frac{1}{\eta} \right) \log \frac{p^\pi(s, a)}{p^{\pi_t}(s, a)} \right]}_{=: \ell^{\pi_t}_{\text{sMDPO}}}, \label{eq: optim_problem_sppo}
 \end{equation}
 subject to the constraints on policy $p^\pi$. We will solve this problem by assuming the policy $\pi \equiv p^\pi$ as an $|\mathcal{S}| \times |\mathcal{A}|$ table satisfying the standard constraints
 \begin{align*}
@@ -170,7 +170,7 @@ where $\theta(x, b)$ for all state-action pairs $(x, b)$ are action preferences 
 where $\mathbb{I}(a = b)$ is the identity function when $a = b$ and zero otherwise. 
 We will use gradient ascent to approximately solve Eq. \ref{eq: optim_problem_sppo}; to do that, the quantity of interest is
 \begin{align}
-  \frac{\partial}{\partial \theta(s, a)} \ell^{\pi_t}_{\text{sPPO}} &= \sum_{x \in \mathcal{S}} \sum_{b \in \mathcal{A}} \left[ \frac{\partial}{\partial \theta(s, a)} p^\pi(b | x) \right] \left[ \frac{\partial}{\partial p^\pi(b | x)} \ell^{\pi_t}_{\text{sPPO}} \right] \tag*{(using total derivative)} \\
+  \frac{\partial}{\partial \theta(s, a)} \ell^{\pi_t}_{\text{sMDPO}} &= \sum_{x \in \mathcal{S}} \sum_{b \in \mathcal{A}} \left[ \frac{\partial}{\partial \theta(s, a)} p^\pi(b | x) \right] \left[ \frac{\partial}{\partial p^\pi(b | x)} \ell^{\pi_t}_{\text{sMDPO}} \right] \tag*{(using total derivative)} \\
   &= \sum_{x, b} \Big[ \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^\pi(a | x) \Big) p^\pi(b | x) \Big] \left[ d^{\pi_t}(x) p^{\pi_t}(b|x) \left( A^{\pi_t}(x, b) + \frac{1}{\eta} \right) \frac{1}{p^\pi(b|x)} \right] \nonumber \\
   &= \E_{X \sim d^{\pi_t}, B \sim p^{\pi_t}(\cdot | X)} \left[ \mathbb{I}(X = s) \Big( \mathbb{I}(B = a) - p^\pi(a | x) \Big) \left( A^{\pi_t}(X, B) + \frac{1}{\eta} \right) \right] \\
   &= d^{\pi_t}(s) \sum_b \Big( \mathbb{I}(b = a) - p^\pi(a | s) \Big) p^{\pi_t}(b|s) \left( A^{\pi_t}(s, b) + \frac{1}{\eta} \right) \nonumber \\
@@ -245,7 +245,7 @@ At each step of the policy update, TRPO (Eq. 14, Schulman et al., 2015) solves t
 \begin{equation}
   \max_\theta \; \underbrace{\sum_s d^{\pi_t}(s) \sum_a p^{\pi_\theta}(a | s) Q^{\pi_t}(s, a)}_{=: \mathcal{J}_{\text{TRPO}}} \qquad \text{subject to } \underbrace{\sum_s d^{\pi_t}(s) \cdot \text{KL}(p^{\pi_t}(\cdot | s) \| p^{\pi_\theta}(\cdot | s))}_{=: \mathcal{C}_{\text{TRPO}}} \leq \delta.  
 \end{equation}
-Unlike the sPPO and the MDPO updates, an analytical solution cannot be derived for this update (since it would require solving a system of non-trivial non-linear equations; to see this, try writing the KKT conditions for the above constrained optimization problem). Therefore, we will use gradient based methods to approximately solve this problem. From Appendix C of Schulman et al. (2015), the descent direction is given by $s \approx A^{-1} g$ where the vector $g$ is defined as $g_{(s, a)} := \frac{\partial}{\partial \theta(s, a)} \mathcal{J}_{\text{TRPO}}$, and the matrix $A$ is defined as $A_{(s, a), (s', a')} := \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{TRPO}}$. We analytically compute the expression for this direction assuming a softmax policy (Eq. \ref{eq: softmax}). The vector $g$ can be readily calculated as
+Unlike the sMDPO and the MDPO updates, an analytical solution cannot be derived for this update (since it would require solving a system of non-trivial non-linear equations; to see this, try writing the KKT conditions for the above constrained optimization problem). Therefore, we will use gradient based methods to approximately solve this problem. From Appendix C of Schulman et al. (2015), the descent direction is given by $s \approx A^{-1} g$ where the vector $g$ is defined as $g_{(s, a)} := \frac{\partial}{\partial \theta(s, a)} \mathcal{J}_{\text{TRPO}}$, and the matrix $A$ is defined as $A_{(s, a), (s', a')} := \frac{\partial}{\partial \theta(s, a)} \frac{\partial}{\partial \theta(s', a')} \mathcal{C}_{\text{TRPO}}$. We analytically compute the expression for this direction assuming a softmax policy (Eq. \ref{eq: softmax}). The vector $g$ can be readily calculated as
 \begin{align}
   \frac{\partial}{\partial \theta(s, a)} \mathcal{J}_{\text{TRPO}} &= \sum_x d^{\pi_t}(x) \sum_b Q^{\pi_t}(x, b) \frac{\partial p^{\pi_\theta}(b | x)}{\partial \theta(s, a)} \nonumber \\
   &= \sum_x d^{\pi_t}(x) \sum_b Q^{\pi_t}(x, b) \mathbb{I}(x = s) \Big( \mathbb{I}(b = a) - p^{\pi_\theta}(a | x) \Big) p^{\pi_\theta}(b | x) \nonumber \\
@@ -300,7 +300,7 @@ The PPO gradient (Eq. \ref{eq: ppo_gradient}) is exactly the same as the TRPO gr
   \begin{tabular}{c|l|c}
     \textbf{PG Alg.} & \hspace{2cm} \textbf{Objective} $(\mathcal{J})$ & \textbf{Constraint} $(\mathcal{C})$ \\
     \hline \hline
-    sPPO &
+    sMDPO &
     $\sum_s d^{\pi_t}(s) \sum_a p^{\pi_t}(a | s) A^{\pi_t}(s, a) \log \frac{p^{\pi_\theta}(s, a)}{p^{\pi_t}(s, a)}$ &
     $\sum_s d^{\pi_t}(s) \cdot \text{KL}(p^{\pi_t}(\cdot | s) \| p^{\pi_\theta}(\cdot | s))$\\
     \hline
@@ -333,7 +333,7 @@ and for the constrained version,
   \begin{tabular}{c|l|c}
     \textbf{PG Alg.} & \hspace{1cm} \textbf{Grad. objective} $(\nabla_{\theta(s, a)} \mathcal{J})$ & \textbf{Grad. constraint} $(\nabla_{\theta(s, a)} \mathcal{C})$ \\
     \hline \hline
-    sPPO &
+    sMDPO &
     $d^{\pi_t}(s) p^{\pi_t}(a|s) A^{\pi_t}(s, a)$ &
     $d^{\pi_t}(s) \left[ p^\pi(a | s) - p^{\pi_t}(a|s) \right]$ \\
     \hline
@@ -353,7 +353,7 @@ and for the constrained version,
 \subsection{MDPO with Constraints}
 \begin{align}
   \frac{\partial}{\partial p^\pi(b | x)} \frac{\partial \mathcal{C}_{\text{MDPO}}}{\partial \theta(s', a')} &= \frac{\partial}{\partial p^\pi(b | x)} d^{\pi_t}(s') p^\pi(a' | s') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - \sum_c p^\pi(c | s') \log \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')} \right) \nonumber \\
-  &= \mathbb{I}(x = s') d^{\pi_t}(s') \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - \sum_c p^\pi(c | s') \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')} \right) \nonumber \\
+  &= \mathbb{I}(x = s') d^{\pi_t}(s') \Bigg[ \mathbb{I}(b = a') \left( \log \frac{p^\pi(a' | s')}{p^{\pi_t}(a' | s')} - \sum_c p^\pi(c | s') \log \frac{p^\pi(c | s')}{p^{\pi_t}(c | s')} \right) \nonumber \\
     & \qquad \qquad \qquad \qquad \quad + p^\pi(a' | s') \frac{\mathbb{I}(b = a')}{p^\pi(a' | s')} - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg] \nonumber \\
   &= \mathbb{I}(x = s') d^{\pi_t}(s') \Bigg[ \mathbb{I}(b = a') \cdot T_{\text{itd}}(s', a') - p^\pi(a' | s') \left( \log \frac{p^\pi(b | s')}{p^{\pi_t}(b | s')} + 1 \right) \Bigg],
 \end{align}
@@ -371,19 +371,22 @@ where the auxillary term $T_{\text{aux}}$ is
   & \qquad - p^\pi(a | s) T_{\text{itd}}(s, a') \sum_{b} p^\pi(b | s) \mathbb{I}(b = a') + p^\pi(a' | s) p^\pi(a | s) \sum_{b} p^\pi(b | s) \left( \log \frac{p^\pi(b | s)}{p^{\pi_t}(b | s)} + 1 \right) \nonumber \\  
   &= T_{\text{itd}}(s, a') p^\pi(a | s) \mathbb{I}(a = a') - p^\pi(a' | s) p^\pi(a | s) \left( \log \frac{p^\pi(a | s)}{p^{\pi_t}(a | s)} + 1 \right) \nonumber \\
   & \qquad - p^\pi(a | s) T_{\text{itd}}(s, a') p^\pi(a' | s) + p^\pi(a' | s) p^\pi(a | s) \Big( \text{KL}( p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s) ) + 1 \Big) \nonumber \\
-  &= \mathbb{I}(a = a') p^\pi(a | s) T_{\text{itd}}(s, a') - 2 p^\pi(a' | s) p^\pi(a | s) T_{\text{itd}}(s, a') + p^\pi(a' | s) p^\pi(a | s).
+  &= \mathbb{I}(a = a') p^\pi(a | s) T_{\text{itd}}(s, a') - p^\pi(a' | s) p^\pi(a | s) \Big[ T_{\text{itd}}(s, a') + T_{\text{itd}}(s, a) \Big] + p^\pi(a' | s) p^\pi(a | s).
 \end{align}
 Therefore, 
 \begin{align}
-  \frac{\partial}{\partial \theta(s, a)} \frac{\partial \mathcal{C}_{\text{MDPO}}}{\partial \theta(s', a')} &= \mathbb{I}(s = s') d^{\pi_t}(s) \bigg[ \mathbb{I}(a = a') p^\pi(a | s) T_{\text{itd}}(s, a') - 2 p^\pi(a' | s) p^\pi(a | s) T_{\text{itd}}(s, a') \nonumber \\
-    & \qquad \qquad \qquad \qquad \quad + p^\pi(a' | s) p^\pi(a | s) \bigg] \\
-  \Rightarrow \qquad \qquad A_{(s, :), (s, :)} &= d^{\pi_t}(s) \cdot \left[ \text{diag} \big( T_{\text{vec}}(s) \big) - 2 p^{\pi}(\cdot | s) T_{\text{vec}}(s)^\top + p^{\pi}(\cdot | s) p^{\pi}(\cdot | s)^\top \right],
+  \frac{\partial}{\partial \theta(s, a)} \frac{\partial \mathcal{C}_{\text{MDPO}}}{\partial \theta(s', a')} &= \mathbb{I}(s = s') d^{\pi_t}(s) \bigg[ \mathbb{I}(a = a') p^\pi(a | s) T_{\text{itd}}(s, a') - p^\pi(a | s) p^\pi(a' | s) T_{\text{itd}}(s, a') \nonumber \\
+    & \qquad \qquad \qquad \qquad \quad - p^\pi(a' | s) p^\pi(a | s) T_{\text{itd}}(s, a) + p^\pi(a' | s) p^\pi(a | s) \bigg] \\
+  \Rightarrow \qquad \qquad A_{(s, :), (s, :)} &= d^{\pi_t}(s) \cdot \Big[ \text{diag} \big( T_{\text{vec}}(s) \big) - p^{\pi}(\cdot | s) T_{\text{vec}}(s)^\top \nonumber \\
+    & \qquad \qquad \qquad - T_{\text{vec}}(s) p^{\pi}(\cdot | s)^\top + p^{\pi}(\cdot | s) p^{\pi}(\cdot | s)^\top \Big],
 \end{align}
-where we use introduced yet another intermediate term $T_{\text{vec}}(s)$, defined as
+where we introduced yet another intermediate term $T_{\text{vec}}(s)$, defined as
 \begin{align}
   T_{\text{vec}}(s) &:= p^{\pi}(\cdot | s) \odot T_{\text{itd}}(s, \cdot) \\
-  &= p^{\pi}(\cdot | s) \odot \left[ \log \Big( p^\pi(\cdot | s) \oslash p^{\pi_t}(\cdot | s) \Big) - \text{KL} (p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s)) \mathbf{1}_{|\mathcal{A}|} + \mathbf{1}_{|\mathcal{A}|} \right].
+  &= p^{\pi}(\cdot | s) \odot \left[ \log \Big( p^\pi(\cdot | s) \oslash p^{\pi_t}(\cdot | s) \Big) - \text{KL} (p^\pi(\cdot | s) \| p^{\pi_t}(\cdot | s)) \mathbf{1}_{|\mathcal{A}|} + \mathbf{1}_{|\mathcal{A}|} \right],
 \end{align}
+and $\oslash$ in the above equation represents the elementwise vector division defined as $[a \oslash b]_i := a_i / b_i$ for any two vectors $a$ and $b$. As a sanity check, note that the matrix $A_{(s, :), (s, :)}$ is symmetric, as any Hessian matrix should be.
+
 
 \section*{References}
 
