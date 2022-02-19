@@ -93,7 +93,7 @@ print('Total time taken: {}'.format(time.time() - tic))
 #----------------------------------------------------------------------
 # save the data
 #----------------------------------------------------------------------
-folder_name = 'fmapg_DAT/{}_{}_{}_{}'.format(
+folder_name = 'fmapg_DAT2/{}_{}_{}_{}'.format(
     env_name, pg_method, optim_type, stepsize_type)
 os.makedirs(folder_name, exist_ok='True')
 
@@ -137,9 +137,9 @@ with open(filename, 'w') as fp:
 
 # python run_exp_v2.py --pg_method 'TRPO' --num_outer_loop 2000 --num_inner_loop 10 --FLAG_SAVE_INNER_STEPS 'True' --alpha_max 100 --FLAG_WARM_START 'True' --warm_start_factor 2 --max_backtracking_steps 100 --optim_type 'regularized' --stepsize_type 'line_search' --eta 0.1 --epsilon -1 --delta -1 --alpha_fixed -1 --decay_factor 0.9 --armijo_const 0.5
 
-# python run_exp_v2.py --pg_method 'sPPO' --num_outer_loop 2000 --num_inner_loop 1000 --FLAG_SAVE_INNER_STEPS 'False' --alpha_max -1 --FLAG_WARM_START 'False' --warm_start_factor -1 --max_backtracking_steps -1 --optim_type 'regularized' --stepsize_type 'fixed' --eta 0.03125 --epsilon -1 --delta -1 --alpha_fixed 0.125 --decay_factor -1 --armijo_const -1
+# python run_exp_v2.py --environment 'CliffWorld' --pg_method 'sPPO' --num_outer_loop 2000 --num_inner_loop 10 --FLAG_SAVE_INNER_STEPS 'False' --alpha_max -1 --FLAG_WARM_START 'False' --warm_start_factor -1 --max_backtracking_steps -1 --optim_type 'regularized' --stepsize_type 'fixed' --eta 0.015625 --epsilon -1 --delta -1 --alpha_fixed 0.2 --decay_factor -1 --armijo_const -1
 
 
 # constrained
 
-# python run_exp_v2.py --pg_method 'MDPO' --num_outer_loop 2000 --num_inner_loop 10 --FLAG_SAVE_INNER_STEPS 'False' --alpha_max -1 --FLAG_WARM_START 'False' --warm_start_factor -1 --max_backtracking_steps 1000 --optim_type 'constrained' --stepsize_type 'line_search' --eta -1 --epsilon -1 --delta 0.1 --alpha_fixed -1 --decay_factor 0.9 --armijo_const 0
+# python run_exp_v2.py --environment 'CliffWorld' --pg_method 'MDPO' --num_outer_loop 2000 --num_inner_loop 10 --FLAG_SAVE_INNER_STEPS 'False' --alpha_max 100000 --FLAG_WARM_START 'False' --warm_start_factor -1 --max_backtracking_steps 1000 --optim_type 'constrained' --stepsize_type 'line_search' --eta -1 --epsilon -1 --delta 0.1 --alpha_fixed -1 --decay_factor 0.9 --armijo_const 0

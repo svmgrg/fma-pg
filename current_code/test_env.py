@@ -19,12 +19,14 @@ from environments import *
 #======================================================================
 # Testing code (plotting dynamics)
 #======================================================================
-env_simone = CliffWorld(
-    P=P_simone, r=r_simone, mu=mu_simone, terminal_states=terminal_states_simone,
+env_DST = TabularMDP(
+    P=P_DeepSeaTreasure, r=r_DeepSeaTreasure, mu=mu_DeepSeaTreasure,
+    terminal_states=terminal_states_DeepSeaTreasure,
     gamma=0.9, episode_cutoff_length=1000, reward_noise=0)
 
-env = CliffWorld(
-    P=P, r=r, mu=mu, terminal_states=terminal_states,
+env_CW = TabularMDP(
+    P=P_CliffWorld, r=r_CliffWorld, mu=mu_CliffWorld,
+    terminal_states=terminal_states_CliffWorld,
     gamma=0.9, episode_cutoff_length=1000, reward_noise=0)
 
 color_list = ['tab:orange', 'tab:blue', 'tab:red', 'tab:green']
@@ -33,52 +35,57 @@ y_diff = [0.5, 0.5, 0.3, 0.7]
 
 fig, axs = plt.subplots(2, 2, figsize=(10, 10))
 
-xlim = ylim = 7
-# make grid
-for x in range(xlim + 1):
-    axs[0, 0].plot((x, x), (0, ylim), linewidth=0.5, color='black')
-for y in range(ylim + 1):
-    axs[0, 0].plot((0, xlim), (y, y), linewidth=0.5, color='black')
-# show the transition dynamics
-for state_idx in range(xlim * ylim):
-    x_old, y_old = state_idx // ylim, state_idx % ylim
-    for action_idx in range(4):
-        next_state_idx = env_simone.P[state_idx, action_idx].nonzero()[0].item()
-        x_new, y_new = next_state_idx // ylim, next_state_idx % ylim
-        axs[0, 0].quiver(x_old + x_diff[action_idx], y_old + y_diff[action_idx],
-                      x_new - x_old, y_new - y_old,
-                      color=color_list[action_idx], width=0.007, headwidth=2,
-                      headlength=4, scale=1, scale_units='xy', linewidth=0.1)
-# show the state indices
-for x in range(xlim):
-    for y in range(ylim):
-        state_idx = ylim * x + y
-        axs[0, 0].text(x + 0.3, y + 0.3, str(state_idx),
-                    fontsize='large', fontweight='bold')
-
 xlim = 4
 ylim = 5
 # make grid
 for x in range(xlim + 2):
-    axs[0, 1].plot((x, x), (0, ylim), linewidth=0.5, color='black')
+    axs[0, 0].plot((x, x), (0, ylim), linewidth=0.5, color='black')
 for y in range(ylim + 1):
-    axs[0, 1].plot((0, xlim + 1), (y, y), linewidth=0.5, color='black')
+    axs[0, 0].plot((0, xlim + 1), (y, y), linewidth=0.5, color='black')
 # show the transition dynamics
 for state_idx in range(xlim * ylim + 1):
     x_old, y_old = state_idx // ylim, state_idx % ylim
     for action_idx in range(4):
-        next_state_idx = env.P[state_idx, action_idx].nonzero()[0].item()
+        next_state_idx = env_CW.P[state_idx, action_idx].nonzero()[0].item()
         x_new, y_new = next_state_idx // ylim, next_state_idx % ylim
-        axs[0, 1].quiver(x_old + x_diff[action_idx], y_old + y_diff[action_idx],
-                      x_new - x_old, y_new - y_old,
-                      color=color_list[action_idx], width=0.007, headwidth=2,
-                      headlength=4, scale=1, scale_units='xy', linewidth=0.1)
+        axs[0, 0].quiver(x_old + x_diff[action_idx], y_old + y_diff[action_idx],
+                         x_new - x_old, y_new - y_old,
+                         color=color_list[action_idx], width=0.007, headwidth=2,
+                         headlength=4, scale=1, scale_units='xy', linewidth=0.1)
 # show the state indices
 for state_idx in range(21):
     x = state_idx // ylim
     y = state_idx % ylim
+    axs[0, 0].text(x + 0.3, y + 0.3, str(state_idx),
+                   fontsize='large', fontweight='bold')
+
+
+xlim = 5
+ylim = 5
+# make grid
+for x in range(xlim + 1):
+    axs[0, 1].plot((x, x), (0, ylim), linewidth=0.5, color='black')
+for y in range(ylim + 1):
+    axs[0, 1].plot((0, xlim), (y, y), linewidth=0.5, color='black')
+# show the transition dynamics
+for state_idx in range(xlim * ylim):
+    x_old, y_old = state_idx // ylim, state_idx % ylim
+    for action_idx in range(2):
+        next_state_idx = env_DST.P[state_idx, action_idx].nonzero()[0].item()
+        x_new, y_new = next_state_idx // ylim, next_state_idx % ylim
+        axs[0, 1].quiver(x_old + x_diff[action_idx], y_old + y_diff[action_idx],
+                         x_new - x_old, y_new - y_old,
+                         color=color_list[action_idx], width=0.007, headwidth=2,
+                         headlength=4, scale=1, scale_units='xy', linewidth=0.1)
+# show the state indices
+for state_idx in range(25):
+    x = state_idx // ylim
+    y = state_idx % ylim
     axs[0, 1].text(x + 0.3, y + 0.3, str(state_idx),
                 fontsize='large', fontweight='bold')
+
+plt.show()
+exit()
 
 #======================================================================
 # Testing code (testing similarity of learning curves from the paper)

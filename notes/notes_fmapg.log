@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.12.11)  17 FEB 2022 16:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.12.11)  19 FEB 2022 06:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -530,111 +530,2213 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 61.
 (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<tabular_figures/cliffworld.pdf, id=62, 1211.30019pt x 509.25706pt>
-File: tabular_figures/cliffworld.pdf Graphic file (type pdf)
-<use tabular_figures/cliffworld.pdf>
-Package pdftex.def Info: tabular_figures/cliffworld.pdf  used on input line 70.
 
-(pdftex.def)             Requested size: 436.06773pt x 183.3324pt.
+LaTeX Warning: Reference `eq:fmd-softmax-kl-practical' on page 1 undefined on i
+nput line 65.
 
 
-LaTeX Warning: Reference `sec: trpo_kl' on page 1 undefined on input line 75.
+LaTeX Warning: Reference `eq:fmd-softmax-statewise' on page 1 undefined on inpu
+t line 65.
+
+
+LaTeX Warning: Reference `alg:generic' on page 1 undefined on input line 74.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.74 ...ing as \texttt{Regularized+fixed_stepsize}
+                                                  . We can equivalently solv...
+
+? 
+! Extra }, or forgotten $.
+<recently read> \egroup 
+                        
+l.74 ...ing as \texttt{Regularized+fixed_stepsize}
+                                                  . We can equivalently solv...
+
+? 
+! Undefined control sequence.
+<argument> ... PPO with KL penalty (Eq. 8, \citet 
+                                                  {schulman2017proximal}) ex...
+l.74 ...L divergence given in the original paper.}
+                                                   as well.
+? 
+! Undefined control sequence.
+<argument> ...n the TRPO paper (Section 4, \citet 
+                                                  {schulman2015trust}) excep...
+l.74 ...L divergence given in the original paper.}
+                                                   as well.
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.75 
+     
+? 
+
+Overfull \hbox (60.28166pt too wide) in paragraph at lines 73--75
+\OT1/cmtt/m/n/10 Regularized+fixed$[]\OML/cmm/m/it/10 tepsize:Wecanequivalently
+solvesuchanunconstrainedoptimizationproblembyusinganArmijo \OMS/cmsy/m/n/10 ^^@
+
+ []
+
+
+Overfull \hbox (281.30331pt too wide) in paragraph at lines 73--75
+\OML/cmm/m/it/10 stylebacktrackinglinesearch; whichwecallas[]:Notethat; wecanus
+ethissameformtoobtainaregularizedversionoftheTRPOalgorithm[][][]aswell:$ 
+ []
+
+
+Overfull \hbox (45.0279pt too wide) in paragraph at lines 100--101
+[]\OT1/cmtt/m/n/10 On the other hand, the conventional TRPO algorithm instead s
+olves a constrained optimization
+ []
 
 [1
 
 {/usr/local/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map}pdfTeX wa
-rning (ext4): destination with the same identifier (name{figure.1}) has been al
-ready used, duplicate ignored
+rning (ext4): destination with the same identifier (name{table.1}) has been alr
+eady used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.76 
-      <./tabular_figures/cliffworld.pdf>]
-<tabular_figures/learning_curves.pdf, id=1211, 772.31708pt x 245.59233pt>
-File: tabular_figures/learning_curves.pdf Graphic file (type pdf)
-<use tabular_figures/learning_curves.pdf>
-Package pdftex.def Info: tabular_figures/learning_curves.pdf  used on input lin
-e 90.
-(pdftex.def)             Requested size: 463.39383pt x 147.35652pt.
+l.103 \end{equation}
+                    ]
 
-Overfull \hbox (10.42593pt too wide) in paragraph at lines 90--91
- [][] 
+LaTeX Warning: Reference `eq:regularized_program' on page 2 undefined on input 
+line 104.
+
+
+LaTeX Warning: Reference `eq:constrained_program' on page 2 undefined on input 
+line 104.
+
+! Undefined control sequence.
+l.104 ...ame process used by the TRPO paper \citep
+                                                  {schulman2015trust}: we us...
+
+? 
+
+LaTeX Warning: Reference `app:trpo' on page 2 undefined on input line 104.
+
+
+LaTeX Warning: Reference `eq:constrained_program' on page 2 undefined on input 
+line 104.
+
+
+Overfull \hbox (3.69727pt too wide) in paragraph at lines 103--105
+\OT1/cmtt/m/n/10 with the terms $\OMS/cmsy/m/n/10 J[]$ \OT1/cmtt/m/n/10 and $\O
+MS/cmsy/m/n/10 C[]$ \OT1/cmtt/m/n/10 again given in Table []1[]. The regularize
+d program of Eq.
  []
 
-[2]
-<tabular_figures/sensitivity.pdf, id=1221, 972.00592pt x 854.56288pt>
-File: tabular_figures/sensitivity.pdf Graphic file (type pdf)
-<use tabular_figures/sensitivity.pdf>
-Package pdftex.def Info: tabular_figures/sensitivity.pdf  used on input line 97
+
+Overfull \hbox (20.25027pt too wide) in paragraph at lines 103--105
+[] \OT1/cmtt/m/n/10 can be considered a ``softer'' version of the constrained p
+rogram of Eq. []. To solve
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 103--105
+\OT1/cmtt/m/n/10 the constrained optimization problem, we use the exact same pr
+ocess used by the TRPO paper
+ []
+
+
+Overfull \hbox (51.02771pt too wide) in paragraph at lines 103--105
+\OT1/cmtt/m/n/10 schulman2015trust: we use line search to find the maximal step
+size that increases the objective
+ []
+
+
+Overfull \hbox (9.38922pt too wide) in paragraph at lines 103--105
+\OT1/cmtt/m/n/10 value in the direction of maximum ascent while satisfying the 
+constraint; see Section []
+ []
+
+
+Overfull \hbox (4.13927pt too wide) in paragraph at lines 103--105
+\OT1/cmtt/m/n/10 for details. We call this setting as Constrained+line search. 
+Further, using Eq. [],
+ []
+
+
+Overfull \hbox (8.27821pt too wide) in paragraph at lines 106--107
+[]\OT1/cmtt/m/n/10 The motivation behind considering these three different vari
+ants for sMDPO, MDPO, and
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 106--107
+\OT1/cmtt/m/n/10 TRPO is to figure out that how much of the performance differe
+nce between these algorithms
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 106--107
+\OT1/cmtt/m/n/10 comes from their exact objectives (Table []1[]) and how much o
+f it comes from the optimization
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 106--107
+\OT1/cmtt/m/n/10 techniques employed. We also summarize the gradient of these o
+bjectives in Table []2[]. The
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 106--107
+\OT1/cmtt/m/n/10 corresponding gradient derivations for the algorithms (includi
+ng PPO) are presented in Appendix
+ []
+
+! Undefined control sequence.
+l.133 ...cliffworld}) and DeepSeaTreasure  (\citet
+                                                  {osband2019behaviour}; wit...
+
+? 
+
+Overfull \hbox (24.77794pt too wide) in paragraph at lines 133--134
+\OT1/cmtt/m/n/10 In all our tabular experiments, we assumed full access to the 
+environment dynamics and used
+ []
+
+
+Overfull \hbox (24.77794pt too wide) in paragraph at lines 133--134
+\OT1/cmtt/m/n/10 the analytically calculated expected gradient updates for all 
+the algorithms, and therefore
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 133--134
+\OT1/cmtt/m/n/10 the results closely follow the theoretical properties of the P
+G methods. Doing so, essentially
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 133--134
+\OT1/cmtt/m/n/10 made this a study of the optimization properties of the four P
+G algorithms considered. We
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 133--134
+\OT1/cmtt/m/n/10 use a policy gradient agent with a tabular softmax policy para
+meterization, and evaluate
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 133--134
+\OT1/cmtt/m/n/10 the algorithms on two tabular episodic environments: CliffWorl
+d (environment description
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 133--134
+\OT1/cmtt/m/n/10 and its properties are discussed in Figure []1[]) and DeepSeaT
+reasure (osband2019behaviour;
+ []
+
+
+LaTeX Warning: File `cliffworld.pdf' not found on input line 137.
+
+
+! Package pdftex.def Error: File `cliffworld.pdf' not found: using draft settin
+g.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.137 ...cludegraphics[scale=0.36]{cliffworld.pdf}
+                                                  
+? 
+! Undefined control sequence.
+<argument> ...ld environment (Example 6.6, \citet 
+                                                  {sutton18book}) containing...
+l.138 ...ften get stuck on one of these policies.}
+                                                  
+? 
+! Undefined control sequence.
+<argument> ...ld environment (Example 6.6, \citet 
+                                                  {sutton18book}) containing...
+l.138 ...ften get stuck on one of these policies.}
+                                                  
+? 
+! Undefined control sequence.
+<argument> ...ld environment (Example 6.6, \citet 
+                                                  {sutton18book}) containing...
+l.138 ...ften get stuck on one of these policies.}
+                                                  
+? 
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<deep_sea_treasure_ablation.pdf, id=98, 1192.8841pt x 484.04507pt>
+File: deep_sea_treasure_ablation.pdf Graphic file (type pdf)
+<use deep_sea_treasure_ablation.pdf>
+Package pdftex.def Info: deep_sea_treasure_ablation.pdf  used on input line 144
 .
-(pdftex.def)             Requested size: 437.39862pt x 384.54974pt.
- [3pdfTeX warning (ext4): destination with the same identifier (name{figure.2})
+(pdftex.def)             Requested size: 407.66833pt x 165.42252pt.
+LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10> not available
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 149.
+
+LaTeX Warning: Reference `alg:generic' on page 2 undefined on input line 149.
+
+
+LaTeX Warning: Reference `app:trpo' on page 2 undefined on input line 149.
+
+
+Overfull \hbox (8.27821pt too wide) in paragraph at lines 149--150
+[]\OT1/cmtt/m/n/10 Hyperparameter configurations: We trained each of the method
+ for 2000 iterations for
+ []
+
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 CliffWorld (200 iterations for DeepSeaTreasure). Each iteratio
+n consisted of multiple inner
+ []
+
+
+Overfull \hbox (23.05817pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 loop updates (we represent this number by $\OML/cmm/m/it/10 m$
+\OT1/cmtt/m/n/10 ); these updates are performed in an off-policy
+ []
+
+
+Overfull \hbox (19.88913pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 fashion that is typical of all these algorithms (also see Algo
+rithm [] in the main paper).
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 We swept over the relevant parameters of the PG algorithms. Fo
+r the Regularized variants
+ []
+
+
+Overfull \hbox (34.42224pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 (both with and without line search) of sMDPO, MDPO, and TRPO, 
+this was $\OML/cmm/m/it/10 ^^Q \OMS/cmsy/m/n/10 2 f\OT1/cmr/m/n/10 2[]\OML/cmm/
+m/it/10 ; \OT1/cmr/m/n/10 2[]\OML/cmm/m/it/10 ; [] ; \OT1/cmr/m/n/10 2[]\OMS/cm
+sy/m/n/10 g$\OT1/cmtt/m/n/10 .
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 For fixed stepsize variant of sMDPO, MDPO, TRPO, and PPO, we s
+wept over the inner loop stepsize
+ []
+
+
+Overfull \hbox (8.4218pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 PPO, we additionally considered the clipping parameter $\OML/c
+mm/m/it/10 ^^O \OMS/cmsy/m/n/10 2 f\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/
+m/n/10 01\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 
+1\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 2\OML/cm
+m/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 3 [] \OML/cmm/m/
+it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8\OML/cmm/m/it/10 ; 
+\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 9\OML/cmm/m/it/10 ; \OT1/cmr
+/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 99\OMS/cmsy/m/n/10 g$\OT1/cmtt/m/n/1
+0 .
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 For the Regularized+line search variant of sMDPO, MDPO, TRPO, 
+we also considered different
+ []
+
+
+Overfull \hbox (56.14005pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 Armijo constant in the set $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 
+0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cm
+m/m/it/10 :\OT1/cmr/m/n/10 1\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/1
+0 :\OT1/cmr/m/n/10 3\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/
+cmr/m/n/10 5\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/
+10 7\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 9\OML
+/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 99\OMS/cmsy/m
+/n/10 g$\OT1/cmtt/m/n/10 , and used a decay factor of 0.9, initialized
+ []
+
+
+Overfull \hbox (65.8335pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 the maximal stepsize to $\OT1/cmr/m/n/10 10\OML/cmm/m/it/10 :\
+OT1/cmr/m/n/10 0$ \OT1/cmtt/m/n/10 and used a warm-start factor of $\OT1/cmr/m/
+n/10 2\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 0$\OT1/cmtt/m/n/10 . Finally, for the C
+onstrained+line
+ []
+
+
+Overfull \hbox (65.42079pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 search variant of sMDPO, MDPO, and TRPO, we swept over the tru
+st region size $\OML/cmm/m/it/10 ^^N \OMS/cmsy/m/n/10 2 f\OT1/cmr/m/n/10 2[]\OM
+L/cmm/m/it/10 ; \OT1/cmr/m/n/10 2[]\OML/cmm/m/it/10 ; [] ; \OT1/cmr/m/n/10 2[]\
+OMS/cmsy/m/n/10 g$\OT1/cmtt/m/n/10 ,
+ []
+
+
+Overfull \hbox (24.77794pt too wide) in paragraph at lines 149--150
+\OT1/cmtt/m/n/10 used a fixed backtracking decay parameter of 0.9, an analytica
+lly obtained maximal stepsize
+ []
+
+[2pdfTeX warning (ext4): destination with the same identifier (name{table.2}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.150 
+      ]
+! Missing $ inserted.
+<inserted text> 
+                $
+l.152 ...MDPO (\texttt{Regularized+fixed_stepsize}
+                                                  ), conventional TRPO (\tex...
+
+? 
+! Extra }, or forgotten $.
+<recently read> \egroup 
+                        
+l.152 ...MDPO (\texttt{Regularized+fixed_stepsize}
+                                                  ), conventional TRPO (\tex...
+
+? 
+
+LaTeX Warning: Reference `fig:learning_curves' on page 3 undefined on input lin
+e 152.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.153 
+      
+? 
+
+Overfull \hbox (61.52762pt too wide) in paragraph at lines 152--153
+\OT1/cmtt/m/n/10 Learning Curves: We show the learning curves corresponding to 
+the best performing hyperparameters
+ []
+
+
+Overfull \hbox (1787.79454pt too wide) in paragraph at lines 152--153
+\OT1/cmtt/m/n/10 for the four algorithms conventional sMDPO and MDPO (Regulariz
+ed+fixed$[]\OML/cmm/m/it/10 tepsize\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; conventi
+onalTRPO\OT1/cmr/m/n/10 ([])\OML/cmm/m/it/10 ; andPPOinFigure[]\OT1/cmr/m/n/10 
+(\OML/cmm/m/it/10 mainpaper\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 :Toselectthehyperp
+arametersforeachsetting; weransweepsoverdifferentconfigurationsandchosetheonest
+hatresultedinthebestfinalperformanceattheendof\OT1/cmr/m/n/10 2000\OML/cmm/m/it
+/10 iterationsforCliffWorld\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 and\OT1/cmr/m/n/10
+ 200\OML/cmm/m/it/10 iterationsforDeepSeaTreasure\OT1/cmr/m/n/10 )\OML/cmm/m/it
+/10 :Fromthisfigure; weseethatforCliffWorld; allthemethodsexceptPPO\OT1/cmr/m/n
+/10 (\OML/cmm/m/it/10 PPOgotstuckina\OT1/cmr/m/n/10 \\OML/cmm/m/it/10 safe[]sub
+ \OMS/cmsy/m/n/10 ^^@
+ []
+
+
+Overfull \hbox (1771.22078pt too wide) in paragraph at lines 152--153
+\OML/cmm/m/it/10 optimalpolicy\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 areabletoconver
+getotheoptimalpolicy; andTRPOhasthefastestconvergence\OT1/cmr/m/n/10 (\OML/cmm/
+m/it/10 learnedtheoptimalpolicyinlessthan\OT1/cmr/m/n/10 200\OML/cmm/m/it/10 it
+erations\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 :OntheotherhandforDeepSeaTreasure; we
+notethatallthemethodsconvergetotheoptimalpolicywithPPOhavingthefastestconvergen
+ceandTRPOhavingtheslowestconvergence:Finally; weshouldalsomentionthattheTRPO[]s
+updatewasthecostliest\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 morethantwotimesslowerth
+antherestofthemethods\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 intermsofwalltime; likel
+ybecauseofthebacktrackingfromtheline \OMS/cmsy/m/n/10 ^^@
+ []
+
+[3pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) 
+has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.153 
+      pdfTeX warning (ext4): destination with the same identifier (name{figure.
+2}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.153 
+       <./deep_sea_treasure_ablation.pdf>]
+
+LaTeX Warning: Reference `fig:cliffworld_sensitivity_plots' on page 4 undefined
+ on input line 154.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.154 ...iants \texttt{Regularized+fixed_stepsize}
+                                                  , \texttt{Regularized+line...
+
+? 
+! Extra }, or forgotten $.
+<recently read> \egroup 
+                        
+l.154 ...iants \texttt{Regularized+fixed_stepsize}
+                                                  , \texttt{Regularized+line...
+
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.154 ...s shows the regularization strength $\eta
+                                                  $. For the \texttt{Regular...
+
+? 
+
+Overfull \hbox (29.27803pt too wide) in paragraph at lines 154--155
+[]\OT1/cmtt/m/n/10 Parameter Sensitivity and Ablation Study: We show the final 
+performance for sMDPO, MDPO,
+ []
+
+
+Overfull \hbox (30.38904pt too wide) in paragraph at lines 154--155
+\OT1/cmtt/m/n/10 and TRPO in Figure [] (after 2000 iterations for CliffWorld; m
+ain paper) and Figure []3[] (after
+ []
+
+
+Overfull \hbox (1555.12457pt too wide) in paragraph at lines 154--155
+\OT1/cmtt/m/n/10 200 iterations for DeepSeaTreasure). The different rows corres
+pond to the variants Regularized+fixed$[]\OML/cmm/m/it/10 tepsize; []; and[]for
+eachofthemethods:Anddifferentcolumnscorrespondtodifferentnumberofinnerloopupdat
+es[][][]:Thelastcolumnineachrowshowsthelearningcurvesforthebestperformingparame
+tersetting:The$\OT1/cmtt/m/n/10 x$\OMS/cmsy/m/n/10 ^^@\OML/cmm/m/it/10 axisonea
+chsubplotoffirsttworowsshowstheregularizationstrength$$^^Q$\OT1/cmtt/m/n/10 .
+ []
+
+
+Overfull \hbox (10.21216pt too wide) in paragraph at lines 154--155
+\OT1/cmtt/m/n/10 For the Regularization + fixed stepsize variant, we chose the 
+best performing $\OML/cmm/m/it/10 $ \OT1/cmtt/m/n/10 for each
+ []
+
+
+Overfull \hbox (35.35197pt too wide) in paragraph at lines 154--155
+\OML/cmm/m/it/10 ^^Q$\OT1/cmtt/m/n/10 , and for Regularization + line search va
+riant, we chose the best performing Armijo constant
+ []
+
+
+Overfull \hbox (35.35197pt too wide) in paragraph at lines 154--155
+\OT1/cmtt/m/n/10 for each $\OML/cmm/m/it/10 ^^Q$\OT1/cmtt/m/n/10 . The last row
+ (constrained variant) had only a single parameter, the trust region
+ []
+
+
+Overfull \hbox (6.55844pt too wide) in paragraph at lines 156--157
+[]\OT1/cmtt/m/n/10 From these figures, we see as the value of $\OML/cmm/m/it/10
+ m$ \OT1/cmtt/m/n/10 increased, the performance of the fixed
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 stepsize algorithms improved. We also note that adding line se
+arch to regularized methods
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 improved their parameter sensitivity to a large extent. Althou
+gh, for CliffWorld, none
+ []
+
+
+Overfull \hbox (24.77794pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 of the Regularized+line search variant were able to achieve th
+e optimal policy. We believe
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 that the reason for this is that with warm-start the algorithm
+s started using very large
+ []
+
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 stepsizes (as large as 1000), which lead to an early convergen
+ce to a locally optimal policy.
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 To verify this further, we tried running these algorithms with
+out warm start and a maximal
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 stepsize of 1.0; this allowed the methods to achieve the optim
+al policy for a small range
+ []
+
+
+Overfull \hbox (45.92601pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 of $\OML/cmm/m/it/10 ^^Q$ \OT1/cmtt/m/n/10 values, but also ma
+de them much more sensitive different $\OML/cmm/m/it/10 ^^Q$\OT1/cmtt/m/n/10 s.
+ For the constrained version,
+ []
+
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 we see that all the three algorithms achieve the optimal polic
+y and are generally insensitive
+ []
+
+
+Overfull \hbox (34.8508pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 to the $\OML/cmm/m/it/10 ^^N$ \OT1/cmtt/m/n/10 values. This is
+ likely because this variant uses the (near) optimal steepest ascent
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 direction with the maximal stepsize, achieved via line search.
+ Finally, we note that for
+ []
+
+
+Overfull \hbox (40.5278pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 DeepSeaTreasure, all the methods had essentially the same perf
+ormance and achieved the optimal
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 156--157
+\OT1/cmtt/m/n/10 policy in each case; we attribute this to the simplicity of th
+e environment coupled with
+ []
+
+
+Overfull \hbox (18.77812pt too wide) in paragraph at lines 158--159
+[]\OT1/cmtt/m/n/10 We provide the sensitivity plot for PPO for the two environm
+ents in Figure []2[]. We again
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 158--159
+\OT1/cmtt/m/n/10 see that increasing the number of inner updates helps PPO achi
+eve better performance on
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 158--159
+\OT1/cmtt/m/n/10 both the environments. We also note that for no value of the p
+arameters we tested, did
+ []
+
+<ppo.pdf, id=442, 1135.63664pt x 367.30132pt>
+File: ppo.pdf Graphic file (type pdf)
+<use ppo.pdf>
+Package pdftex.def Info: ppo.pdf  used on input line 162.
+(pdftex.def)             Requested size: 407.66833pt x 131.85286pt.
+[4pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) 
+has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.170 \item T
+             he optimization methods might matter as much as the policy grad...
+ <./ppo.pdf>]
+Overfull \hbox (18.27824pt too wide) in paragraph at lines 170--171
+[]\OT1/cmtt/m/n/10 The optimization methods might matter as much as the policy 
+gradient objectives being
+ []
+
+
+Overfull \hbox (44.52802pt too wide) in paragraph at lines 170--171
+\OT1/cmtt/m/n/10 considered. In particular, we found that much of TRPO's perfor
+mance came from formalizing
+ []
+
+
+Overfull \hbox (2.52838pt too wide) in paragraph at lines 170--171
+\OT1/cmtt/m/n/10 the optimization problem as a constrained program solved using
+ the optimal descent
+ []
+
+
+Overfull \hbox (34.0281pt too wide) in paragraph at lines 170--171
+\OT1/cmtt/m/n/10 direction and a large stepsize found using line search. Not on
+ly did TRPO's performance
+ []
+
+
+Overfull \hbox (7.77834pt too wide) in paragraph at lines 170--171
+\OT1/cmtt/m/n/10 suffer when we replaced the constraint with regularization, th
+e performance of both
+ []
+
+
+Overfull \hbox (7.77834pt too wide) in paragraph at lines 170--171
+\OT1/cmtt/m/n/10 sMDPO and MDPO improved significantly when we used TRPO style 
+optimization on their
+ []
+
+
+Overfull \hbox (7.77834pt too wide) in paragraph at lines 170--171
+\OT1/cmtt/m/n/10 objectives. Additionally, we found that line search greatly im
+proved the parameter
+ []
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.171 ...y the \texttt{Regularized+fixed_stepsize}
+                                                   variants of sMDPO and MDP...
+
+? 
+! Extra }, or forgotten $.
+<recently read> \egroup 
+                        
+l.171 ...y the \texttt{Regularized+fixed_stepsize}
+                                                   variants of sMDPO and MDP...
+
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.171 ... results. For instance, the maximal $\eta
+                                                  $ values for CliffWorld are
+? 
+
+Overfull \hbox (520.75214pt too wide) in paragraph at lines 171--172
+[]\OT1/cmtt/m/n/10 We also note that the optimal $\OML/cmm/m/it/10 ^^Q$ \OT1/cm
+tt/m/n/10 values chosen by the Regularized+fixed$[]\OML/cmm/m/it/10 tepsizevari
+antsofsMDPOandMDPOweremuchlargerthanthevaluespredictedbyourtheoreticalresults:F
+orinstance; themaximal$$^^Q$
+ []
+
+
+LaTeX Warning: Reference `fig:learning_curves' on page 5 undefined on input lin
+e 181.
+
+
+Overfull \hbox (18.35237pt too wide) in paragraph at lines 180--182
+\OT1/cmtt/m/n/10 Note that these values of $\OML/cmm/m/it/10 ^^Q$ \OT1/cmtt/m/n
+/10 are extremely small, and while the FMA-PG framework still
+ []
+
+
+Overfull \hbox (23.5282pt too wide) in paragraph at lines 180--182
+\OT1/cmtt/m/n/10 guarantees policy improvement with these values, the convergen
+ce would be much slower.
+ []
+
+
+Overfull \hbox (34.10223pt too wide) in paragraph at lines 180--182
+\OT1/cmtt/m/n/10 This is natural since these $\OML/cmm/m/it/10 ^^Q$ \OT1/cmtt/m
+/n/10 bounds are based on the smoothness of the policy objective
+ []
+
+
+Overfull \hbox (0.7276pt too wide) in paragraph at lines 180--182
+\OMS/cmsy/m/n/10 J$ \OT1/cmtt/m/n/10 and such bounds are usually quite loose. F
+inally, also note that the optimal $\OML/cmm/m/it/10 ^^Q$
+ []
+
+
+Overfull \hbox (13.38943pt too wide) in paragraph at lines 180--182
+\OT1/cmtt/m/n/10 for sMDPO found by the experiments (in Figure []) is closer to
+ that predicted by the
+ []
+
+! Undefined control sequence.
+l.182 ... simpler algorithms like REINFORCE \citep
+                                                  {williams1992simple} which...
+
+? 
+
+Overfull \hbox (2.52838pt too wide) in paragraph at lines 182--183
+[]\OT1/cmtt/m/n/10 Each of the algorithms benefited from increasing the number 
+of inner loop updates.
+ []
+
+
+Overfull \hbox (18.27824pt too wide) in paragraph at lines 182--183
+\OT1/cmtt/m/n/10 These off-policy type of updates allow PG algorithms to ``maxi
+mally squeeze'' out all
+ []
+
+
+Overfull \hbox (23.5282pt too wide) in paragraph at lines 182--183
+\OT1/cmtt/m/n/10 the information present in the data they have already collecte
+d, thereby allowing them
+ []
+
+
+Overfull \hbox (23.5282pt too wide) in paragraph at lines 182--183
+\OT1/cmtt/m/n/10 to improve their performance without any additional interactio
+ns with the environment.
+ []
+
+
+Overfull \hbox (23.5282pt too wide) in paragraph at lines 182--183
+\OT1/cmtt/m/n/10 This demonstrates the strength of these methods over simpler a
+lgorithms like REINFORCE
+ []
+
+! Missing } inserted.
+<inserted text> 
+                }
+l.183 \end{enumerate}
+                     
+? 
+
+Overfull \hbox (50.27785pt too wide) in paragraph at lines 185--186
+[]\OT1/cmtt/m/n/10 To conclude, our experiments suggest that FMA-PG provides ge
+neral purpose surrogate functions
+ []
+
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 185--186
+\OT1/cmtt/m/n/10 with policy improvement guarantees, which when combined with e
+xisting optimization techniques
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 185--186
+\OT1/cmtt/m/n/10 can yield policy gradient algorithms that are competitive to e
+xisting state-of-the-art methods. 
+ []
+
+[5]
+Overfull \hbox (24.77794pt too wide) in paragraph at lines 189--190
+\OT1/cmtt/m/n/10 In the rest of this section, we give the calculations (the clo
+sed form analytical solutions
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 189--190
+\OT1/cmtt/m/n/10 for sMDPO and MDPO, and the gradient expressions for all four 
+algorithms) employed in our
+ []
+
+
+LaTeX Warning: Reference `eq:fmd-softmax-kl-practical' on page 6 undefined on i
+nput line 193.
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 193--194
+\OT1/cmtt/m/n/10 Our goal is to find the closed form solution to the following 
+optimization problem (from
+ []
+
+
+Overfull \hbox (24.73676pt too wide) in paragraph at lines 196--198
+\OT1/cmtt/m/n/10 subject to the constraints on policy $\OML/cmm/m/it/10 p[]$\OT
+1/cmtt/m/n/10 . We will solve this problem by assuming the policy
+ []
+
+
+Overfull \hbox (5.75867pt too wide) in paragraph at lines 201--203
+\OT1/cmtt/m/n/10 We begin by formulating this problem using Lagrange multiplier
+s $\OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 ^^U[]\OMS/cmsy/m/n/10 g[]$ \OT1/cmtt/m/n/
+10 and $\OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 ^^U[]\OMS/cmsy/m/n/10 g[]$
+ []
+
+! Undefined control sequence.
+l.207 ... The KKT conditions (Theorem 12.1, \citet
+                                                  {nocedal2006numerical}) fo...
+
+? 
+
+Overfull \hbox (20.77779pt too wide) in paragraph at lines 206--208
+\OT1/cmtt/m/n/10 where we abused the notation, in $\OMS/cmsy/m/n/10 L\OT1/cmr/m
+/n/10 (\OML/cmm/m/it/10 p[]; ^^U[]; ^^U[]\OT1/cmr/m/n/10 )$\OT1/cmtt/m/n/10 , b
+y using $\OML/cmm/m/it/10 ^^U[]$ \OT1/cmtt/m/n/10 to represent the set $\OMS/cm
+sy/m/n/10 f\OML/cmm/m/it/10 ^^U[]\OMS/cmsy/m/n/10 g[]$ \OT1/cmtt/m/n/10 and
+ []
+
+
+Overfull \hbox (45.1379pt too wide) in paragraph at lines 206--208
+\OML/cmm/m/it/10 ^^U[]$ \OT1/cmtt/m/n/10 to represent the set $\OMS/cmsy/m/n/10
+ f\OML/cmm/m/it/10 ^^U[]\OMS/cmsy/m/n/10 g[]$\OT1/cmtt/m/n/10 . The KKT conditi
+ons (Theorem 12.1, nocedal2006numerical)
+ []
+
+
+Overfull \hbox (14.75749pt too wide) in paragraph at lines 217--218
+[]\OT1/cmtt/m/n/10 We now solve this system. Simplifying Eq. []C1[] for an arbi
+trary state-action pair $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 x; b\OT1/cmr/m/n/10 
+)$
+ []
+
+[6]
+Overfull \hbox (13.27606pt too wide) in paragraph at lines 233--235
+\OT1/cmtt/m/n/10 Note that $\OML/cmm/m/it/10 d[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/
+10 s\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; p[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 a\
+OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ^^U \OT1/
+cmr/m/n/10 0$ \OT1/cmtt/m/n/10 for any state-action pair, since they are proper
+ measures. We
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 237--239
+\OT1/cmtt/m/n/10 to satisfy the third and fourth KKT conditions. One straightfo
+rward way to achieve this
+ []
+
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 241--243
+\OT1/cmtt/m/n/10 However, it leaves us one last problem to deal with: Is it alw
+ays true that given any state
+ []
+
+
+Overfull \hbox (20.12749pt too wide) in paragraph at lines 241--243
+\OML/cmm/m/it/10 s$\OT1/cmtt/m/n/10 , there always exists atleast one action $\
+OML/cmm/m/it/10 a$\OT1/cmtt/m/n/10 , such that $\OT1/cmr/m/n/10 1 + \OML/cmm/m/
+it/10 ^^QA[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 s; a\OT1/cmr/m/n/10 ) \OMS/cmsy/m
+/n/10 ^^U \OT1/cmr/m/n/10 0$\OT1/cmtt/m/n/10 ? Because otherwise,
+ []
+
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 241--243
+\OT1/cmtt/m/n/10 we would fail to satisfy the second KKT condition. But not tha
+t this is not a problem since
+ []
+
+
+Overfull \hbox (11.209pt too wide) in paragraph at lines 248--250
+\OT1/cmtt/m/n/10 where $\OML/cmm/m/it/10 ^^R\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 x
+; b\OT1/cmr/m/n/10 )$ \OT1/cmtt/m/n/10 for all state-action pairs $\OT1/cmr/m/n
+/10 (\OML/cmm/m/it/10 x; b\OT1/cmr/m/n/10 )$ \OT1/cmtt/m/n/10 are action prefer
+ences maintained in a table
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 248--250
+\OT1/cmtt/m/n/10 (tabular parameterization). Also note that the derivative of t
+he policy with respect to
+ []
+
+
+Overfull \hbox (19.26672pt too wide) in paragraph at lines 252--255
+\OT1/cmtt/m/n/10 where $\U/msb/m/n/10 I\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 a \OT1
+/cmr/m/n/10 = \OML/cmm/m/it/10 b\OT1/cmr/m/n/10 )$ \OT1/cmtt/m/n/10 is the iden
+tity function when $\OML/cmm/m/it/10 a \OT1/cmr/m/n/10 = \OML/cmm/m/it/10 b$ \O
+T1/cmtt/m/n/10 and zero otherwise. We will use gradient
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 262--264
+\OT1/cmtt/m/n/10 Now we can simply update the inner loop of FMA-PG (Algorithm 1
+, main paper) via gradient
+ []
+
+[7]
+
+LaTeX Warning: Reference `eq:fmd-softmax-statewise' on page 8 undefined on inpu
+t line 269.
+
+! Undefined control sequence.
+l.269 ... exactly same as the original MDPO \citep
+                                                  {tomar2020mirror} update.
+? 
+
+Overfull \hbox (9.38922pt too wide) in paragraph at lines 269--270
+\OT1/cmtt/m/n/10 In this section, we study the MDPO type FMA-PG update (Eq. [] 
+in main paper). We first
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 269--270
+\OT1/cmtt/m/n/10 calculate the analytical solution to that optimization problem
+, and then calculate its gradient
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 269--270
+\OT1/cmtt/m/n/10 which we use in the experiments. However, in the analysis that
+ follows, we we replace the
+ []
+
+
+Overfull \hbox (9.92317pt too wide) in paragraph at lines 269--270
+\OT1/cmtt/m/n/10 advantage function $\OML/cmm/m/it/10 A[]$ \OT1/cmtt/m/n/10 wit
+h the action-value function $\OML/cmm/m/it/10 Q[]$ \OT1/cmtt/m/n/10 to make it 
+exactly same as the
+ []
+
+
+LaTeX Warning: Reference `eq:fmd-softmax-statewise' on page 8 undefined on inpu
+t line 271.
+
+
+Overfull \hbox (67.13872pt too wide) in paragraph at lines 271--272
+\OT1/cmtt/m/n/10 While giving the MDPO type FMA-PG equation (Eq. []), the paper
+ considers the direct representation
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 271--272
+\OT1/cmtt/m/n/10 along with tabular parameterization of the policy, albeit with
+ a small change in notation
+ []
+
+
+Overfull \hbox (5.3544pt too wide) in paragraph at lines 271--272
+\OT1/cmtt/m/n/10 as compared to the previous subsection: $\OML/cmm/m/it/10 ^^Y\
+OT1/cmr/m/n/10 (\OML/cmm/m/it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/
+m/n/10 ) \OMS/cmsy/m/n/10 ^^Q \OML/cmm/m/it/10 p[]\OT1/cmr/m/n/10 (\OML/cmm/m/i
+t/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s; ^^R\OT1/cmr/m/n/10 )$\OT1/cmtt/m/n/
+10 . However, since this notation
+ []
+
+
+Overfull \hbox (30.42175pt too wide) in paragraph at lines 271--272
+\OT1/cmtt/m/n/10 is more cumbersome, we will stick with our the notation of the
+ previous subsection: $\OML/cmm/m/it/10 ^^Y\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 a\
+OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ^^Q
+ []
+
+
+Overfull \hbox (1.35657pt too wide) in paragraph at lines 271--272
+\OT1/cmr/m/n/10 1\OML/cmm/m/it/10 ;  \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 s \OMS/
+cmsy/m/n/10 2 S$\OT1/cmtt/m/n/10 ; and $\OML/cmm/m/it/10 p[]\OT1/cmr/m/n/10 (\O
+ML/cmm/m/it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) \OMS/cmsy
+/m/n/10 ^^U \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ;  \OMS/cmsy/m/n/10 8\OML/cmm/m/i
+t/10 s \OMS/cmsy/m/n/10 2 S\OML/cmm/m/it/10 ;  \OMS/cmsy/m/n/10 8\OML/cmm/m/it/
+10 a \OMS/cmsy/m/n/10 2 A$\OT1/cmtt/m/n/10 . Our goal, this time, is to solve t
+he following
+ []
+
+! Undefined control sequence.
+l.275 ...as the negative entropy (Eq. 5.27, \citet
+                                                  {beck2003mirror}). This pa...
+
+? 
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 274--276
+\OT1/cmtt/m/n/10 with the mirror map as the negative entropy (Eq. 5.27, beck200
+3mirror). This particular
+ []
+
+
+Overfull \hbox (14.2064pt too wide) in paragraph at lines 284--285
+[]\OT1/cmtt/m/n/10 Proceeding analogously to the previous subsection, we use La
+grange multipliers $\OML/cmm/m/it/10 ^^U[]$\OT1/cmtt/m/n/10 , $\OML/cmm/m/it/10
+ ^^U[]$
+ []
+
+[8]
+Overfull \hbox (23.51947pt too wide) in paragraph at lines 298--300
+\OT1/cmtt/m/n/10 where in the fourth line, we used the assumption that $\OML/cm
+m/m/it/10 d[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 x\OT1/cmr/m/n/10 ) \OML/cmm/m/it
+/10 > \OT1/cmr/m/n/10 0$ \OT1/cmtt/m/n/10 for all states $\OML/cmm/m/it/10 x$\O
+T1/cmtt/m/n/10 . We again
+ []
+
+
+Overfull \hbox (5.40681pt too wide) in paragraph at lines 310--312
+\OT1/cmtt/m/n/10 This leaves one last problem: Can we ensure that $\OML/cmm/m/i
+t/10 ^^U[] \OMS/cmsy/m/n/10 ^^U \OT1/cmr/m/n/10 0$ \OT1/cmtt/m/n/10 for all sta
+tes $\OML/cmm/m/it/10 s$\OT1/cmtt/m/n/10 ? If not, then
+ []
+
+
+Overfull \hbox (3.85225pt too wide) in paragraph at lines 310--312
+\OT1/cmtt/m/n/10 the fourth KKT condition cannot be satisfied. Again, we can se
+t the stepsize $\OML/cmm/m/it/10 ^^Q$ \OT1/cmtt/m/n/10 in such
+ []
+
+
+Overfull \hbox (5.66504pt too wide) in paragraph at lines 314--315
+\OT1/cmtt/m/n/10 We again take the softmax policy representation given by Eq. [
+]10[], and compute $\OMS/cmsy/m/n/10 r[]\OML/cmm/m/it/10 `[]$
+ []
+
+! Undefined control sequence.
+l.327 ...f the policy update, TRPO (Eq. 14, \citet
+                                                  {schulman2015trust}) solve...
+
+? 
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 327--328
+\OT1/cmtt/m/n/10 At each step of the policy update, TRPO (Eq. 14, schulman2015t
+rust) solves the following
+ []
+
+[9]
+! Undefined control sequence.
+l.331 ...e this problem. From Appendix C of \citet
+                                                  {schulman2015trust}, the d...
+
+? 
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 330--332
+\OT1/cmtt/m/n/10 Unlike the sMDPO and the MDPO updates, an analytical solution 
+cannot be derived for this
+ []
+
+
+Overfull \hbox (56.27766pt too wide) in paragraph at lines 330--332
+\OT1/cmtt/m/n/10 update (since it would require solving a system of non-trivial
+ non-linear equations). Therefore,
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 330--332
+\OT1/cmtt/m/n/10 we will use gradient based methods to approximately solve this
+ problem. From Appendix C
+ []
+
+
+Overfull \hbox (20.80771pt too wide) in paragraph at lines 330--332
+\OT1/cmtt/m/n/10 defined as $\OML/cmm/m/it/10 g[] \OT1/cmr/m/n/10 := []\OMS/cms
+y/m/n/10 J[]$\OT1/cmtt/m/n/10 , and the matrix $\OML/cmm/m/it/10 A$ \OT1/cmtt/m
+/n/10 is defined as $\OML/cmm/m/it/10 A[] \OT1/cmr/m/n/10 := [][]\OMS/cmsy/m/n/
+10 C[]$\OT1/cmtt/m/n/10 .
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 330--332
+\OT1/cmtt/m/n/10 We analytically compute the expression for this direction assu
+ming a softmax policy (Eq.
+ []
+
+
+Overfull \hbox (10.71568pt too wide) in paragraph at lines 352--354
+\OT1/cmtt/m/n/10 square sub-block of the matrix $\OML/cmm/m/it/10 A$ \OT1/cmtt/
+m/n/10 corresponding to the given state $\OML/cmm/m/it/10 s$ \OT1/cmtt/m/n/10 a
+nd all the actions.
+ []
+
+
+Overfull \hbox (11.27814pt too wide) in paragraph at lines 352--354
+\OT1/cmtt/m/n/10 In our experiments, since our $\OML/cmm/m/it/10 A$ \OT1/cmtt/m
+/n/10 matrix is small, we directly take its inverse to compute
+ []
+
+
+Overfull \hbox (56.27766pt too wide) in paragraph at lines 352--354
+\OT1/cmtt/m/n/10 the update direction, thereby bypassing the conjugate method. 
+Once we have the update direction,
+ []
+
+
+Overfull \hbox (20.46205pt too wide) in paragraph at lines 352--354
+\OT1/cmtt/m/n/10 we then compute the maximal stepsize $\OML/cmm/m/it/10 ^^L$ \O
+T1/cmtt/m/n/10 and perform an exponential backtracking line search
+ []
+
+[10]
+! Undefined control sequence.
+l.356 ...imal Policy Optimization algorithm \citep
+                                                  {schulman2017proximal} sol...
+
+? 
+
+Overfull \hbox (56.27766pt too wide) in paragraph at lines 356--357
+\OT1/cmtt/m/n/10 The Proximal Policy Optimization algorithm schulman2017proxima
+l solves the following optimization
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 375--377
+\OT1/cmtt/m/n/10 The PPO gradient (Eq. []30[]) is exactly the same as the TRPO 
+gradient (Eq. []23[]) except for
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 375--377
+\OT1/cmtt/m/n/10 the additional condition on choosing only specific state-actio
+n pairs while calculating
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 375--377
+\OT1/cmtt/m/n/10 the difference between advantage under the current policy and 
+the approximate change in
+ []
+
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 379--380
+\OT1/cmtt/m/n/10 In this section, we calculate the second derivative of the MDP
+O constraint as given in Table
+ []
+
+
+Overfull \hbox (18.40347pt too wide) in paragraph at lines 379--380
+[]\OT1/cmtt/m/n/10 1[]. This will allow us compute the Hessian $\OML/cmm/m/it/1
+0 A[]$\OT1/cmtt/m/n/10 , which is the analog of the $\OML/cmm/m/it/10 A$ \OT1/c
+mtt/m/n/10 matrix from
+ []
+
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 379--380
+\OT1/cmtt/m/n/10 TRPO implementation, and help us implement MDPO with a constra
+ined objective and line search. 
+ []
+
+[11]
+Overfull \hbox (0.39516pt too wide) in paragraph at lines 387--389
+\OT1/cmtt/m/n/10 where we introduced an intermediate variable $\OML/cmm/m/it/10
+ T[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 s[]; a[]\OT1/cmr/m/n/10 ) := [] [] \OMS/c
+msy/m/n/10 ^^@ []\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 p[]\OT1/cmr/m/n/10 (\OMS/cms
+y/m/n/10 ^^Aj\OML/cmm/m/it/10 s[]\OT1/cmr/m/n/10 )\OMS/cmsy/m/n/10 k\OML/cmm/m/
+it/10 p[]\OT1/cmr/m/n/10 (\OMS/cmsy/m/n/10 ^^Aj\OML/cmm/m/it/10 s[]\OT1/cmr/m/n
+/10 )) +
+ []
+
+
+Overfull \hbox (19.6297pt too wide) in paragraph at lines 415--417
+\OT1/cmtt/m/n/10 and $\OMS/cmsy/m/n/10 $ \OT1/cmtt/m/n/10 in the above equatio
+n represents the elementwise vector division defined as $\OT1/cmr/m/n/10 [\OML/
+cmm/m/it/10 a \OMS/cmsy/m/n/10  \OML/cmm/m/it/10 b\OT1/cmr/m/n/10 ][] :=
+ []
+
+
+Overfull \hbox (36.46718pt too wide) in paragraph at lines 415--417
+\OML/cmm/m/it/10 a[]=b[]$ \OT1/cmtt/m/n/10 for any two vectors $\OML/cmm/m/it/1
+0 a$ \OT1/cmtt/m/n/10 and $\OML/cmm/m/it/10 b$\OT1/cmtt/m/n/10 . As a sanity ch
+eck, note that the matrix $\OML/cmm/m/it/10 A[]$ \OT1/cmtt/m/n/10 is symmetric,
+
+ []
+
+[12]
+
+LaTeX Warning: Reference `eq:fmd-softmax-kl-practical' on page 13 undefined on 
+input line 419.
+
+
+LaTeX Warning: Reference `eq:fmd-softmax-statewise' on page 13 undefined on inp
+ut line 419.
+
+! Undefined control sequence.
+l.419 ...ridworld environments: CliffWorld (\citep
+                                                  {sutton18book}; environmen...
+
+? 
+! Undefined control sequence.
+l.419 ...: cliffworld}) and DeepSeaTreasure \citep
+                                                  {osband2019behaviour} with...
+
+? 
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 In this section, we study the performance of four different po
+licy gradient (PG) algorithms.
+ []
+
+
+Overfull \hbox (40.5278pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 Two of these can be directly obtained from the FMA-PG framewor
+k: sMDPO (FMA-PG with a softmax
+ []
+
+
+Overfull \hbox (19.88913pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 policy and log-sum-exp mirror map; see Eq. []) in main text) a
+nd MDPO (FMA-PG with direct
+ []
+
+
+Overfull \hbox (9.38922pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 parameterization and a negative entropy mirror map; see Eq. []
+). And the other two are
+ []
+
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 existing popular PG algorithms: TRPO and PPO. And to better un
+derstand major reasons behind
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 the performance of each of these methods, in addition to study
+ing the objective functions
+ []
+
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 used by these PG algorithms, we will also consider the impact 
+of the optimization techqniques
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 used to implement them. In particular, we will look at three d
+ifferent variants of sMDPO,
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 MDPO, and TRPO based on whether they use a regularized objecti
+ve with a fixed stepsize (similar
+ []
+
+
+Overfull \hbox (61.52762pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 to conventional sMDPO and MDPO), a regularized objective with 
+Armijo line search, or a constrained
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 objective with line search (similar to conventional TRPO). We 
+use a tabular softmax policy
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 parameterization and evaluate the algorithms on two tabular gr
+idworld environments: CliffWorld
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 419--420
+\OT1/cmtt/m/n/10 (sutton18book; environment description and its properties are 
+discussed in Figure []1[]) and
+ []
+
+<tabular_figures/cliffworld.pdf, id=633, 1211.30019pt x 509.25706pt>
+File: tabular_figures/cliffworld.pdf Graphic file (type pdf)
+<use tabular_figures/cliffworld.pdf>
+Package pdftex.def Info: tabular_figures/cliffworld.pdf  used on input line 423
+.
+(pdftex.def)             Requested size: 436.06773pt x 183.3324pt.
+[13pdfTeX warning (ext4): destination with the same identifier (name{figure.4})
  has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.118 \end{align*}
-                   <./tabular_figures/learning_curves.pdf>] [4pdfTeX warning (e
-xt4): destination with the same identifier (name{figure.3}) has been already us
-ed, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  
-l.118 \end{align*}
-                   <./tabular_figures/sensitivity.pdf>] [5] [6]
-Overfull \hbox (10.86612pt too wide) detected at line 237
-[]
+l.453 
+       <./tabular_figures/cliffworld.pdf>]
+! Undefined control sequence.
+<argument> ... PPO with KL penalty (Eq. 8, \citet 
+                                                  {schulman2017proximal}) ex...
+l.454 ...rgence instead of the max KL divergence.}
+                                                  ,
+? 
+! Undefined control sequence.
+<argument> ...n the TRPO paper (Section 4, \citet 
+                                                  {schulman2015trust}) excep...
+l.454 ...rgence instead of the max KL divergence.}
+                                                  ,
+? 
+LaTeX Font Info:    Trying to load font information for TS1+cmtt on input line 
+488.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/ts1cmtt.fd
+File: ts1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+
+LaTeX Warning: Reference `sec: trpo_kl' on page 14 undefined on input line 488.
+
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 488--489
+\OT1/cmtt/m/n/10 To make the results easier to interpret and make them closely 
+follow the theoretical properties
  []
 
-[7] [8] [9] [10pdfTeX warning (ext4): destination with the same identifier (nam
-e{table.1}) has been already used, duplicate ignored
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 488--489
+\OT1/cmtt/m/n/10 of the PG methods, we assume full access to the environment dy
+namics and use the analytically
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 488--489
+\OT1/cmtt/m/n/10 calculated expected gradient updates for all the five algorith
+ms. Doing so, essentially
+ []
+
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 488--489
+\OT1/cmtt/m/n/10 made this a study of the optimization properties of the above 
+five PG algorithms. We trained
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 488--489
+\OT1/cmtt/m/n/10 each of the method for 2000 iterations. Each iteration consist
+ed of one or multiple inner
+ []
+
+
+Overfull \hbox (38.80803pt too wide) in paragraph at lines 488--489
+\OT1/cmtt/m/n/10 updates (we represent this number by $\OML/cmm/m/it/10 m$\OT1/
+cmtt/m/n/10 ); these updates are performed in an off-policy fashion
+ []
+
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 488--489
+\OT1/cmtt/m/n/10 that is typical of all these algorithms (also see Algorithm 1,
+ main paper). We also sweeped
+ []
+
+
+Overfull \hbox (75.42181pt too wide) in paragraph at lines 488--489
+\OT1/cmtt/m/n/10 over the relevant parameters of the PG algorithms. For sMDPO a
+nd MDPO, this was $\OML/cmm/m/it/10 ^^Q \OMS/cmsy/m/n/10 2 f\OT1/cmr/m/n/10 2[]
+\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 2[]\OML/cmm/m/it/10 ; [] ; \OT1/cmr/m/n/10 2
+[]\OMS/cmsy/m/n/10 g$
+ []
+
+
+Overfull \hbox (8.41093pt too wide) in paragraph at lines 488--489
+\OT1/cmtt/m/n/10 and inner loop stepsize $\OML/cmm/m/it/10  \OMS/cmsy/m/n/10 2
+ f\OT1/cmr/m/n/10 2[]\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 2[]\OML/cmm/m/it/10 ; [
+] ; \OT1/cmr/m/n/10 2[]\OMS/cmsy/m/n/10 g$\OT1/cmtt/m/n/10 . For PPO, we sweepe
+d over the stepsize $\OML/cmm/m/it/10  \OMS/cmsy/m/n/10 2
+ []
+
+
+Overfull \hbox (17.90787pt too wide) in paragraph at lines 488--489
+\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 2[]\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 2[]\OML
+/cmm/m/it/10 ; [] ; \OT1/cmr/m/n/10 2[]\OMS/cmsy/m/n/10 g$ \OT1/cmtt/m/n/10 and
+ the clipping parameter $\OML/cmm/m/it/10 ^^O \OMS/cmsy/m/n/10 2 f\OT1/cmr/m/n/
+10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 1\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML
+/cmm/m/it/10 :\OT1/cmr/m/n/10 2\OML/cmm/m/it/10 ; [] ; \OT1/cmr/m/n/10 0\OML/cm
+m/m/it/10 :\OT1/cmr/m/n/10 9\OMS/cmsy/m/n/10 g$\OT1/cmtt/m/n/10 . For TRPO, we 
+sweeped over
+ []
+
+
+Overfull \hbox (5.40741pt too wide) in paragraph at lines 488--489
+\OT1/cmtt/m/n/10 the trust region size $\OML/cmm/m/it/10 ^^N \OMS/cmsy/m/n/10 2
+ f\OT1/cmr/m/n/10 2[]\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 2[]\OML/cmm/m/it/10 ; [
+] ; \OT1/cmr/m/n/10 2[]\OMS/cmsy/m/n/10 g$ \OT1/cmtt/m/n/10 and the line search
+ stepsize decay parameter
+ []
+
+[14pdfTeX warning (ext4): destination with the same identifier (name{table.3}) 
+has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.359 \end{align}
-                 ] [11pdfTeX warning (ext4): destination with the same identifi
-er (name{table.2}) has been already used, duplicate ignored
+l.489 
+      pdfTeX warning (ext4): destination with the same identifier (name{table.4
+}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.382 \end{align}
-                 ] [12] (./notes_fmapg.aux)
+l.489 
+      ]
+Overfull \hbox (13.52817pt too wide) in paragraph at lines 490--491
+[]\OT1/cmtt/m/n/10 In the next section, we present the learning curves for thes
+e algorithms corresponding
+ []
+
+
+Overfull \hbox (24.77794pt too wide) in paragraph at lines 490--491
+\OT1/cmtt/m/n/10 to the best hyperparameter configurations. After that we prese
+nt the parameter sensitivity
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 490--491
+\OT1/cmtt/m/n/10 plots. We then describe our conclusions from these experiments
+. Finally, we also include
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 490--491
+\OT1/cmtt/m/n/10 the gradient calculations used in our implementations and asso
+ciated details for all the
+ []
+
+
+LaTeX Warning: Reference `fig: learning_curves' on page 15 undefined on input l
+ine 493.
+
+
+LaTeX Warning: Reference `fig: sensitivity' on page 15 undefined on input line 
+493.
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 493--494
+\OT1/cmtt/m/n/10 We show the performance of the five algorithms against the num
+ber of outer loop iterations
+ []
+
+
+Overfull \hbox (45.37508pt too wide) in paragraph at lines 493--494
+\OT1/cmtt/m/n/10 in Figure []. The three different subplots correspond to a dif
+ferent number of inner updates[][][].
+ []
+
+
+Overfull \hbox (24.77794pt too wide) in paragraph at lines 493--494
+\OT1/cmtt/m/n/10 To select the hyperparameters for each setting, we ran sweeps 
+over different configurations
+ []
+
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 493--494
+\OT1/cmtt/m/n/10 and chose the ones that resulted in the best final performance
+ at the end of 2000 iterations. 
+ []
+
+
+Overfull \hbox (29.27803pt too wide) in paragraph at lines 495--496
+[]\OT1/cmtt/m/n/10 From this figure, we see that TRPO learned the optimal polic
+y in less than 20 iterations.
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 495--496
+\OT1/cmtt/m/n/10 Whereas, PPO got stuck in a ``safe'' sub-optimal policy. MDPO,
+ sMDPO, and TRPO-KL were
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 495--496
+\OT1/cmtt/m/n/10 all able to achieve the optimal policy with 100 and 1000 numbe
+r of inner iterations, but
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 495--496
+\OT1/cmtt/m/n/10 got stuck in the suboptimal policy with 10 number of inner ite
+rations. We further observe
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 495--496
+\OT1/cmtt/m/n/10 that increasing the number of inner loop iterations helped all
+ the methods, except TRPO
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 495--496
+\OT1/cmtt/m/n/10 (which was already super fast), to improve the convergence spe
+ed. We should also mention,
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 495--496
+\OT1/cmtt/m/n/10 although TRPO had the faster convergence, its update was also 
+the costliest (more than ten
+ []
+
+
+LaTeX Warning: Reference `fig: sensitivity' on page 15 undefined on input line 
+497.
+
+
+Overfull \hbox (45.38904pt too wide) in paragraph at lines 497--498
+[]\OT1/cmtt/m/n/10 We show the complete parameter sweeps for the different meth
+ods in Figure []. The different
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 497--498
+\OT1/cmtt/m/n/10 rows correspond to different algorithms and the columns corres
+pond to different number of
+ []
+
+
+Overfull \hbox (19.9933pt too wide) in paragraph at lines 497--498
+\OT1/cmtt/m/n/10 inner loop updates. Each algorithm has two parameters: the $\O
+ML/cmm/m/it/10 x$ \OT1/cmtt/m/n/10 axis gives the value of one
+ []
+
+
+Overfull \hbox (9.03972pt too wide) in paragraph at lines 497--498
+\OT1/cmtt/m/n/10 of these parameters and the shaded curves correspond to the ot
+her parameter. The $\OML/cmm/m/it/10 y$ \OT1/cmtt/m/n/10 axis
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 497--498
+\OT1/cmtt/m/n/10 shows the final performance of the algorithm at the end of 200
+0 iterations corresponding
+ []
+
+
+Overfull \hbox (24.77794pt too wide) in paragraph at lines 497--498
+\OT1/cmtt/m/n/10 to the particular parameter configuration. We also include the
+ sensitivity plots for sMDPO
+ []
+
+
+Overfull \hbox (24.77794pt too wide) in paragraph at lines 497--498
+\OT1/cmtt/m/n/10 and MDPO under analytical updates, which is equivalent of doin
+g an infinite number of inner
+ []
+
+
+Overfull \hbox (17.80821pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 performance. And as the value of $\OML/cmm/m/it/10 m$ \OT1/cmt
+t/m/n/10 increased, these algorithms were able to perform well
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 with a large number of stepsizes. We also note that, each of s
+MDPO, MDPO, and TRPO-KL achieved
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 the optimal policy for some parameter configurations, whereas 
+PPO failed to achieve the
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 optimal policy for any stepsize configuration we tried. sMDPO,
+ MDPO, and TRPO-KL had good
+ []
+
+
+Overfull \hbox (42.80571pt too wide) in paragraph at lines 499--500
+\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 1$\OT1/cmtt/m/n/10 , which w
+as suggested by the theory for sMDPO, worked well. TRPO had a very low sensitiv
+ity
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 for all its parameters, probably because TRPO uses the (near) 
+optimal steepest ascent direction
+ []
+
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 with the maximal stepsize, achieved via line search. This give
+s TRPO much better convergence
+ []
+
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 properties, especially in this case where there are no samplin
+g or estimation errors. Also,
+ []
+
+
+Overfull \hbox (11.1844pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 we think that the trust region parameter $\OML/cmm/m/it/10 ^^N
+ \OT1/cmr/m/n/10 = 4$ \OT1/cmtt/m/n/10 was already too small for this problem a
+nd
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 therefore TRPO performed well for all the values below it. Int
+erestingly, TRPO-KL (which
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 corresponds to an unconstrained optimization problem and doesn
+'t use line search) did not
+ []
+
+
+Overfull \hbox (3.35107pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 enjoy these properties. TRPO-KL's performance for certain valu
+es of $\OML/cmm/m/it/10 ^^N$ \OT1/cmtt/m/n/10 was very similar
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 499--500
+\OT1/cmtt/m/n/10 to PPO; and for other values was superior to PPO. And it was s
+lighltly less sensitive to
+ []
+
+[15]
+File: ppo.pdf Graphic file (type pdf)
+<use ppo.pdf>
+Package pdftex.def Info: ppo.pdf  used on input line 503.
+(pdftex.def)             Requested size: 407.66833pt x 131.85286pt.
+File: deep_sea_treasure_ablation.pdf Graphic file (type pdf)
+<use deep_sea_treasure_ablation.pdf>
+Package pdftex.def Info: deep_sea_treasure_ablation.pdf  used on input line 510
+.
+(pdftex.def)             Requested size: 407.66833pt x 165.42252pt.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.515 \subsection{Discussion} \sec
+                                  {app:tabular_discussion}
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.516 ...the algorithm, for all the value of $\eta
+                                                  $ suggested by theory, was...
+
+? 
+! Undefined control sequence.
+l.516 ... simpler algorithms like REINFORCE \citep
+                                                  {williams1992simple} which...
+
+? 
+
+Overfull \hbox (69.45888pt too wide) in paragraph at lines 515--517
+$[] []\OML/cmm/m/it/10 TheexperimentsforsMDPOservedasaverificationofthetheoreti
+calpropertiesoftheFMA \OMS/cmsy/m/n/10 ^^@
+ []
+
+
+Overfull \hbox (1034.58624pt too wide) in paragraph at lines 515--517
+\OML/cmm/m/it/10 PGframeworkstudiedinthispaper:Wealsocompareditagainstotherpopu
+larpolicygradientalgorithmsfromapureoptimizationperspective:Ourresultsdemonstra
+tedthatsMDPOwascompetitive\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 orsuperior\OT1/cmr/
+m/n/10 )\OML/cmm/m/it/10 tothepopularPGmethods:Itwasalsosomewhatrobusttothehype
+rparameters\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 inparticularwefoundthatthealgorit
+hm; forallthevalueof$$^^Q$
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 515--517
+\OT1/cmtt/m/n/10 suggested by theory, was able to converge to a locally optimal
+ policy. The results also
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 515--517
+\OT1/cmtt/m/n/10 highlighted the importance of re-using data, i.e. doing multip
+le off-policy type of PG
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 515--517
+\OT1/cmtt/m/n/10 updates: as we increased the number of inner updates, the perf
+ormance of all the methods
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 515--517
+\OT1/cmtt/m/n/10 seem to improve. They not only enjoyed faster convergence, but
+ they also started to work
+ []
+
+
+Overfull \hbox (40.5278pt too wide) in paragraph at lines 515--517
+\OT1/cmtt/m/n/10 for a wider range of parameters. This demonstrates the strengt
+h of these methods over simpler
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 515--517
+\OT1/cmtt/m/n/10 algorithms like REINFORCE williams1992simple which only have a
+ single update per batch of
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 515--517
+\OT1/cmtt/m/n/10 sampled data. To conclude, experiments with sMDPO suggest that
+ the FMA-PG framework is
+ []
+
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 515--517
+\OT1/cmtt/m/n/10 a systematic way of obtaining new policy gradient algorithms t
+hat enjoy desirable theoretical
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 515--517
+\OT1/cmtt/m/n/10 properties and can be competitive to existing PG method, as su
+ggested by our empirical results.
+ []
+
+
+Overfull \hbox (24.77794pt too wide) in paragraph at lines 519--520
+\OT1/cmtt/m/n/10 In the rest of this section, we give the calculations (the clo
+sed form analytical solutions
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 519--520
+\OT1/cmtt/m/n/10 for sMDPO and MDPO, and the gradient expressions for all four 
+algorithms) employed in our
+ []
+
+
+LaTeX Warning: Reference `eq:fmd-softmax-kl-practical' on page 16 undefined on 
+input line 523.
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 523--524
+\OT1/cmtt/m/n/10 Our goal is to find the closed form solution to the following 
+optimization problem (from
+ []
+
+[16pdfTeX warning (ext4): destination with the same identifier (name{figure.5})
+ has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.526 \end{equation}
+                    ]
+Overfull \hbox (24.73676pt too wide) in paragraph at lines 526--528
+\OT1/cmtt/m/n/10 subject to the constraints on policy $\OML/cmm/m/it/10 p[]$\OT
+1/cmtt/m/n/10 . We will solve this problem by assuming the policy
+ []
+
+
+Overfull \hbox (5.75867pt too wide) in paragraph at lines 531--533
+\OT1/cmtt/m/n/10 We begin by formulating this problem using Lagrange multiplier
+s $\OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 ^^U[]\OMS/cmsy/m/n/10 g[]$ \OT1/cmtt/m/n/
+10 and $\OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 ^^U[]\OMS/cmsy/m/n/10 g[]$
+ []
+
+! Undefined control sequence.
+l.537 ... The KKT conditions (Theorem 12.1, \citet
+                                                  {nocedal2006numerical}) fo...
+
+? 
+
+Overfull \hbox (20.77779pt too wide) in paragraph at lines 536--538
+\OT1/cmtt/m/n/10 where we abused the notation, in $\OMS/cmsy/m/n/10 L\OT1/cmr/m
+/n/10 (\OML/cmm/m/it/10 p[]; ^^U[]; ^^U[]\OT1/cmr/m/n/10 )$\OT1/cmtt/m/n/10 , b
+y using $\OML/cmm/m/it/10 ^^U[]$ \OT1/cmtt/m/n/10 to represent the set $\OMS/cm
+sy/m/n/10 f\OML/cmm/m/it/10 ^^U[]\OMS/cmsy/m/n/10 g[]$ \OT1/cmtt/m/n/10 and
+ []
+
+
+Overfull \hbox (45.1379pt too wide) in paragraph at lines 536--538
+\OML/cmm/m/it/10 ^^U[]$ \OT1/cmtt/m/n/10 to represent the set $\OMS/cmsy/m/n/10
+ f\OML/cmm/m/it/10 ^^U[]\OMS/cmsy/m/n/10 g[]$\OT1/cmtt/m/n/10 . The KKT conditi
+ons (Theorem 12.1, nocedal2006numerical)
+ []
+
+[17pdfTeX warning (ext4): destination with the same identifier (name{figure.6})
+ has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.545 \end{align}
+                 ]
+Overfull \hbox (14.75749pt too wide) in paragraph at lines 547--548
+[]\OT1/cmtt/m/n/10 We now solve this system. Simplifying Eq. []C1[] for an arbi
+trary state-action pair $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 x; b\OT1/cmr/m/n/10 
+)$
+ []
+
+
+Overfull \hbox (13.27606pt too wide) in paragraph at lines 563--565
+\OT1/cmtt/m/n/10 Note that $\OML/cmm/m/it/10 d[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/
+10 s\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; p[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 a\
+OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ^^U \OT1/
+cmr/m/n/10 0$ \OT1/cmtt/m/n/10 for any state-action pair, since they are proper
+ measures. We
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 567--569
+\OT1/cmtt/m/n/10 to satisfy the third and fourth KKT conditions. One straightfo
+rward way to achieve this
+ []
+
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 571--573
+\OT1/cmtt/m/n/10 However, it leaves us one last problem to deal with: Is it alw
+ays true that given any state
+ []
+
+
+Overfull \hbox (20.12749pt too wide) in paragraph at lines 571--573
+\OML/cmm/m/it/10 s$\OT1/cmtt/m/n/10 , there always exists atleast one action $\
+OML/cmm/m/it/10 a$\OT1/cmtt/m/n/10 , such that $\OT1/cmr/m/n/10 1 + \OML/cmm/m/
+it/10 ^^QA[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 s; a\OT1/cmr/m/n/10 ) \OMS/cmsy/m
+/n/10 ^^U \OT1/cmr/m/n/10 0$\OT1/cmtt/m/n/10 ? Because otherwise,
+ []
+
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 571--573
+\OT1/cmtt/m/n/10 we would fail to satisfy the second KKT condition. But not tha
+t this is not a problem since
+ []
+
+
+Overfull \hbox (11.209pt too wide) in paragraph at lines 578--580
+\OT1/cmtt/m/n/10 where $\OML/cmm/m/it/10 ^^R\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 x
+; b\OT1/cmr/m/n/10 )$ \OT1/cmtt/m/n/10 for all state-action pairs $\OT1/cmr/m/n
+/10 (\OML/cmm/m/it/10 x; b\OT1/cmr/m/n/10 )$ \OT1/cmtt/m/n/10 are action prefer
+ences maintained in a table
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 578--580
+\OT1/cmtt/m/n/10 (tabular parameterization). Also note that the derivative of t
+he policy with respect to
+ []
+
+[18]
+Overfull \hbox (19.26672pt too wide) in paragraph at lines 582--585
+\OT1/cmtt/m/n/10 where $\U/msb/m/n/10 I\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 a \OT1
+/cmr/m/n/10 = \OML/cmm/m/it/10 b\OT1/cmr/m/n/10 )$ \OT1/cmtt/m/n/10 is the iden
+tity function when $\OML/cmm/m/it/10 a \OT1/cmr/m/n/10 = \OML/cmm/m/it/10 b$ \O
+T1/cmtt/m/n/10 and zero otherwise. We will use gradient
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 592--594
+\OT1/cmtt/m/n/10 Now we can simply update the inner loop of FMA-PG (Algorithm 1
+, main paper) via gradient
+ []
+
+
+LaTeX Warning: Reference `eq:fmd-softmax-statewise' on page 19 undefined on inp
+ut line 599.
+
+! Undefined control sequence.
+l.599 ... exactly same as the original MDPO \citep
+                                                  {tomar2020mirror} update.
+? 
+
+Overfull \hbox (9.38922pt too wide) in paragraph at lines 599--600
+\OT1/cmtt/m/n/10 In this section, we study the MDPO type FMA-PG update (Eq. [] 
+in main paper). We first
+ []
+
+
+Overfull \hbox (45.77776pt too wide) in paragraph at lines 599--600
+\OT1/cmtt/m/n/10 calculate the analytical solution to that optimization problem
+, and then calculate its gradient
+ []
+
+
+Overfull \hbox (19.52798pt too wide) in paragraph at lines 599--600
+\OT1/cmtt/m/n/10 which we use in the experiments. However, in the analysis that
+ follows, we we replace the
+ []
+
+
+Overfull \hbox (9.92317pt too wide) in paragraph at lines 599--600
+\OT1/cmtt/m/n/10 advantage function $\OML/cmm/m/it/10 A[]$ \OT1/cmtt/m/n/10 wit
+h the action-value function $\OML/cmm/m/it/10 Q[]$ \OT1/cmtt/m/n/10 to make it 
+exactly same as the
+ []
+
+
+LaTeX Warning: Reference `eq:fmd-softmax-statewise' on page 19 undefined on inp
+ut line 601.
+
+
+Overfull \hbox (67.13872pt too wide) in paragraph at lines 601--602
+\OT1/cmtt/m/n/10 While giving the MDPO type FMA-PG equation (Eq. []), the paper
+ considers the direct representation
+ []
+
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 601--602
+\OT1/cmtt/m/n/10 along with tabular parameterization of the policy, albeit with
+ a small change in notation
+ []
+
+
+Overfull \hbox (5.3544pt too wide) in paragraph at lines 601--602
+\OT1/cmtt/m/n/10 as compared to the previous subsection: $\OML/cmm/m/it/10 ^^Y\
+OT1/cmr/m/n/10 (\OML/cmm/m/it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/
+m/n/10 ) \OMS/cmsy/m/n/10 ^^Q \OML/cmm/m/it/10 p[]\OT1/cmr/m/n/10 (\OML/cmm/m/i
+t/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s; ^^R\OT1/cmr/m/n/10 )$\OT1/cmtt/m/n/
+10 . However, since this notation
+ []
+
+
+Overfull \hbox (30.42175pt too wide) in paragraph at lines 601--602
+\OT1/cmtt/m/n/10 is more cumbersome, we will stick with our the notation of the
+ previous subsection: $\OML/cmm/m/it/10 ^^Y\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 a\
+OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ^^Q
+ []
+
+
+Overfull \hbox (1.35657pt too wide) in paragraph at lines 601--602
+\OT1/cmr/m/n/10 1\OML/cmm/m/it/10 ;  \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 s \OMS/
+cmsy/m/n/10 2 S$\OT1/cmtt/m/n/10 ; and $\OML/cmm/m/it/10 p[]\OT1/cmr/m/n/10 (\O
+ML/cmm/m/it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) \OMS/cmsy
+/m/n/10 ^^U \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ;  \OMS/cmsy/m/n/10 8\OML/cmm/m/i
+t/10 s \OMS/cmsy/m/n/10 2 S\OML/cmm/m/it/10 ;  \OMS/cmsy/m/n/10 8\OML/cmm/m/it/
+10 a \OMS/cmsy/m/n/10 2 A$\OT1/cmtt/m/n/10 . Our goal, this time, is to solve t
+he following
+ []
+
+! Undefined control sequence.
+l.605 ...as the negative entropy (Eq. 5.27, \citet
+                                                  {beck2003mirror}). This pa...
+
+? 
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 604--606
+\OT1/cmtt/m/n/10 with the mirror map as the negative entropy (Eq. 5.27, beck200
+3mirror). This particular
+ []
+
+[19]
+Overfull \hbox (14.2064pt too wide) in paragraph at lines 614--615
+[]\OT1/cmtt/m/n/10 Proceeding analogously to the previous subsection, we use La
+grange multipliers $\OML/cmm/m/it/10 ^^U[]$\OT1/cmtt/m/n/10 , $\OML/cmm/m/it/10
+ ^^U[]$
+ []
+
+
+Overfull \hbox (23.51947pt too wide) in paragraph at lines 628--630
+\OT1/cmtt/m/n/10 where in the fourth line, we used the assumption that $\OML/cm
+m/m/it/10 d[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 x\OT1/cmr/m/n/10 ) \OML/cmm/m/it
+/10 > \OT1/cmr/m/n/10 0$ \OT1/cmtt/m/n/10 for all states $\OML/cmm/m/it/10 x$\O
+T1/cmtt/m/n/10 . We again
+ []
+
+
+Overfull \hbox (5.40681pt too wide) in paragraph at lines 640--642
+\OT1/cmtt/m/n/10 This leaves one last problem: Can we ensure that $\OML/cmm/m/i
+t/10 ^^U[] \OMS/cmsy/m/n/10 ^^U \OT1/cmr/m/n/10 0$ \OT1/cmtt/m/n/10 for all sta
+tes $\OML/cmm/m/it/10 s$\OT1/cmtt/m/n/10 ? If not, then
+ []
+
+
+Overfull \hbox (3.85225pt too wide) in paragraph at lines 640--642
+\OT1/cmtt/m/n/10 the fourth KKT condition cannot be satisfied. Again, we can se
+t the stepsize $\OML/cmm/m/it/10 ^^Q$ \OT1/cmtt/m/n/10 in such
+ []
+
+
+Overfull \hbox (5.66504pt too wide) in paragraph at lines 644--645
+\OT1/cmtt/m/n/10 We again take the softmax policy representation given by Eq. [
+]10[], and compute $\OMS/cmsy/m/n/10 r[]\OML/cmm/m/it/10 `[]$
+ []
+
+[20]
+! Undefined control sequence.
+l.657 ...f the policy update, TRPO (Eq. 14, \citet
+                                                  {schulman2015trust}) solve...
+
+? 
+
+Overfull \hbox (14.27803pt too wide) in paragraph at lines 657--658
+\OT1/cmtt/m/n/10 At each step of the policy update, TRPO (Eq. 14, schulman2015t
+rust) solves the following
+ []
+
+! Undefined control sequence.
+l.661 ...e this problem. From Appendix C of \citet
+                                                  {schulman2015trust}, the d...
+
+? 
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 660--662
+\OT1/cmtt/m/n/10 Unlike the sMDPO and the MDPO updates, an analytical solution 
+cannot be derived for this
+ []
+
+
+Overfull \hbox (56.27766pt too wide) in paragraph at lines 660--662
+\OT1/cmtt/m/n/10 update (since it would require solving a system of non-trivial
+ non-linear equations). Therefore,
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 660--662
+\OT1/cmtt/m/n/10 we will use gradient based methods to approximately solve this
+ problem. From Appendix C
+ []
+
+
+Overfull \hbox (20.80771pt too wide) in paragraph at lines 660--662
+\OT1/cmtt/m/n/10 defined as $\OML/cmm/m/it/10 g[] \OT1/cmr/m/n/10 := []\OMS/cms
+y/m/n/10 J[]$\OT1/cmtt/m/n/10 , and the matrix $\OML/cmm/m/it/10 A$ \OT1/cmtt/m
+/n/10 is defined as $\OML/cmm/m/it/10 A[] \OT1/cmr/m/n/10 := [][]\OMS/cmsy/m/n/
+10 C[]$\OT1/cmtt/m/n/10 .
+ []
+
+
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 660--662
+\OT1/cmtt/m/n/10 We analytically compute the expression for this direction assu
+ming a softmax policy (Eq.
+ []
+
+[21]
+Overfull \hbox (10.71568pt too wide) in paragraph at lines 682--684
+\OT1/cmtt/m/n/10 square sub-block of the matrix $\OML/cmm/m/it/10 A$ \OT1/cmtt/
+m/n/10 corresponding to the given state $\OML/cmm/m/it/10 s$ \OT1/cmtt/m/n/10 a
+nd all the actions.
+ []
+
+
+Overfull \hbox (11.27814pt too wide) in paragraph at lines 682--684
+\OT1/cmtt/m/n/10 In our experiments, since our $\OML/cmm/m/it/10 A$ \OT1/cmtt/m
+/n/10 matrix is small, we directly take its inverse to compute
+ []
+
+
+Overfull \hbox (56.27766pt too wide) in paragraph at lines 682--684
+\OT1/cmtt/m/n/10 the update direction, thereby bypassing the conjugate method. 
+Once we have the update direction,
+ []
+
+
+Overfull \hbox (20.46205pt too wide) in paragraph at lines 682--684
+\OT1/cmtt/m/n/10 we then compute the maximal stepsize $\OML/cmm/m/it/10 ^^L$ \O
+T1/cmtt/m/n/10 and perform an exponential backtracking line search
+ []
+
+! Undefined control sequence.
+l.686 ...imal Policy Optimization algorithm \citep
+                                                  {schulman2017proximal} sol...
+
+? 
+
+Overfull \hbox (56.27766pt too wide) in paragraph at lines 686--687
+\OT1/cmtt/m/n/10 The Proximal Policy Optimization algorithm schulman2017proxima
+l solves the following optimization
+ []
+
+[22]
+Overfull \hbox (9.02808pt too wide) in paragraph at lines 705--707
+\OT1/cmtt/m/n/10 The PPO gradient (Eq. []30[]) is exactly the same as the TRPO 
+gradient (Eq. []23[]) except for
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 705--707
+\OT1/cmtt/m/n/10 the additional condition on choosing only specific state-actio
+n pairs while calculating
+ []
+
+
+Overfull \hbox (3.77812pt too wide) in paragraph at lines 705--707
+\OT1/cmtt/m/n/10 the difference between advantage under the current policy and 
+the approximate change in
+ []
+
+
+Overfull \hbox (30.0279pt too wide) in paragraph at lines 709--710
+\OT1/cmtt/m/n/10 In this section, we calculate the second derivative of the MDP
+O constraint as given in Table
+ []
+
+
+Overfull \hbox (18.40347pt too wide) in paragraph at lines 709--710
+[]\OT1/cmtt/m/n/10 1[]. This will allow us compute the Hessian $\OML/cmm/m/it/1
+0 A[]$\OT1/cmtt/m/n/10 , which is the analog of the $\OML/cmm/m/it/10 A$ \OT1/c
+mtt/m/n/10 matrix from
+ []
+
+
+Overfull \hbox (35.27785pt too wide) in paragraph at lines 709--710
+\OT1/cmtt/m/n/10 TRPO implementation, and help us implement MDPO with a constra
+ined objective and line search. 
+ []
+
+
+Overfull \hbox (0.39516pt too wide) in paragraph at lines 717--719
+\OT1/cmtt/m/n/10 where we introduced an intermediate variable $\OML/cmm/m/it/10
+ T[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 s[]; a[]\OT1/cmr/m/n/10 ) := [] [] \OMS/c
+msy/m/n/10 ^^@ []\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 p[]\OT1/cmr/m/n/10 (\OMS/cms
+y/m/n/10 ^^Aj\OML/cmm/m/it/10 s[]\OT1/cmr/m/n/10 )\OMS/cmsy/m/n/10 k\OML/cmm/m/
+it/10 p[]\OT1/cmr/m/n/10 (\OMS/cmsy/m/n/10 ^^Aj\OML/cmm/m/it/10 s[]\OT1/cmr/m/n
+/10 )) +
+ []
+
+[23]
+Overfull \hbox (19.6297pt too wide) in paragraph at lines 745--747
+\OT1/cmtt/m/n/10 and $\OMS/cmsy/m/n/10 $ \OT1/cmtt/m/n/10 in the above equatio
+n represents the elementwise vector division defined as $\OT1/cmr/m/n/10 [\OML/
+cmm/m/it/10 a \OMS/cmsy/m/n/10  \OML/cmm/m/it/10 b\OT1/cmr/m/n/10 ][] :=
+ []
+
+
+Overfull \hbox (36.46718pt too wide) in paragraph at lines 745--747
+\OML/cmm/m/it/10 a[]=b[]$ \OT1/cmtt/m/n/10 for any two vectors $\OML/cmm/m/it/1
+0 a$ \OT1/cmtt/m/n/10 and $\OML/cmm/m/it/10 b$\OT1/cmtt/m/n/10 . As a sanity ch
+eck, note that the matrix $\OML/cmm/m/it/10 A[]$ \OT1/cmtt/m/n/10 is symmetric,
+
+ []
+
+
+Overfull \hbox (24.25156pt too wide) in paragraph at lines 761--762
+[]\OT1/cmtt/m/n/9 Beck, A., Teboulle, M. (2003). Mirror descent and nonlinear p
+rojected subgradient methods for convex
+ []
+
+
+Overfull \hbox (24.25156pt too wide) in paragraph at lines 765--766
+[]\OT1/cmtt/m/n/9 Schulman, J., Wolski, F., Dhariwal, P., Radford, A., Klimov, 
+O. (2017). Proximal policy optimization
+ []
+
+
+Overfull \hbox (62.05112pt too wide) in paragraph at lines 767--768
+[]\OT1/cmtt/m/n/9 Schulman, J., Levine, S., Abbeel, P., Jordan, M., Moritz, P. 
+(2015, June). Trust region policy optimization.
+ []
+
+
+Overfull \hbox (24.25163pt too wide) in paragraph at lines 769--770
+[]\OT1/cmtt/m/n/9 Tomar, M., Shani, L., Efroni, Y., Ghavamzadeh, M. (2020). Mir
+ror descent policy optimization. \OT1/cmtt/m/it/9 arXiv
+ []
+
+
+Overfull \hbox (0.62683pt too wide) in paragraph at lines 771--772
+[]\OT1/cmtt/m/n/9 Vaswani, S., Bachem, O., Totaro, S., Mueller, R., Geist, M., 
+Machado, M. C., Castro P. S., Roux,
+ []
+
+
+Overfull \hbox (43.43027pt too wide) in paragraph at lines 771--772
+\OT1/cmtt/m/n/9 N. L. (2021). A functional mirror ascent view of policy gradien
+t methods with function approximation.
+ []
+
+
+Overfull \hbox (43.15134pt too wide) in paragraph at lines 773--774
+[]\OT1/cmtt/m/n/9 Williams, R. J. (1992). Simple statistical gradient-following
+ algorithms for connectionist reinforcement
+ []
+
+[24] (./notes_fmapg.aux)
 
 LaTeX Warning: There were undefined references.
 
-Package rerunfilecheck Info: File `notes_fmapg.out' has not changed.
-(rerunfilecheck)             Checksum: 1207D79772820A543607D5850C6D3394;3673.
- ) 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `notes_fmapg.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `notes_fmapg.out':
+(rerunfilecheck)             Before: B4D2EBEC853C6C8F439E268ED5236756;3748
+(rerunfilecheck)             After:  092AE7A1C0CD3B5B4D6B9A27628A0250;7647.
+ )
+(\end occurred inside a group at level 3)
+
+### simple group (level 3) entered at line 154 ({)
+### simple group (level 2) entered at line 152 ({)
+### simple group (level 1) entered at line 74 ({)
+### bottom level 
 Here is how much of TeX's memory you used:
- 11779 strings out of 478994
- 173410 string characters out of 5858189
+ 11934 strings out of 478994
+ 175494 string characters out of 5858189
  652414 words of memory out of 5000000
- 28976 multiletter control sequences out of 15000+600000
- 413059 words of font info for 64 fonts, out of 8000000 for 9000
+ 29027 multiletter control sequences out of 15000+600000
+ 414136 words of font info for 70 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 71i,18n,75p,1448b,357s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
-}</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb>
-</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><
-/usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></
-usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></u
-sr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr
-/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/l
-ocal/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/loc
-al/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local
-/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/t
-exlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/tex
-live/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texliv
-e/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2
-021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2021
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2021/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2021/texmf
--dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2021/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2021/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2021/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2021/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2021/texmf-dist/fo
-nts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2021/texmf-dis
-t/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on notes_fmapg.pdf (12 pages, 606399 bytes).
+ 71i,18n,75p,1643b,601s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm
+-super-ts1.enc}</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmbx10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmbx12.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmbx8.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mex10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+itt10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+mi10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmm
+i5.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7
+.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.p
+fb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb
+></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><
+/usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></u
+sr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/
+local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/loc
+al/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/
+texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/tex
+live/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texl
+ive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texliv
+e/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/
+2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2
+021/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/202
+1/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb></usr/local/texlive/2021/
+texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2
+021/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
+Output written on notes_fmapg.pdf (24 pages, 573319 bytes).
 PDF statistics:
- 2491 PDF objects out of 2984 (max. 8388607)
- 1712 compressed objects within 18 object streams
- 82 named destinations out of 1000 (max. 500000)
- 128 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 2014 PDF objects out of 2073 (max. 8388607)
+ 1441 compressed objects within 15 object streams
+ 166 named destinations out of 1000 (max. 500000)
+ 136 words of extra memory for PDF output out of 10000 (max. 10000000)
 

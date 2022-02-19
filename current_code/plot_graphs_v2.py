@@ -9,74 +9,85 @@ color_dict = {'sPPO': 'blue', 'MDPO': 'red', 'PPO': 'green',
               'TRPO': 'orange', 'TRPO_KL': 'tab:purple',
               'TRPO_KL_LS': 'cyan'}
 linewidth = 1
-
-num_inner_loop_list = [10, 100, 1000] #, 10000]
+num_inner_loop_list = [10, 100, 1000]
 
 # inner lists
-eta_list = [2**i for i in range(-13, -4, 2)]
-delta_list =  [2**i for i in range(-13, +0, 2)] # [2**i for i in range(-24, 0, 2)] # 
+eta_list = [2**i for i in range(-13, -2, 1)]
+delta_list = [2**i for i in range(-24, +0, 2)] 
 epsilon_list = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]
 
 # outer lists
-alpha_list = [2**i for i in range(-13, 4, 1)] # [2**i for i in range(-13, 4, 1)]
-alpha_list_big = [2**i for i in range(-13, 4, 1)] # + [0.199, 0.2, 0.201]
+# alpha_list = [2**i for i in range(-13, -1, 1)] # for DeepSeaTreasure
+alpha_list = [2**i for i in range(-13, 4, 1)] # for CliffWorld
+alpha_list_big = [2**i for i in range(-13, 4, 1)] + [0.2]
 
-armijo_const_list = [0.0] # 0, 0.1, 0.5] #, 0.001, 0.01, 0.1, 0.5]
+armijo_const_list = [0.0, 0.1, 0.3, 0.5, 0.7, 0.9, 0.99]
 
-env_name = 'CliffWorld' # 'DeepSeaTreasure' # 
-pg_method = 'sPPO' #
+env_name = 'CliffWorld' #'DeepSeaTreasure' #   
 PLOT_TYPE = 'vpi_outer' # 'grad_jpi_outer' #
-
-if env_name == 'DeepSeaTreasure':
-    VSTAR = 0.9**3
-elif env_name == 'CliffWorld':
-    VSTAR = 0.9**6
-
-# num_outer_loop = 2000
-# FLAG_SAVE_INNER_STEPS = False
-# alpha_max = None # 100000.0 # 10.0 # 
-# FLAG_WARM_START = False
-# warm_start_factor = None # 2.0 # None
-# max_backtracking_steps = None # 1000 # 
-# optim_type = 'regularized' # 'constrained' # 
-# stepsize_type = 'fixed' # 'line_search' # 
-# alpha_fixed = None
-# decay_factor = None # 0.9 #
 
 num_outer_loop = 2000
 FLAG_SAVE_INNER_STEPS = False
-alpha_max = 10.0 # None # 100000.0 # 10.0 # 
+alpha_max = None 
 FLAG_WARM_START = False
-warm_start_factor = None # 2.0 # None
-max_backtracking_steps = 1000 # None # 
-optim_type = 'regularized' # 'constrained' # 
-stepsize_type = 'line_search' # 'line_search' # 
+warm_start_factor = None
+max_backtracking_steps = None
+optim_type = 'regularized'
+stepsize_type = 'fixed'
 alpha_fixed = None
-decay_factor = 0.9 # None # 
+decay_factor = None
 
 # num_outer_loop = 2000
 # FLAG_SAVE_INNER_STEPS = False
-# alpha_max = 100000.0 # None # 10.0 # 
-# FLAG_WARM_START = False # True # 
-# warm_start_factor = None # 2.0 # 
-# max_backtracking_steps = 1000 # None # 
-# optim_type = 'constrained' # 'regularized' # 
-# stepsize_type = 'line_search' # 'fixed' # 
+# alpha_max = 1.0 
+# FLAG_WARM_START = False
+# warm_start_factor = None
+# max_backtracking_steps = 1000
+# optim_type = 'regularized'
+# stepsize_type = 'line_search' 
 # alpha_fixed = None
-# decay_factor = 0.9 # None #
+# decay_factor = 0.9 
 
-folder_name = 'fmapg_DAT/{}_{}_{}_{}'.format(
-    env_name, pg_method, optim_type, stepsize_type)
+# num_outer_loop = 2000
+# FLAG_SAVE_INNER_STEPS = False
+# alpha_max = 10.0 
+# FLAG_WARM_START = True
+# warm_start_factor = 2.0 
+# max_backtracking_steps = 1000 
+# optim_type = 'regularized' 
+# stepsize_type = 'line_search'
+# alpha_fixed = None
+# decay_factor = 0.9
+
+# num_outer_loop = 2000
+# FLAG_SAVE_INNER_STEPS = False
+# alpha_max = 100000.0 
+# FLAG_WARM_START = False
+# warm_start_factor = None
+# max_backtracking_steps = 1000
+# optim_type = 'constrained'
+# stepsize_type = 'line_search'
+# alpha_fixed = None
+# decay_factor = 0.9
+# armijo_const_list = [0.0]
+
+if env_name == 'DeepSeaTreasure':
+    VSTAR = (-0.01 / 5) * (1 + 0.9 + 0.9**2) + 0.9**3
+elif env_name == 'CliffWorld':
+    VSTAR = 0.9**6
 
 num_cols = len(num_inner_loop_list)
 
+#======================================================================
+# Utility functions
+#======================================================================
 def plot_sensitivity(ax, num_inner_loop, pg_method, final_perf_idx=-1, 
                      plot_type=None, linewidth=1):
     assert plot_type in ['vpi_outer', 'grad_lpi_inner', 'grad_jpi_outer']
     
     c1 = np.array(mpl.colors.to_rgb(color_dict[pg_method]))
     c2 = np.array(mpl.colors.to_rgb('white'))
-
+    
     if optim_type == 'analytical':
         outer_list = [None]
     elif stepsize_type == 'fixed':
@@ -144,17 +155,13 @@ def plot_sensitivity(ax, num_inner_loop, pg_method, final_perf_idx=-1,
         elif plot_type == 'grad_jpi_outer':
             ax.set_yscale('log')
 
-        # box = ax.get_position()
-        # ax.set_position([box.x0, box.y0 + box.height * 0.1,
-        #                        box.width, box.height * 0.9])
     # if pg_method != 'TRPO':
     #     ax.invert_xaxis()
-
-
 
 def plot_sensitivity_best_alpha(ax, num_inner_loop, pg_method,
                                 final_perf_idx=-1,  plot_type=None,
                                 linewidth=1):
+    # plots the sensitivity plots for all the methods on a single plot
     assert plot_type == 'vpi_outer'
        
     if pg_method == 'PPO':
@@ -178,7 +185,8 @@ def plot_sensitivity_best_alpha(ax, num_inner_loop, pg_method,
             inner_list = [None]
         elif stepsize_type == 'fixed':
             # get rid of the weird kink in the sensitivity plot for sPPO
-            if pg_method == 'sPPO' and eta == 0.015625 and num_inner_loop == 10:
+            if (env_name == 'CliffWorld' and pg_method == 'sPPO'
+                and eta == 0.015625 and num_inner_loop == 10):
                 inner_list = alpha_list_big
             else:
                 inner_list = alpha_list
@@ -225,42 +233,10 @@ def plot_sensitivity_best_alpha(ax, num_inner_loop, pg_method,
     elif env_name == 'DeepSeaTreasure':
         ax.set_ylim([0, 0.75])
         
-    if optim_type != 'constrained':
-        ax.invert_xaxis()
+    ax.invert_xaxis()
     # if pg_method == 'TRPO':
     #     ax.invert_xaxis()
 
-#======================================================================
-# Plot sensitivity plots
-#======================================================================
-if optim_type == 'analytical':
-    num_inner_loop_list = [None]
-num_cols = len(num_inner_loop_list)
-fig, axs = plt.subplots(1, num_cols, sharey=True, figsize=(3 * num_cols, 1.7))
-final_perf_idx = -1
-for col, num_inner_loop in enumerate(num_inner_loop_list):
-    ax = axs[col] if num_cols > 1 else axs
-    
-    plot_sensitivity_best_alpha(
-        ax=ax, num_inner_loop=num_inner_loop, pg_method=pg_method,
-        final_perf_idx=final_perf_idx, plot_type=PLOT_TYPE,
-        linewidth=linewidth)
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.set_title('m={}'.format(num_inner_loop))
-
-    # if col == 2:
-    #     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.5),
-    #                     fancybox=True, shadow=True, ncol=6)
-ax = axs[0] if num_cols > 1 else axs
-# plt.show()
-plt.savefig('final_trpo_party/best_alpha/{}_{}_{}_{}_{}_sensitivity.pdf'.format(
-    env_name, pg_method, optim_type, stepsize_type, PLOT_TYPE))
-exit()
-
-#======================================================================
-# Plot best learning curves
-#======================================================================
 def find_best_param_config(folder_name, pg_method, num_inner_loop, 
                            optim_type, stepsize_type, decay_factor, alpha_max,
                            max_backtracking_steps, best_config_type,
@@ -281,11 +257,12 @@ def find_best_param_config(folder_name, pg_method, num_inner_loop,
         if pg_method == 'PPO':
             inner_list = epsilon_list
         elif optim_type == 'regularized':
-            # inner_list = eta_list
-            if pg_method == 'sPPO':
-                inner_list = [(1 - 0.9) / 101]
-            elif pg_method == 'MDPO':
-                inner_list = [(1 - 0.9)**3 / (2 * 0.9 * 4) * 101]
+            inner_list = eta_list
+            # # inner_list = eta_list
+            # if pg_method == 'sPPO':
+            #     inner_list = eta_list # [(1 - 0.9) / 101]
+            # elif pg_method == 'MDPO':
+            #     inner_list = eta_list # [(1 - 0.9)**3 / (2 * 0.9 * 4) / 101]
         elif optim_type == 'constrained':
             inner_list = delta_list
             
@@ -329,26 +306,61 @@ def find_best_param_config(folder_name, pg_method, num_inner_loop,
     return best_alpha_fixed, best_armijo_const, best_eta,\
         best_delta, best_epsilon
 
-num_inner_loop = 1000
-best_config_type = 'max_jpi' # 'min_grad_jpi' # 
-fig, axs = plt.subplots(1, 2, figsize=(3 * 2, 1.7))
+#======================================================================
+# Plot sensitivity plots
+#======================================================================
+if optim_type == 'analytical':
+    num_inner_loop_list = [None]
+num_cols = 4 # len(num_inner_loop_list)
+fig, axs = plt.subplots(1, num_cols, sharey=True, figsize=(4 * num_cols, 2))
+final_perf_idx = -1
 
-for pg_method in ['sPPO', 'MDPO', 'PPO']:
-    if pg_method == 'TRPO':
-        optim_type = 'constrained'
-        stepsize_type = 'line_search'
-        dcy_fac = decay_factor
-        alph_mx = alpha_max
-        mx_bkt_stps = max_backtracking_steps
-    else:
-        optim_type = 'regularized'
-        stepsize_type = 'fixed'
-        dcy_fac = None
-        alph_mx = None
-        mx_bkt_stps = None
+for pg_method in ['PPO']: #, 'sPPO', 'MDPO', 'TRPO']:    
+    folder_name = 'fmapg_DAT2/{}_{}_{}_{}'.format(
+        env_name, pg_method, optim_type, stepsize_type)
+    
+    for col, num_inner_loop in enumerate(num_inner_loop_list):
+        ax = axs[col] if num_cols > 1 else axs
 
-    folder_name = 'fmapg_DAT/CliffWorld_{}_{}_{}'.format(
-        pg_method, optim_type, stepsize_type)
+        plot_sensitivity_best_alpha(
+            ax=ax, num_inner_loop=num_inner_loop, pg_method=pg_method,
+            final_perf_idx=final_perf_idx, plot_type=PLOT_TYPE,
+            linewidth=linewidth)
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.set_title('m={}'.format(num_inner_loop))
+
+#======================================================================
+# Plot best learning curves
+#======================================================================
+num_inner_loop = 100
+best_config_type = 'max_jpi' # 'min_grad_jpi' #
+plotting_iter = -1
+
+for pg_method in ['PPO']: # ['sPPO', 'MDPO', 'TRPO']:
+    # if pg_method == 'TRPO':
+    #     optim_type = 'constrained'
+    #     stepsize_type = 'line_search'
+    #     dcy_fac = decay_factor
+    #     alph_mx = 100000.0
+    #     mx_bkt_stps = max_backtracking_steps
+    # else:
+    #     optim_type = 'regularized'
+    #     stepsize_type = 'fixed'
+    #     dcy_fac = None
+    #     alph_mx = None
+    #     mx_bkt_stps = None
+    
+    # dcy_fac = decay_factor if pg_method != 'TRPO' else 0.9
+    # alph_mx = alpha_max if pg_method != 'TRPO' else 100000.0
+    # mx_bkt_stps = max_backtracking_steps if pg_method != 'TRPO' else 1000
+
+    dcy_fac = decay_factor
+    alph_mx = alpha_max
+    mx_bkt_stps = max_backtracking_steps
+
+    folder_name = 'fmapg_DAT2/{}_{}_{}_{}'.format(
+        env_name, pg_method, optim_type, stepsize_type)
         
     best_alpha_fixed, best_armijo_const, best_eta, best_delta, best_epsilon = \
         find_best_param_config(
@@ -356,10 +368,12 @@ for pg_method in ['sPPO', 'MDPO', 'PPO']:
             num_inner_loop=num_inner_loop, optim_type=optim_type,
             stepsize_type=stepsize_type, decay_factor=dcy_fac,
             alpha_max=alph_mx, max_backtracking_steps=mx_bkt_stps,
-            best_config_type=best_config_type, final_perf_idx=-1)
+            best_config_type=best_config_type, final_perf_idx=plotting_iter)
     
-    print(pg_method, best_alpha_fixed, 'eta', best_eta, 'delta', best_delta,
-          'epsilon', best_epsilon)
+    print(pg_method,
+          'alpha', best_alpha_fixed, 'eta', best_eta,
+          'delta', best_delta, 'epsilon', best_epsilon,
+          'armijo_const', best_armijo_const)
 
     filename='{}/nmOtrLp_{}__nmInrLp_{}'\
         '__SvInrStps_{}__alphMx_{}__WrmStr_{}__wrmStrFac_{}'\
@@ -372,16 +386,19 @@ for pg_method in ['sPPO', 'MDPO', 'PPO']:
     with open(filename, 'r') as fp:
         dat = json.load(fp)
 
-    axs[0].plot(dat['vpi_outer_list'], color=color_dict[pg_method])
-    axs[1].plot(dat['grad_jpi_outer_list'], color=color_dict[pg_method])
+    axs[3].plot(dat['vpi_outer_list'][:plotting_iter],
+                color=color_dict[pg_method])
 
-    axs[0].set_ylim([-0.1, 0.6])
-    axs[1].set_yscale('log')
+    x_length = 2000 if plotting_iter == -1 else plotting_iter
+    axs[3].plot([VSTAR] * x_length,
+             color='black', linestyle=':', linewidth=0.5)
+    if env_name == 'CliffWorld':
+        axs[3].set_ylim([0, 0.6])
+    elif env_name == 'DeepSeaTreasure':
+        axs[3].set_ylim([0, 0.75])
 
-    axs[0].spines['right'].set_visible(False)
-    axs[0].spines['top'].set_visible(False)
-    axs[1].spines['right'].set_visible(False)
-    axs[1].spines['top'].set_visible(False)
+    axs[3].spines['right'].set_visible(False)
+    axs[3].spines['top'].set_visible(False)
 
 plt.savefig('{}_m{}_learning_curve.pdf'.format(
     best_config_type, num_inner_loop))
@@ -454,6 +471,11 @@ for row, alpha_fixed in enumerate(alpha_list):
 
 plt.savefig('{}__alpha_best_eta_min__grad_pi.png'.format(pg_method), dpi=150)
 exit()
+
+
+
+
+
 
 
 #======================================================================

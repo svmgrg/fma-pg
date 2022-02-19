@@ -308,11 +308,7 @@ def run_experiment(env, pg_method, num_outer_loop, num_inner_loop,
         J_pi_grad = dpi.reshape(-1, 1) * pi * adv
         grad_jpi_outer_list.append(np.linalg.norm(J_pi_grad))
 
-        # if np.linalg.norm(J_pi_grad) < 1e-16:
-        #     print('kill outside')
-        #     break
-        
-        print(T, np.linalg.norm(J_pi_grad))
+        # print(T, np.linalg.norm(J_pi_grad))
 
         vpi_outer_list.append(env.calc_vpi(pi, FLAG_RETURN_V_S0=True))
 
