@@ -1,6 +1,6 @@
-Code for empirically testing the FMA-PG framework.
+Code for the paper A general class of surrogate functions for stable and efficient reinforcement learning (https://arxiv.org/abs/2108.05828) published at AISTATS 2022.
 
-This code requires Numpy, Scipy, and Matplotlib to run.
+Runs exact (non-stochastic) tabular methods from the FMA-PG framework. This code requires Numpy, Scipy, and Matplotlib to run.
 
 The "current_code" folder contains the main code for running the tabular experiments given in the paper.
 - independent code for the CliffWorld and DeepSeaTreasure environments
