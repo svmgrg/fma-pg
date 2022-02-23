@@ -3,21 +3,7 @@ import copy
 import pdb
 
 #======================================================================
-# Saving the environment data from Simone's environment
-#----------------------------------------------------------------------
-# from src.envs.gridworld_mdp import cliff_gw
-# env = cliff_gw(gamma=0.99)
-# np.savez('cliff_world_env', P=env.P, r=env.R, mu=env.p0,
-#          terminal_states=env.terminal_states)
-# arr_dict = np.load('cliff_world_env.npz')
-# P_simone = arr_dict['P']
-# r_simone = arr_dict['r']
-# mu_simone = arr_dict['mu']
-# terminal_states_simone = [48]
-#======================================================================
-
-#======================================================================
-# Simplified CliffWorld (re-write)
+# Simplified CliffWorld
 #----------------------------------------------------------------------
 # -------------------         4 is the goal state
 # | 4 | 9 | 14 | 19 |         20 is terminal state reached only via the state 4
